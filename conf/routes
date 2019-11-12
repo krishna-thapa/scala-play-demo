@@ -11,3 +11,9 @@ GET     /message                    controllers.AsyncController.message
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(file)
+
+# Inspiration CRUD project endpoints
+GET     /inspiration                controllers.InspirationController.index
+POST    /inspiration                controllers.InspirationController.add
+PUT     /inspiration                controllers.InspirationController.update
+DELETE  /inspiration                controllers.InspirationController.delete(index: Int)
