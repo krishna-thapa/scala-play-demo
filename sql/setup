@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+# https://superuser.com/questions/1179844/what-does-dev-null-21-true-mean-in-linux
+createdb inspiration_db &> /dev/null || true
+psql -h localhost -U santosh -d inspiration_db -f dbsetup.sql
+
+#sbt clean compile
