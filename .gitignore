@@ -1,7 +1,8 @@
 logs
 target
-/.idea
-/.idea_modules
-/.classpath
-/.project
-/.settings
+.idea
+.idea_modules
+.classpath
+.project
+.settings
+.idea
