@@ -11,10 +11,10 @@ scalaVersion := "2.13.0"
 
 libraryDependencies ++= Seq(
   guice,
-  jdbc,
   "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test,
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "com.typesafe.play" %% "play-slick" % "4.0.2",
+  "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
   "com.h2database" % "h2" % "1.4.199")
 

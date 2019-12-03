@@ -1,5 +1,7 @@
 \c inspiration_db
 
+DROP TABLE "quotations" if exists;
+
 CREATE TABLE quotations(
   index serial,
   author varchar(255) NOT NULL,
