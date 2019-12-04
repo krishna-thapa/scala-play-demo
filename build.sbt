@@ -15,7 +15,9 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "com.typesafe.play" %% "play-slick" % "4.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
+  "com.byteslounge" %% "slick-repo" % "1.5.3",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
+  evolutions,
   "com.h2database" % "h2" % "1.4.199")
 
 // Adds additional packages into Twirl

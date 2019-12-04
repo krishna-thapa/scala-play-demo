@@ -31,11 +31,13 @@ class InspirationController @Inject()(
     )(QuotesQuery.apply)(QuotesQuery.unapply)
   }
 
-  def index(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  /**
+   * A REST endpoint that gets all the quotes as JSON.
+   */
+  def getQuotes(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     quotesQueryDAO.list().map { quoteQueries =>
-      Ok(quoteQueries.map(_.author))
+      Ok(Json.toJson(quoteQueries))
     }
-    //Ok(generateQuote(scala.util.Random.nextInt(10)))
   }
 
   /*def generateQuote(random: Int): String = {
