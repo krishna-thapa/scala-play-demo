@@ -7,8 +7,11 @@ case class QuotesQuery (
   quote: String,
   author: String,
   genre: String
-)
+) extends QuotesTable {
+
+  def hasGenre: Boolean = genre.trim.nonEmpty
+}
 
 object QuotesQuery {
-  implicit val quotesFormat: OFormat[QuotesQuery] = Json.format[QuotesQuery]
+  implicit lazy val quotesFormat: OFormat[QuotesQuery] = Json.format[QuotesQuery]
 }
