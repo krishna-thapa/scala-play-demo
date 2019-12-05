@@ -13,7 +13,8 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(file)
 
 # Inspiration CRUD project endpoints
-GET     /inspiration                controllers.InspirationController.getQuotes
-#POST    /inspiration                controllers.InspirationController.add
-#PUT     /inspiration                controllers.InspirationController.update
-#DELETE  /inspiration                controllers.InspirationController.delete(index: Int)
+GET      /quote                     controllers.InspirationController.getQuote
+GET      /quotes                    controllers.InspirationController.getQuotes
+#POST    /inspiration               controllers.InspirationController.add
+#PUT     /inspiration               controllers.InspirationController.update
+#DELETE  /inspiration               controllers.InspirationController.delete(index: Int)

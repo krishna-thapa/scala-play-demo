@@ -3,9 +3,10 @@ package models
 import play.api.libs.json._
 
 case class QuotesQuery (
-  index: Int,
+  id: Int,
+  quote: String,
   author: String,
-  quote: String
+  genre: String
 )
 
 object QuotesQuery {

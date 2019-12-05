@@ -6,5 +6,3 @@ set -e
 # shellcheck disable=SC2039
 createdb inspiration_db &> /dev/null || true
 psql -h localhost -U santosh -d inspiration_db -f ../data/dbsetup.sql
-
-#sbt clean compile

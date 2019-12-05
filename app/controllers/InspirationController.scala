@@ -25,27 +25,30 @@ class InspirationController @Inject()(
    */
   val quotesQueryForm: Form[QuotesQuery] = Form {
     mapping(
-      "index" -> number,
+      "id" -> number,
+      "quote" -> nonEmptyText.verifying(_.nonEmpty),
       "author" -> nonEmptyText,
-      "quote" -> nonEmptyText.verifying(_.nonEmpty)
+      "genre" -> text
     )(QuotesQuery.apply)(QuotesQuery.unapply)
   }
 
   /**
-   * A REST endpoint that gets all the quotes as JSON.
+   * A REST endpoint that gets a random quote as JSON.
    */
-  def getQuotes(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  def getQuote: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     quotesQueryDAO.list().map { quoteQueries =>
-      Ok(Json.toJson(quoteQueries))
+      val randomQuotes: QuotesQuery = quoteQueries(scala.util.Random.nextInt(quoteQueries.size))
+      Ok(Json.toJson(randomQuotes))
     }
   }
 
-  /*def generateQuote(random: Int): String = {
-    val x: Future[Seq[String]] = quotesQueryDAO.list().map { quote =>
-      quote.map {
-        q => q.author
-      }
+  /**
+   * A REST endpoint that gets first 100 quotes as JSON.
+   */
+  def getQuotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    quotesQueryDAO.list().map { quoteQueries =>
+      val first100Quotes: Seq[QuotesQuery] = quoteQueries.take(100)
+      Ok(Json.toJson(first100Quotes))
     }
-  }*/
-
+  }
 }
