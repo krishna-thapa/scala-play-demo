@@ -11,11 +11,7 @@ case class CustomQuotesQuery (
   genre: String,
   storedDate: Date,
   ownQuote: Boolean
-) extends QuotesTable {
-
-  def hasGenre: Boolean = genre.trim.nonEmpty
-
-}
+) extends QuotesTable
 
 object CustomQuotesQuery {
   implicit lazy val customerQuotesFormat: OFormat[CustomQuotesQuery] = Json.format[CustomQuotesQuery]

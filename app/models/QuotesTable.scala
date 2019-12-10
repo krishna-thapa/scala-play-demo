@@ -10,4 +10,6 @@ trait QuotesTable {
 
   val genre: String
 
+  def hasGenre: Boolean = genre.trim.nonEmpty
+
 }
