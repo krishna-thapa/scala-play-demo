@@ -59,7 +59,15 @@ class InspirationController @Inject()(
     customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
   }
 
-  def addCustomQuote(): Action[AnyContent] = Action.async {implicit request: Request[AnyContent] =>
+  def getRandomCustomQuote: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    customerQuotesDAO.listRandomQuote().map(quote => Ok(Json.toJson(quote)))
+  }
+
+  def getSelectedQuote(id: Int): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    customerQuotesDAO.listSelectedQuote(id).map(quote => Ok(Json.toJson(quote)))
+  }
+
+  def addCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     quotesQueryForm.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(Ok("error" + formWithErrors))
@@ -70,5 +78,10 @@ class InspirationController @Inject()(
         }
       }
     )
+  }
+
+  def deleteCustomQuote(id: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    customerQuotesDAO.deleteQuote(id)
+    Ok(s"Successfully delete entry $id")
   }
 }

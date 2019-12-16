@@ -44,7 +44,30 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
    */
   private val customQuoteQueries = TableQuery[CustomQuotesQueriesTable]
 
+  /**
+   * List all the records from the table
+   * @returnn sequence of the CustomQuotesQuery records
+   */
   def listCustomQuotes(): Future[Seq[CustomQuotesQuery]] = db.run(customQuoteQueries.result)
+
+  /**
+   * List the JSON format of the selected record from the table
+   * @param id
+   * @return Option of the CustomQuotesQuery record
+   */
+  def listSelectedQuote(id: Int): Future[Option[CustomQuotesQuery]] = {
+    db.run(customQuoteQueries.filter(_.id === id).result.headOption)
+  }
+
+  /**
+   * Defined custom function for slick 3
+   * aware that "random" function is database specific
+   * @return Option of CustomQuotesQuery
+   */
+  def listRandomQuote(): Future[Option[CustomQuotesQuery]] = {
+    val randomFunction = SimpleFunction.nullary[Double]("random")
+    db.run(customQuoteQueries.sortBy(x => randomFunction).result.headOption)
+  }
 
   /**
    * Create a customQuotes in the table.
@@ -57,6 +80,10 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
      += customQuotes).map { id => customQuotes.copy(id = id) }
   }
 
+  /**
+   * Delete the record from the table
+   * @param id of the selected row from the CustomQuotesQuery table
+   */
   def deleteQuote(id: Int): Unit = {
     db.run(customQuoteQueries.filter(_.id === id).delete)
   }

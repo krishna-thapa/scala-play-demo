@@ -15,8 +15,15 @@ GET     /assets/*file               controllers.Assets.versioned(file)
 # Inspiration CRUD project endpoints
 GET      /randomQuote               controllers.InspirationController.getRandomQuote
 GET      /10quotes                  controllers.InspirationController.getFirst10Quotes
-GET      /customQuotes              controllers.InspirationController.getCustomQuotes
-POST     /addQuote                  controllers.InspirationController.addCustomQuote
+
+# CRUD operation endpoints for the custom table "custom_quotations"
+GET         /customQuotes           controllers.InspirationController.getCustomQuotes
+GET         /randomCustomQuote      controllers.InspirationController.getRandomCustomQuote
+GET         /selectedQuote/:id      controllers.InspirationController.getSelectedQuote(id: Int)
+POST        /customQuote            controllers.InspirationController.addCustomQuote
+DELETE      /customQuote/:id        controllers.InspirationController.deleteCustomQuote(id: Int)
+
+
 #POST    /inspiration               controllers.InspirationController.add
 #PUT     /inspiration               controllers.InspirationController.update
 #DELETE  /inspiration               controllers.InspirationController.delete(index: Int)
