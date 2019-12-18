@@ -70,10 +70,23 @@ class InspirationController @Inject()(
   def addCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     quotesQueryForm.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(Ok("error" + formWithErrors))
+          Future.successful(BadRequest("error" + formWithErrors))
         },
       customQuote => {
         customerQuotesDAO.createQuote(customQuote.copy(storedDate = new java.sql.Date(System.currentTimeMillis()))).map { _ =>
+          Redirect(routes.InspirationController.getCustomQuotes())
+        }
+      }
+    )
+  }
+
+  def updateCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    quotesQueryForm.bindFromRequest.fold(
+      formWithErrors => {
+        Future.successful(BadRequest("error" + formWithErrors))
+      },
+      customQuote => {
+        customerQuotesDAO.updateQuote(customQuote).map { _ =>
           Redirect(routes.InspirationController.getCustomQuotes())
         }
       }

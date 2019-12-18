@@ -46,9 +46,9 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
 
   /**
    * List all the records from the table
-   * @returnn sequence of the CustomQuotesQuery records
+   * @return sequence of the CustomQuotesQuery records
    */
-  def listCustomQuotes(): Future[Seq[CustomQuotesQuery]] = db.run(customQuoteQueries.result)
+  def listCustomQuotes(): Future[Seq[CustomQuotesQuery]] = db.run(customQuoteQueries.sortBy(_.id).result)
 
   /**
    * List the JSON format of the selected record from the table
@@ -75,11 +75,15 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
    * This is an asynchronous operation, it will return a future of the created customQuotes,
    * which can be used to obtain the id for that person.
    */
-  def createQuote(customQuotes: CustomQuotesQuery): Future[CustomQuotesQuery] = {
+  def createQuote(customQuote: CustomQuotesQuery): Future[CustomQuotesQuery] = {
     db.run(customQuoteQueries returning customQuoteQueries.map(_.id)
-     += customQuotes).map { id => customQuotes.copy(id = id) }
+     += customQuote).map { id => customQuote.copy(id = id) }
   }
 
+  def updateQuote(customQuote: CustomQuotesQuery): Future[Int] = {
+    db.run(customQuoteQueries.filter(_.id === customQuote.id).map( quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
+    .update(customQuote.quote, customQuote.author, customQuote.genre, customQuote.ownQuote))
+  }
   /**
    * Delete the record from the table
    * @param id of the selected row from the CustomQuotesQuery table

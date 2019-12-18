@@ -22,7 +22,7 @@ GET         /randomCustomQuote      controllers.InspirationController.getRandomC
 GET         /selectedQuote/:id      controllers.InspirationController.getSelectedQuote(id: Int)
 POST        /customQuote            controllers.InspirationController.addCustomQuote
 DELETE      /customQuote/:id        controllers.InspirationController.deleteCustomQuote(id: Int)
-
+PUT         /customQuote            controllers.InspirationController.updateCustomQuote
 
 #POST    /inspiration               controllers.InspirationController.add
 #PUT     /inspiration               controllers.InspirationController.update
