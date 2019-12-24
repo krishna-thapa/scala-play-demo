@@ -32,8 +32,8 @@ GET      /firstTen             controllers.CSVQueryController.getFirst10Quotes
 #      in: "path"
 #      description: "Genre of the quote"
 #      required: true
-#      schema:
-#        $ref: '#/definitions/models.Genre'
+#      type: "string"
+#      enum: ["love", "freedom", "famous", "romantic", "sad"]
 #  responses:
 #    200:
 #      schema:
