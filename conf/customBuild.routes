@@ -1,0 +1,117 @@
+# An example controller showing how to use dependency injection
+# Protecting against Cross Site Request Forgery: https://www.playframework.com/documentation/2.8.x/ScalaCsrf
+# disable the CSRF filter for a specific route in the routes file. To do this, add the 'nocsrf' modifier tag before your route
+
+###
+#  summary: Get all the quotes from a custom build quote table
+#  tags:
+#    - Custom Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+###
+GET         /all            controllers.CustomQueryController.getCustomQuotes
+
+###
+#  summary: Get a random quote from a custom build quote table
+#  tags:
+#    - Custom Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+###
+GET         /random         controllers.CustomQueryController.getRandomCustomQuote
+
+###
+#  summary: Get a selected quote from a custom build quote table
+#  tags:
+#    - Custom Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+###
+GET         /:id            controllers.CustomQueryController.getSelectedQuote(id: Int)
+
+###
+#  summary: Crete a new custom quote to the table
+#  description: "This can only be done by the logged in user."
+#  tags:
+#    - Custom Query table
+#  parameters:
+#    - name: body
+#      in: body
+#      required: true
+#      description: Create a new Quote
+#      schema:
+#        $ref: '#/definitions/models.CustomQuoteForm'
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+###
++ nocsrf
+POST        /               controllers.CustomQueryController.addCustomQuote
+
+###
+#  summary: Delete a selected quote from a custom build quote table
+#  description: "This can only be done by the logged in user."
+#  tags:
+#    - Custom Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+###
++ nocsrf
+DELETE      /:id            controllers.CustomQueryController.deleteCustomQuote(id: Int)
+
+###
+#  summary: Update a existing custom quote record in the table
+#  description: "This can only be done by the logged in user."
+#  tags:
+#    - Custom Query table
+#  parameters:
+#    - name: "id"
+#      in: "path"
+#      description: "ID of quote that needs to be updated"
+#      required: true
+#      type: "integer"
+#      format: "int64"
+#    - name: "quote"
+#      in: "formData"
+#      description: "Custom quote"
+#      required: true
+#      type: "string"
+#    - name: "author"
+#      in: "formData"
+#      description: "Author of the quote"
+#      required: true
+#      type: "string"
+#    - name: "genre"
+#      in: "formData"
+#      description: "Genre of the quote"
+#      required: true
+#      type: "string"
+#    - name: "ownquote"
+#      in: "formData"
+#      description: "Is it custom made quote"
+#      required: true
+#      type: "boolean"
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/models.CustomQuotesQuery'
+#    400:
+#      description: "Invalid ID supplied"
+#    404:
+#      description: "Pet not found"
+#    405:
+#      description: "Validation exception"
+###
++ nocsrf
+PUT         /:id            controllers.CustomQueryController.updateCustomQuote(id: Int)

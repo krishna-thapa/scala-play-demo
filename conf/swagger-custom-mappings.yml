@@ -1,0 +1,12 @@
+# To override any of the automatically generated field, you just need to
+# write the same part in your comment or base swagger spec file.
+---
+- type: java\.sql\.Date
+  specAsParameter:
+    - type: string
+      format: date
+# Below is an example to replace java Duration with user defined object of Duration
+- type: java\.time\.Duration
+  specAsParameter: []   #this hides the type from query and path parameter
+  specAsProperty:
+    $ref: "#/definitions/Duration"

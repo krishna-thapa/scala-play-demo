@@ -1,0 +1,9 @@
+---
+swagger: "2.0"
+info:
+  title: "Inspirations-Quotes-API"
+  description: "API for the inspirational quotes project"
+consumes:
+  - application/json
+produces:
+  - application/json

@@ -3,7 +3,7 @@ package daos
 import java.sql.Date
 
 import javax.inject.{Inject, Singleton}
-import models.CustomQuotesQuery
+import models.{CustomQuoteForm, CustomQuotesQuery}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
@@ -33,9 +33,9 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
     def quote: Rep[String] = column[String]("quote")
     def author: Rep[String] = column[String]("author")
     def genre: Rep[String] = column[String]("genre")
-    def storedDate: Rep[Date] = column[Date]("storeddate")
-    def ownQuote: Rep[Boolean] = column[Boolean]("ownquote")
-    def * : ProvenShape[CustomQuotesQuery] = (id, quote, author, genre, storedDate, ownQuote) <>
+    def storeddate: Rep[Date] = column[Date]("storeddate")
+    def ownquote: Rep[Boolean] = column[Boolean]("ownquote")
+    def * : ProvenShape[CustomQuotesQuery] = (id, quote, author, genre, storeddate, ownquote) <>
       ((CustomQuotesQuery.apply _).tupled, CustomQuotesQuery.unapply)
   }
 
@@ -75,14 +75,17 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
    * This is an asynchronous operation, it will return a future of the created customQuotes,
    * which can be used to obtain the id for that person.
    */
-  def createQuote(customQuote: CustomQuotesQuery): Future[CustomQuotesQuery] = {
-    db.run(customQuoteQueries returning customQuoteQueries.map(_.id)
-     += customQuote).map { id => customQuote.copy(id = id) }
+  def createQuote(customQuote: CustomQuoteForm): Future[CustomQuotesQuery] = {
+    val currentDate = new java.sql.Date(System.currentTimeMillis())
+    val insertQuery = customQuoteQueries returning customQuoteQueries.map(_.id) into ((fields, id) => fields.copy(id = id))
+    val action = insertQuery += CustomQuotesQuery(0, customQuote.quote, customQuote.author, customQuote.genre, currentDate, customQuote.ownquote)
+    db.run(action)
   }
 
-  def updateQuote(customQuote: CustomQuotesQuery): Future[Int] = {
-    db.run(customQuoteQueries.filter(_.id === customQuote.id).map( quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
-    .update(customQuote.quote, customQuote.author, customQuote.genre, customQuote.ownQuote))
+  // return number of records get updated
+  def updateQuote(id:Int, customQuote: CustomQuoteForm): Future[Int] = {
+    db.run(customQuoteQueries.filter(_.id === id).map( quote => (quote.quote, quote.author, quote.genre, quote.ownquote))
+    .update(customQuote.quote, customQuote.author, customQuote.genre, customQuote.ownquote))
   }
   /**
    * Delete the record from the table

@@ -46,7 +46,12 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   /**
    * The starting point for all queries on the quotations table.
    */
-  private val QuoteQueries = TableQuery[CSVQuoteQueriesTable]
+  private val CSVQuoteQueries = TableQuery[CSVQuoteQueriesTable]
 
-  def listAllQuotes(): Future[Seq[CSVQuotesQuery]] = db.run(QuoteQueries.result)
+  def listAllQuotes(): Future[Seq[CSVQuotesQuery]] = db.run(CSVQuoteQueries.result)
+
+  def getGenreQuote(genre: String): Future[Option[CSVQuotesQuery]] = {
+    val randomFunction = SimpleFunction.nullary[Double]("random")
+    db.run(CSVQuoteQueries.filter(_.genre === genre).sortBy(x => randomFunction).result.headOption)
+  }
 }

@@ -9,8 +9,8 @@ case class CustomQuotesQuery (
   quote: String,
   author: String,
   genre: String,
-  storedDate: Date,
-  ownQuote: Boolean
+  storeddate: Date,
+  ownquote: Boolean
 ) extends QuotesTable
 
 object CustomQuotesQuery {

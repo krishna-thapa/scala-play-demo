@@ -1,0 +1,42 @@
+# An example controller showing how to use dependency injection
+
+###
+#  summary: Get a random quote from a csv build quotation table
+#  tags:
+#    - CSV Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CSVQuotesQuery'
+###
+GET      /random               controllers.CSVQueryController.getRandomQuote
+
+###
+#  summary: Get a random quote from a csv build quotation table
+#  tags:
+#    - CSV Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CSVQuotesQuery'
+###
+GET      /firstTen             controllers.CSVQueryController.getFirst10Quotes
+
+###
+#  summary: Get a genre selected random quote from a csv build quotation table
+#  description: "Only the hard-coded genre should be used"
+#  tags:
+#    - CSV Query table
+#  parameters:
+#    - name: "genre"
+#      in: "path"
+#      description: "Genre of the quote"
+#      required: true
+#      schema:
+#        $ref: '#/definitions/models.Genre'
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CSVQuotesQuery'
+###
+GET      /:genre                controllers.CSVQueryController.getGenreQuote(genre: String)

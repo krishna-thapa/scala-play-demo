@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "swagger-ui" % "2.2.0"  //play-swagger ui integration
 )
 
+//add domain package names for play-swagger to auto generate swagger definitions for domain classes mentioned in your routes
 swaggerDomainNameSpaces := Seq("models")
 
 // Adds additional packages into Twirl
