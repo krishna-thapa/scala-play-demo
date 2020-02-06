@@ -9,7 +9,7 @@
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /random               controllers.CSVQueryController.getRandomQuote
+GET      /random               controllers.CSV.CSVQueryController.getRandomQuote
 
 ###
 #  summary: Get a random quote from a csv build quotation table
@@ -20,7 +20,7 @@ GET      /random               controllers.CSVQueryController.getRandomQuote
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /firstTen             controllers.CSVQueryController.getFirst10Quotes
+GET      /firstTen             controllers.CSV.CSVQueryController.getFirst10Quotes
 
 ###
 #  summary: Get a genre selected random quote from a csv build quotation table
@@ -39,4 +39,4 @@ GET      /firstTen             controllers.CSVQueryController.getFirst10Quotes
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /:genre                controllers.CSVQueryController.getGenreQuote(genre: String)
+GET      /:genre                controllers.CSV.CSVQueryController.getGenreQuote(genre: String)

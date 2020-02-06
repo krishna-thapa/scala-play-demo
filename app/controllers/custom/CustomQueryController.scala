@@ -1,4 +1,4 @@
-package controllers
+package controllers.custom
 
 import daos.CustomQuotesQueryDAO
 import javax.inject.{Inject, Singleton}

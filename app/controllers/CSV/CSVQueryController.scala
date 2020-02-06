@@ -1,4 +1,4 @@
-package controllers
+package controllers.CSV
 
 import daos.{CSVQuotesQueryDAO, CustomQuotesQueryDAO}
 import javax.inject._

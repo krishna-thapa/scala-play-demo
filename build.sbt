@@ -1,3 +1,5 @@
+import com.sun.xml.internal.bind.v2.TODO
+
 name := """inspirational-quote-api"""
 organization := "com.krishna"
 
@@ -33,9 +35,13 @@ swaggerDomainNameSpaces := Seq("models")
 scalacOptions ++= Seq(
   "-feature",
   "-deprecation",
-  "-Xfatal-warnings"
+  "-Xfatal-warnings",
+  // Enable routes file splitting
+  "-language:reflectiveCalls"
 )
 
+
+//TODO: this below codes
 // No need to run tests while building jar
 test in assembly := {}
 // Simple and constant jar name

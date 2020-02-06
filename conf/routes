@@ -2,18 +2,18 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# CSV build endpoints for the table "csv_quotations"
+->      /csvQuote                   csvBuild.Routes
+
+# CRUD operation endpoints for the custom table "custom_quotations"
+->      /customQuote                customBuild.Routes
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
 GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
-
-# CSV build endpoints for the table "csv_quotations"
-->      /csvQuote                   csvBuild.Routes
-
-# CRUD operation endpoints for the custom table "custom_quotations"
-->      /customQuote                customBuild.Routes
 
 ### NoDocs ###
 GET   /docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
