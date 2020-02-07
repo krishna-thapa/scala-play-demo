@@ -1,12 +1,14 @@
 package daos
 
-import javax.inject.{ Inject, Singleton }
-import models.CSVQuotesQuery
+import javax.inject.{Inject, Singleton}
+import models.{CSVQuotesQuery, Genre}
+import models.Genre.Genre
 import play.api.db.slick.DatabaseConfigProvider
+import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A repository for Quotes stored in quotations table.
@@ -23,6 +25,8 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   import dbConfig._
   import profile.api._
 
+  implicit val genreEnumMapper: BaseTypedType[Genre.Value] = MappedColumnType.base[Genre, String](_.toString, Genre.withName)
+
   /**
   * Here we define the table. It will have a quotations
   */
@@ -30,7 +34,7 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def quote: Rep[String] = column[String]("quote")
     def author: Rep[String] = column[String]("author")
-    def genre: Rep[String] = column[String]("genre")
+    def genre: Rep[Genre] = column[Genre]("genre")
 
     /**
      * This is the tables default "projection".
@@ -52,6 +56,7 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
 
   def getGenreQuote(genre: String): Future[Option[CSVQuotesQuery]] = {
     val randomFunction = SimpleFunction.nullary[Double]("random")
-    db.run(CSVQuoteQueries.filter(_.genre === genre).sortBy(x => randomFunction).result.headOption)
+    // db.run(CSVQuoteQueries.filter(_.genre.toString === genre).sortBy(x => randomFunction).result.headOption)
+    db.run(CSVQuoteQueries.sortBy(x => randomFunction).result.headOption)
   }
 }

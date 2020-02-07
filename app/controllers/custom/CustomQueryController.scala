@@ -2,8 +2,9 @@ package controllers.custom
 
 import daos.CustomQuotesQueryDAO
 import javax.inject.{Inject, Singleton}
-import models.CustomQuoteForm
-import play.api.data.Form
+import models.Genre.Genre
+import models.{CustomQuoteForm, Genre}
+import play.api.data.{Form, Forms}
 import play.api.data.Forms._
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -23,7 +24,7 @@ class CustomQueryController @Inject()(
     mapping(
       "quote" -> nonEmptyText.verifying(_.nonEmpty),
       "author" -> nonEmptyText,
-      "genre" -> text,
+      "genre" -> Forms.of[Genre],
       "ownquote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }

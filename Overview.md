@@ -1,5 +1,7 @@
 # Over-view of the project
 
+## Markdown Cheatsheet
+- https://github.com/tchapi/markdown-cheatsheet
 ## Technologies/libraries used so far
 - Scala as back-end programming language
 - SBT
@@ -27,3 +29,6 @@
 ## Major issues faces so far
 - Splitted routes are not recompiled: https://stackoverflow.com/questions/55289199/the-generated-route-files-of-play-framework-are-re-generated-automatically-even
 - Disable the CSRF filter for a specific route in the routes file: add the nocsrf modifier tag before your route (for POST, PUT and DELETE)
+- Use of enumeration with slick in play framework
+    - Update a column with type enumeration using play-slick: Need to define the custom column type: https://stackoverflow.com/questions/47944361/play-slick-updating-enumeration-column
+    - Implement an implicit Writes or Format for a case class including an Enumeration: https://github.com/jethrogillgren/play-samples/blob/workingversion/play-scala-hello-world-tutorial/app/models/Search.scala

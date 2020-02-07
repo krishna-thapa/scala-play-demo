@@ -1,13 +1,15 @@
 package models
 
+import models.Genre.Genre
+
 trait QuotesTable {
 
   val quote: String
 
   val author: String
 
-  val genre: String
+  val genre: Genre
 
-  def hasGenre: Boolean = genre.trim.nonEmpty
+  //def hasGenre: Boolean = genre
 
 }

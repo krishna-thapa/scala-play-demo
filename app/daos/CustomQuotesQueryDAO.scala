@@ -3,8 +3,10 @@ package daos
 import java.sql.Date
 
 import javax.inject.{Inject, Singleton}
-import models.{CustomQuoteForm, CustomQuotesQuery}
+import models.Genre.Genre
+import models.{CustomQuoteForm, CustomQuotesQuery, Genre}
 import play.api.db.slick.DatabaseConfigProvider
+import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
@@ -27,12 +29,14 @@ class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
   import dbConfig._
   import profile.api._
 
+  implicit val genreEnumMapper: BaseTypedType[Genre.Value] = MappedColumnType.base[Genre, String](_.toString, Genre.withName)
+
   private class CustomQuotesQueriesTable(tag: Tag) extends Table[CustomQuotesQuery](tag, "custom_quotations") {
 
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def quote: Rep[String] = column[String]("quote")
     def author: Rep[String] = column[String]("author")
-    def genre: Rep[String] = column[String]("genre")
+    def genre: Rep[Genre] = column[Genre]("genre")
     def storeddate: Rep[Date] = column[Date]("storeddate")
     def ownquote: Rep[Boolean] = column[Boolean]("ownquote")
     def * : ProvenShape[CustomQuotesQuery] = (id, quote, author, genre, storeddate, ownquote) <>

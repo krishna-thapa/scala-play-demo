@@ -1,12 +1,13 @@
 package models
 
+import models.Genre.Genre
 import play.api.libs.json._
 
 case class CSVQuotesQuery(
   id: Int,
   quote: String,
   author: String,
-  genre: String
+  genre: Genre
 ) extends QuotesTable
 
 object CSVQuotesQuery {
