@@ -13,8 +13,8 @@ abstract class GenericEnum extends Enumeration {
     override val format = Some(("format.enum", Nil))
 
     override def bind(
-      key: String,
-      data: Map[String, String]
+        key: String,
+        data: Map[String, String]
     ): Either[Seq[FormError], Value] = {
       try {
         Right(GenericEnum.this.withName(data.get(key).head))

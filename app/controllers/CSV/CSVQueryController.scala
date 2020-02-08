@@ -14,10 +14,10 @@ import scala.concurrent.ExecutionContext
   * application's home page.
   */
 @Singleton
-class CSVQueryController @Inject()(
-  cc: ControllerComponents,
-  csvQuotesDAO: CSVQuotesQueryDAO,
-  customerQuotesDAO: CustomQuotesQueryDAO
+class CSVQueryController @Inject() (
+    cc: ControllerComponents,
+    csvQuotesDAO: CSVQuotesQueryDAO,
+    customerQuotesDAO: CustomQuotesQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc) {
 

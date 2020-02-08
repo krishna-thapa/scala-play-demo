@@ -12,9 +12,9 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CustomQueryController @Inject()(
-  cc: ControllerComponents,
-  customerQuotesDAO: CustomQuotesQueryDAO
+class CustomQueryController @Inject() (
+    cc: ControllerComponents,
+    customerQuotesDAO: CustomQuotesQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc) {
 
@@ -53,24 +53,30 @@ class CustomQueryController @Inject()(
 
   def addCustomQuote(): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
-      quotesQueryForm.bindFromRequest.fold(formWithErrors => {
-        Future.successful(BadRequest("error" + formWithErrors))
-      }, customQuote => {
-        customerQuotesDAO.createQuote(customQuote).map { _ =>
-          Redirect(routes.CustomQueryController.getCustomQuotes())
+      quotesQueryForm.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest("error" + formWithErrors))
+        },
+        customQuote => {
+          customerQuotesDAO.createQuote(customQuote).map { _ =>
+            Redirect(routes.CustomQueryController.getCustomQuotes())
+          }
         }
-      })
+      )
   }
 
   def updateCustomQuote(id: Int): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
-      quotesQueryForm.bindFromRequest.fold(formWithErrors => {
-        Future.successful(BadRequest("error" + formWithErrors))
-      }, customQuote => {
-        customerQuotesDAO.updateQuote(id, customQuote).map { _ =>
-          Redirect(routes.CustomQueryController.getCustomQuotes())
+      quotesQueryForm.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest("error" + formWithErrors))
+        },
+        customQuote => {
+          customerQuotesDAO.updateQuote(id, customQuote).map { _ =>
+            Redirect(routes.CustomQueryController.getCustomQuotes())
+          }
         }
-      })
+      )
   }
 
   def deleteCustomQuote(id: Int): Action[AnyContent] = Action {

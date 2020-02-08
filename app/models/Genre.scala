@@ -1,5 +1,6 @@
 package models
 
+// format: off
 object Genre extends GenericEnum {
 
   type Genre = Value

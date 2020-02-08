@@ -62,7 +62,7 @@ class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
 
   /**
     * List the JSON format of the selected record from the table
-    * @param id
+    * @param id quote id
     * @return Option of the CustomQuotesQuery record
     */
   def listSelectedQuote(id: Int): Future[Option[CustomQuotesQuery]] = {

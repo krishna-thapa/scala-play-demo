@@ -17,8 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * We want the JdbcProfile for this provider
   */
 @Singleton
-class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
-  implicit executionContext: ExecutionContext
+class CSVQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
+    implicit executionContext: ExecutionContext
 ) {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
