@@ -33,10 +33,10 @@ GET      /firstTen             controllers.CSV.CSVQueryController.getFirst10Quot
 #      description: "Genre of the quote"
 #      required: true
 #      type: "string"
-#      enum: ["love", "freedom", "famous", "romantic", "sad"]
+#      enum: ["love", "freedom", "famous", "romantic", "sad", "demo"]
 #  responses:
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /:genre                controllers.CSV.CSVQueryController.getGenreQuote(genre: String)
+GET      /:genre                controllers.CSV.CSVQueryController.getGenreQuote(genre: models.Genre.Value)

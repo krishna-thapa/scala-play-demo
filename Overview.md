@@ -2,6 +2,7 @@
 
 ## Markdown Cheatsheet
 - https://github.com/tchapi/markdown-cheatsheet
+
 ## Technologies/libraries used so far
 - Scala as back-end programming language
 - SBT
@@ -23,8 +24,11 @@
 - AWS services implementation
 
 ## Tickets to do
-- Make genre as enum 
+- Make genre as enum (http requests not working atm)
 - Make genre enum as list of genre
+- Make genre as option to hold empty 
+- Docker compose
+- fix id issue that should start from 1 when table is dropped
 
 ## Major issues faces so far
 - Splitted routes are not recompiled: https://stackoverflow.com/questions/55289199/the-generated-route-files-of-play-framework-are-re-generated-automatically-even

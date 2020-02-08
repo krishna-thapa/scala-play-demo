@@ -25,7 +25,10 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   import dbConfig._
   import profile.api._
 
-  implicit val genreEnumMapper: BaseTypedType[Genre.Value] = MappedColumnType.base[Genre, String](_.toString, Genre.withName)
+  implicit val genreEnumMapper: BaseTypedType[Genre.Value] = MappedColumnType.base[Genre, String](
+    { genre => genre.toString },
+    { string => Genre.withName(string)}
+  )
 
   /**
   * Here we define the table. It will have a quotations
@@ -54,9 +57,9 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
 
   def listAllQuotes(): Future[Seq[CSVQuotesQuery]] = db.run(CSVQuoteQueries.result)
 
-  def getGenreQuote(genre: String): Future[Option[CSVQuotesQuery]] = {
+  def getGenreQuote(genre: Genre): Future[Option[CSVQuotesQuery]] = {
     val randomFunction = SimpleFunction.nullary[Double]("random")
-    // db.run(CSVQuoteQueries.filter(_.genre.toString === genre).sortBy(x => randomFunction).result.headOption)
-    db.run(CSVQuoteQueries.sortBy(x => randomFunction).result.headOption)
+     db.run(CSVQuoteQueries.filter(_.genre === genre).sortBy(x => randomFunction).result.headOption)
+    //db.run(CSVQuoteQueries.sortBy(x => randomFunction).result.headOption)
   }
 }

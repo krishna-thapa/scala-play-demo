@@ -3,6 +3,7 @@ package controllers.CSV
 import daos.{CSVQuotesQueryDAO, CustomQuotesQueryDAO}
 import javax.inject._
 import models.CSVQuotesQuery
+import models.Genre.Genre
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -38,7 +39,7 @@ class CSVQueryController @Inject()(
     }
   }
 
-  def getGenreQuote(genre: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  def getGenreQuote(genre: Genre): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     csvQuotesDAO.getGenreQuote(genre).map {
       case Some(quote) => Ok(Json.toJson(quote))
       case None => NotFound(s"Database is empty with that genre!")
