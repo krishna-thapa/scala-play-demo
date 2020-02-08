@@ -15,11 +15,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class CustomQueryController @Inject()(
   cc: ControllerComponents,
   customerQuotesDAO: CustomQuotesQueryDAO
-)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+)(implicit executionContext: ExecutionContext)
+    extends AbstractController(cc) {
 
   /**
-   * The mapping for the QuotesQuery form.
-   */
+    * The mapping for the QuotesQuery form.
+    */
   val quotesQueryForm: Form[CustomQuoteForm] = Form {
     mapping(
       "quote" -> nonEmptyText.verifying(_.nonEmpty),
@@ -29,52 +30,52 @@ class CustomQueryController @Inject()(
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }
 
-  def getCustomQuotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
+  def getCustomQuotes: Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
   }
 
-  def getRandomCustomQuote: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    customerQuotesDAO.listRandomQuote().map {
-      case Some(quote) => Ok(Json.toJson(quote))
-      case None => NotFound(s"Database is empty!")
-    }
+  def getRandomCustomQuote: Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      customerQuotesDAO.listRandomQuote().map {
+        case Some(quote) => Ok(Json.toJson(quote))
+        case None        => NotFound(s"Database is empty!")
+      }
   }
 
-  def getSelectedQuote(id: Int): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    customerQuotesDAO.listSelectedQuote(id).map {
-      case Some(quote) => Ok(Json.toJson(quote))
-      case None => NotFound(s"Record with id:$id, not found in Database!")
-    }
+  def getSelectedQuote(id: Int): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      customerQuotesDAO.listSelectedQuote(id).map {
+        case Some(quote) => Ok(Json.toJson(quote))
+        case None        => NotFound(s"Record with id:$id, not found in Database!")
+      }
   }
 
-  def addCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    quotesQueryForm.bindFromRequest.fold(
-      formWithErrors => {
+  def addCustomQuote(): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      quotesQueryForm.bindFromRequest.fold(formWithErrors => {
         Future.successful(BadRequest("error" + formWithErrors))
-      },
-      customQuote => {
+      }, customQuote => {
         customerQuotesDAO.createQuote(customQuote).map { _ =>
           Redirect(routes.CustomQueryController.getCustomQuotes())
         }
-      }
-    )
+      })
   }
 
-  def updateCustomQuote(id: Int): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    quotesQueryForm.bindFromRequest.fold(
-      formWithErrors => {
+  def updateCustomQuote(id: Int): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      quotesQueryForm.bindFromRequest.fold(formWithErrors => {
         Future.successful(BadRequest("error" + formWithErrors))
-      },
-      customQuote => {
+      }, customQuote => {
         customerQuotesDAO.updateQuote(id, customQuote).map { _ =>
           Redirect(routes.CustomQueryController.getCustomQuotes())
         }
-      }
-    )
+      })
   }
 
-  def deleteCustomQuote(id: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    customerQuotesDAO.deleteQuote(id)
-    Ok(s"Successfully delete entry $id")
+  def deleteCustomQuote(id: Int): Action[AnyContent] = Action {
+    implicit request: Request[AnyContent] =>
+      customerQuotesDAO.deleteQuote(id)
+      Ok(s"Successfully delete entry $id")
   }
 }

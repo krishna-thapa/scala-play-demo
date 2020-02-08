@@ -1,5 +1,3 @@
 package models
 
-case class JSONQuotesQuery (
-
-)
+case class JSONQuotesQuery()
