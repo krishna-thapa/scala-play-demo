@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * We want the JdbcProfile for this provider
   */
 @Singleton
-class CSVQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
+class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     implicit executionContext: ExecutionContext
 ) {
 
@@ -36,12 +36,11 @@ class CSVQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
   /**
     * Here we define the table. It will have a quotations
     */
-  private class CSVQuoteQueriesTable(tag: Tag)
-      extends Table[CSVQuotesQuery](tag, "quotations") {
-    def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    def quote: Rep[String] = column[String]("quote")
+  private class CSVQuoteQueriesTable(tag: Tag) extends Table[CSVQuotesQuery](tag, "quotations") {
+    def id: Rep[Int]        = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def quote: Rep[String]  = column[String]("quote")
     def author: Rep[String] = column[String]("author")
-    def genre: Rep[Genre] = column[Genre]("genre")
+    def genre: Rep[Genre]   = column[Genre]("genre")
 
     /**
       * This is the tables default "projection".

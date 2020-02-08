@@ -12,7 +12,7 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CustomQueryController @Inject() (
+class CustomQueryController @Inject()(
     cc: ControllerComponents,
     customerQuotesDAO: CustomQuotesQueryDAO
 )(implicit executionContext: ExecutionContext)
@@ -23,16 +23,15 @@ class CustomQueryController @Inject() (
     */
   val quotesQueryForm: Form[CustomQuoteForm] = Form {
     mapping(
-      "quote" -> nonEmptyText.verifying(_.nonEmpty),
-      "author" -> nonEmptyText,
-      "genre" -> Forms.of[Genre],
+      "quote"    -> nonEmptyText.verifying(_.nonEmpty),
+      "author"   -> nonEmptyText,
+      "genre"    -> Forms.of[Genre],
       "ownquote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }
 
-  def getCustomQuotes: Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
+  def getCustomQuotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
   }
 
   def getRandomCustomQuote: Action[AnyContent] = Action.async {
@@ -51,18 +50,17 @@ class CustomQueryController @Inject() (
       }
   }
 
-  def addCustomQuote(): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      quotesQueryForm.bindFromRequest.fold(
-        formWithErrors => {
-          Future.successful(BadRequest("error" + formWithErrors))
-        },
-        customQuote => {
-          customerQuotesDAO.createQuote(customQuote).map { _ =>
-            Redirect(routes.CustomQueryController.getCustomQuotes())
-          }
+  def addCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    quotesQueryForm.bindFromRequest.fold(
+      formWithErrors => {
+        Future.successful(BadRequest("error" + formWithErrors))
+      },
+      customQuote => {
+        customerQuotesDAO.createQuote(customQuote).map { _ =>
+          Redirect(routes.CustomQueryController.getCustomQuotes())
         }
-      )
+      }
+    )
   }
 
   def updateCustomQuote(id: Int): Action[AnyContent] = Action.async {

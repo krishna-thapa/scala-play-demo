@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
   * a blocking API.
   */
 @Singleton
-class AsyncController @Inject() (
+class AsyncController @Inject()(
     cc: ControllerComponents,
     actorSystem: ActorSystem
 )(implicit exec: ExecutionContext)

@@ -12,7 +12,7 @@ import services.Counter
   * object is injected by the Guice dependency injection system.
   */
 @Singleton
-class CountController @Inject() (cc: ControllerComponents, counter: Counter)
+class CountController @Inject()(cc: ControllerComponents, counter: Counter)
     extends AbstractController(cc) {
 
   /**

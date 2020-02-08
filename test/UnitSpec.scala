@@ -17,7 +17,7 @@ class UnitSpec extends PlaySpec {
         override def nextCount(): Int = 49
       }
       val controller = new CountController(stubControllerComponents(), counter)
-      val result = controller.count(FakeRequest())
+      val result     = controller.count(FakeRequest())
       contentAsString(result) must equal("49")
     }
   }
