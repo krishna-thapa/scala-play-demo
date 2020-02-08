@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
       with:
         # Args to pass to scalafmt
         args: "--exclude=third_party --list"
-    - name: Run tests
+    - name: Run clean, compile and tests
       run: |
         sbt clean compile
         sbt test
