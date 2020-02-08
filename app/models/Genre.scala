@@ -1,6 +1,7 @@
 package models
 
 // format: off
+//https://scalameta.org/scalafmt/docs/known-issues.html#deeply-nested-code
 object Genre extends GenericEnum {
 
   type Genre = Value

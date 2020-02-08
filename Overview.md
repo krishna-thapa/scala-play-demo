@@ -9,6 +9,7 @@
 - Play framework with AkkaHttp
 - Slick
 - Postgres
+- scalafmt for scala formatting 
 - Swagger Api management
 - Docker compose
 - Git

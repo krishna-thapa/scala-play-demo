@@ -22,8 +22,8 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 
 @Singleton
-class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
-  implicit ec: ExecutionContext
+class CustomQuotesQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(
+    implicit ec: ExecutionContext
 ) {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
@@ -88,8 +88,10 @@ class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   def createQuote(customQuote: CustomQuoteForm): Future[CustomQuotesQuery] = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
     val insertQuery = customQuoteQueries returning customQuoteQueries.map(_.id) into (
-      (fields,
-       id) => fields.copy(id = id)
+        (
+            fields,
+            id
+        ) => fields.copy(id = id)
     )
     val action = insertQuery += CustomQuotesQuery(
       0,

@@ -15,9 +15,6 @@ jobs:
         java-version: 1.8
     - name: Scalafmt Action
       uses: openlawteam/scalafmt-ci@v2.0.2
-      with:
-        # Args to pass to scalafmt
-        args: "--exclude=third_party --list"
     - name: Run clean, compile and tests
       run: |
         sbt clean compile
