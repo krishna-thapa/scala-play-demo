@@ -33,7 +33,7 @@ GET      /firstTen             controllers.CSV.CSVQueryController.getFirst10Quot
 #      description: "Genre of the quote"
 #      required: true
 #      type: "string"
-#      enum: ["love", "freedom", "famous", "romantic", "sad", "demo"]
+#      enum: ["love", "freedom", "famous", "romantic", "sad", "suspense", "demo"]
 #  responses:
 #    200:
 #      schema:

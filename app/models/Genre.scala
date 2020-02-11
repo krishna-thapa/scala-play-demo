@@ -20,5 +20,5 @@ object Genre extends GenericEnum {
   success, romantic, sad, teacher, society, teen, thankful, sports, strength,
   sympathy, technology, travel, truth, wisdom, wedding, christmas, easter,
   fathersday, memorialday, mothersday, newyears, saintpatricksday, thanksgiving,
-  valentinesday = Value
+  valentinesday, suspense = Value
 }

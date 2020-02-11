@@ -26,6 +26,7 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   import dbConfig._
   import profile.api._
 
+  // Slick mapping custom type enum in database column
   implicit val genreEnumMapper: BaseTypedType[Genre.Value] =
     MappedColumnType.base[Genre, String]({ genre =>
       genre.toString
@@ -71,6 +72,5 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
         .result
         .headOption
     )
-    //db.run(CSVQuoteQueries.sortBy(x => randomFunction).result.headOption)
   }
 }

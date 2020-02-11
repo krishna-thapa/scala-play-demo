@@ -3,7 +3,8 @@ package controllers.custom
 import daos.CustomQuotesQueryDAO
 import javax.inject.{Inject, Singleton}
 import models.Genre.Genre
-import models.{CustomQuoteForm, Genre}
+import models.CustomQuoteForm
+import org.slf4j.LoggerFactory
 import play.api.data.{Form, Forms}
 import play.api.data.Forms._
 import play.api.libs.json.Json
@@ -17,6 +18,8 @@ class CustomQueryController @Inject()(
     customerQuotesDAO: CustomQuotesQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc) {
+
+  private val logger = LoggerFactory.getLogger(classOf[CustomQueryController])
 
   /**
     * The mapping for the QuotesQuery form.
@@ -38,7 +41,9 @@ class CustomQueryController @Inject()(
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.listRandomQuote().map {
         case Some(quote) => Ok(Json.toJson(quote))
-        case None        => NotFound(s"Database is empty!")
+        case None =>
+          logger.warn("Database is empty")
+          NotFound("Database is empty!")
       }
   }
 
@@ -46,7 +51,9 @@ class CustomQueryController @Inject()(
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.listSelectedQuote(id).map {
         case Some(quote) => Ok(Json.toJson(quote))
-        case None        => NotFound(s"Record with id:$id, not found in Database!")
+        case None =>
+          logger.warn(s"Record with id:$id, not found in Database!")
+          NotFound(s"Record with id:$id, not found in Database!")
       }
   }
 
@@ -80,6 +87,7 @@ class CustomQueryController @Inject()(
   def deleteCustomQuote(id: Int): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.deleteQuote(id)
+      logger.warn(s"Successfully delete entry $id")
       Ok(s"Successfully delete entry $id")
   }
 }

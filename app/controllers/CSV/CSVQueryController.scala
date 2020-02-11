@@ -1,9 +1,10 @@
 package controllers.CSV
 
-import daos.{CSVQuotesQueryDAO, CustomQuotesQueryDAO}
+import daos.CSVQuotesQueryDAO
 import javax.inject._
 import models.CSVQuotesQuery
 import models.Genre.Genre
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -11,18 +12,19 @@ import scala.concurrent.ExecutionContext
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
-  * application's home page.
+  * application's quotes from CSV Query table.
   */
 @Singleton
 class CSVQueryController @Inject()(
     cc: ControllerComponents,
-    csvQuotesDAO: CSVQuotesQueryDAO,
-    customerQuotesDAO: CustomQuotesQueryDAO
+    csvQuotesDAO: CSVQuotesQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc) {
 
+  private val logger = LoggerFactory.getLogger(classOf[CSVQueryController])
+
   /**
-    * A REST endpoint that gets a random quote as JSON.
+    * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
   def getRandomQuote: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     csvQuotesDAO.listAllQuotes().map { quoteQueries =>
@@ -42,11 +44,16 @@ class CSVQueryController @Inject()(
     }
   }
 
+  /**
+    * A REST endpoint that gets a random quote as per selected genre from the table.
+    */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
       csvQuotesDAO.getGenreQuote(genre).map {
         case Some(quote) => Ok(Json.toJson(quote))
-        case None        => NotFound(s"Database is empty with that genre!")
+        case None =>
+          logger.warn(s"Database is empty with that genre: ${genre}")
+          NotFound("Database is empty with that genre!")
       }
   }
 }
