@@ -1,6 +1,6 @@
 package controllers.csv
 
-import daos.{CSVQuotesQueryDAO, FavQuoteQueryDAO}
+import daos.{ CSVQuotesQueryDAO, FavQuoteQueryDAO }
 import javax.inject._
 import models.CSVQuotesQuery
 import models.Genre.Genre

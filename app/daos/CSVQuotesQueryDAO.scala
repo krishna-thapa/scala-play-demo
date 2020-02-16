@@ -1,14 +1,14 @@
 package daos
 
-import javax.inject.{Inject, Singleton}
-import models.{CSVQuotesQuery, FavQuoteQuery, Genre}
+import javax.inject.{ Inject, Singleton }
+import models.{ CSVQuotesQuery, FavQuoteQuery, Genre }
 import models.Genre.Genre
 import play.api.db.slick.DatabaseConfigProvider
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
-import slick.lifted.{ForeignKeyQuery, ProvenShape}
+import slick.lifted.{ ForeignKeyQuery, ProvenShape }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * A repository for Quotes stored in quotations table.

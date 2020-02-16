@@ -1,13 +1,13 @@
 package daos
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import models.FavQuoteQuery
 import org.slf4j.LoggerFactory
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(

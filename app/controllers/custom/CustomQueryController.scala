@@ -1,16 +1,16 @@
 package controllers.custom
 
 import daos.CustomQuotesQueryDAO
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import models.Genre.Genre
 import models.CustomQuoteForm
 import org.slf4j.LoggerFactory
-import play.api.data.{Form, Forms}
+import play.api.data.{ Form, Forms }
 import play.api.data.Forms._
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class CustomQueryController @Inject()(

@@ -3,7 +3,7 @@ package models
 import org.slf4j.LoggerFactory
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import play.api.libs.json.{Format, JsResult, JsString, JsSuccess, JsValue}
+import play.api.libs.json.{ Format, JsResult, JsString, JsSuccess, JsValue }
 import play.api.mvc.PathBindable
 
 abstract class GenericEnum extends Enumeration {

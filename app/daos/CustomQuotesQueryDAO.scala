@@ -2,15 +2,15 @@ package daos
 
 import java.sql.Date
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import models.Genre.Genre
-import models.{CustomQuoteForm, CustomQuotesQuery, Genre}
+import models.{ CustomQuoteForm, CustomQuotesQuery, Genre }
 import play.api.db.slick.DatabaseConfigProvider
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * A repository for the custom quotes
