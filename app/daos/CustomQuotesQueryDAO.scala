@@ -26,7 +26,7 @@ class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     implicit ec: ExecutionContext
 ) {
 
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  lazy val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
@@ -81,7 +81,6 @@ class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
 
   /**
     * Create a customQuotes in the table.
-    *
     * This is an asynchronous operation, it will return a future of the created customQuotes,
     * which can be used to obtain the id for that person.
     */
@@ -104,7 +103,11 @@ class CustomQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     db.run(action)
   }
 
-  // return number of records get updated
+  /**
+    * @param id quote record id
+    * @param customQuote updated custom quote object
+    * @return number of updated records, just 1 here
+    */
   def updateQuote(id: Int, customQuote: CustomQuoteForm): Future[Int] = {
     db.run(
       customQuoteQueries

@@ -9,10 +9,10 @@
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /random               controllers.CSV.CSVQueryController.getRandomQuote
+GET      /random               controllers.csv.CSVQueryController.getRandomQuote
 
 ###
-#  summary: Get a random quote from a csv build quotation table
+#  summary: Get a first 10 quote from a csv build quotation table
 #  tags:
 #    - CSV Query table
 #  responses:
@@ -20,7 +20,38 @@ GET      /random               controllers.CSV.CSVQueryController.getRandomQuote
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /firstTen             controllers.CSV.CSVQueryController.getFirst10Quotes
+GET      /firstTen             controllers.csv.CSVQueryController.getFirst10Quotes
+
+###
+#  summary: Add a favorite quote in the fav_quotations table
+#  description: "This can only be done by the logged in user."
+#  tags:
+#    - CSV Query table
+#  parameters:
+#    - name: "csvid"
+#      in: "path"
+#      description: "Post multiple times to change the status of tag"
+#      required: true
+#      type: "string"
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/models.CSVQuotesQuery'
+###
++ nocsrf
+POST     /fav/:csvid            controllers.csv.CSVQueryController.favQuote(csvid: String)
+
+###
+#  summary: Get all the quotes that are marked as favorite in the fav_quotations table
+#  tags:
+#    - CSV Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.CSVQuotesQuery'
+###
+GET      /favQuotes             controllers.csv.CSVQueryController.getFavQuotes
 
 ###
 #  summary: Get a genre selected random quote from a csv build quotation table
@@ -39,4 +70,4 @@ GET      /firstTen             controllers.CSV.CSVQueryController.getFirst10Quot
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /:genre                controllers.CSV.CSVQueryController.getGenreQuote(genre: models.Genre.Value)
+GET      /:genre                controllers.csv.CSVQueryController.getGenreQuote(genre: models.Genre.Value)

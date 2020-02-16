@@ -1,12 +1,12 @@
 package daos
 
 import javax.inject.{Inject, Singleton}
-import models.{CSVQuotesQuery, Genre}
+import models.{CSVQuotesQuery, FavQuoteQuery, Genre}
 import models.Genre.Genre
 import play.api.db.slick.DatabaseConfigProvider
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
-import slick.lifted.ProvenShape
+import slick.lifted.{ForeignKeyQuery, ProvenShape}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,7 +21,7 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     implicit executionContext: ExecutionContext
 ) {
 
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  lazy val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
@@ -38,7 +38,8 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     * Here we define the table. It will have a quotations
     */
   private class CSVQuoteQueriesTable(tag: Tag) extends Table[CSVQuotesQuery](tag, "quotations") {
-    def id: Rep[Int]        = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def id: Rep[Int]        = column[Int]("id", O.AutoInc)
+    def csvid: Rep[String]  = column[String]("csvid", O.PrimaryKey)
     def quote: Rep[String]  = column[String]("quote")
     def author: Rep[String] = column[String]("author")
     def genre: Rep[Genre]   = column[Genre]("genre")
@@ -52,7 +53,18 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
       * apply and unapply methods.
       */
     def * : ProvenShape[CSVQuotesQuery] =
-      (id, quote, author, genre) <> ((CSVQuotesQuery.apply _).tupled, CSVQuotesQuery.unapply)
+      (id, csvid, quote, author, genre) <> ((CSVQuotesQuery.apply _).tupled, CSVQuotesQuery.unapply)
+
+    def favQuote: ForeignKeyQuery[FavQuoteQueriesTable, FavQuoteQuery] =
+      foreignKey("fav_quotations", csvid, favQuoteQueries)(_.csvid)
+  }
+
+  private class FavQuoteQueriesTable(tag: Tag) extends Table[FavQuoteQuery](tag, "fav_quotations") {
+    def id: Rep[Int]         = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def csvid: Rep[String]   = column[String]("csvid")
+    def favTag: Rep[Boolean] = column[Boolean]("favtag")
+    def * : ProvenShape[FavQuoteQuery] =
+      (id, csvid, favTag) <> ((FavQuoteQuery.apply _).tupled, FavQuoteQuery.unapply)
   }
 
   /**
@@ -60,9 +72,30 @@ class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     */
   private val CSVQuoteQueries = TableQuery[CSVQuoteQueriesTable]
 
+  private val favQuoteQueries = TableQuery[FavQuoteQueriesTable]
+
+  /**
+    * @return list of custom quotes
+    */
   def listAllQuotes(): Future[Seq[CSVQuotesQuery]] =
     db.run(CSVQuoteQueries.result)
 
+  /**
+    * @return quotes that are marked as favorite
+    */
+  def listAllFavQuotes(): Future[Seq[CSVQuotesQuery]] = {
+
+    val query = CSVQuoteQueries
+      .join(favQuoteQueries.filter(_.favTag))
+      .on(_.csvid === _.csvid)
+
+    db.run(query.result).map(_.map(_._1))
+  }
+
+  /**
+    * @param genre to filter records with that genre
+    * @return lists of quotes that matches input genre
+    */
   def getGenreQuote(genre: Genre): Future[Option[CSVQuotesQuery]] = {
     val randomFunction = SimpleFunction.nullary[Double]("random")
     db.run(

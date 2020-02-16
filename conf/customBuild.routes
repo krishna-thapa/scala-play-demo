@@ -36,7 +36,7 @@ GET         /random         controllers.custom.CustomQueryController.getRandomCu
 GET         /:id            controllers.custom.CustomQueryController.getSelectedQuote(id: Int)
 
 ###
-#  summary: Crete a new custom quote to the table
+#  summary: Create a new custom quote to the table
 #  description: "This can only be done by the logged in user."
 #  tags:
 #    - Custom Query table

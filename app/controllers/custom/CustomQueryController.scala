@@ -33,10 +33,16 @@ class CustomQueryController @Inject()(
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }
 
+  /**
+    * A REST endpoint that gets all the custom quotes.
+    */
   def getCustomQuotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     customerQuotesDAO.listCustomQuotes().map(quote => Ok(Json.toJson(quote)))
   }
 
+  /**
+    * A REST endpoint that gets a random quote as JSON from Custom quotes table.
+    */
   def getRandomCustomQuote: Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.listRandomQuote().map {
@@ -47,6 +53,9 @@ class CustomQueryController @Inject()(
       }
   }
 
+  /**
+    * A REST endpoint that gets a selected quote as JSON from Custom quotes table.
+    */
   def getSelectedQuote(id: Int): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.listSelectedQuote(id).map {
@@ -57,6 +66,9 @@ class CustomQueryController @Inject()(
       }
   }
 
+  /**
+    * A REST endpoint that add a new quote as JSON to Custom quotes table.
+    */
   def addCustomQuote(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     quotesQueryForm.bindFromRequest.fold(
       formWithErrors => {
@@ -70,6 +82,9 @@ class CustomQueryController @Inject()(
     )
   }
 
+  /**
+    * A REST endpoint that updated selected quote to Custom quotes table.
+    */
   def updateCustomQuote(id: Int): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
       quotesQueryForm.bindFromRequest.fold(
@@ -84,6 +99,9 @@ class CustomQueryController @Inject()(
       )
   }
 
+  /**
+    * A REST endpoint that deletes selected quote as JSON from Custom quotes table.
+    */
   def deleteCustomQuote(id: Int): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
       customerQuotesDAO.deleteQuote(id)
