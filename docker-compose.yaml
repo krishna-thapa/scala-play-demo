@@ -1,0 +1,16 @@
+version: '3'
+
+volumes:
+  pg-data:
+    driver: local
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: 'inspiration_db'
+      POSTGRES_USER: 'santosh'
