@@ -41,6 +41,34 @@ scalacOptions ++= Seq(
   "-language:reflectiveCalls"
 )
 
+lazy val codeartifact_token = sys.env.get("CODEARTIFACT_AUTH_TOKEN")
+
+publishMavenStyle := true
+publishArtifact in Test := false
+pomExtra := (
+  <profiles>
+    <profile>
+      <id>krishna--inspirational-api</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>krishna--inspirational-api</id>
+          <url>https://krishna-634798335225.d.codeartifact.us-east-1.amazonaws.com/maven/inspirational-api/</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <servers>
+    <server>
+      <id>krishna--inspirational-api</id>
+      <username>aws</username>
+      <password>${codeartifact_token}</password>
+    </server>
+  </servers>
+)
+
 //TODO: this below codes
 // No need to run tests while building jar
 /*test in assembly := {}
