@@ -13,10 +13,12 @@ trait DbRunner extends Logging {
 
   val dbConfig: DatabaseConfig[JdbcProfile]
 
+  /* Run and get the result from the future*/
   def runDbAction[T](action: DBIOAction[T, NoStream, All], timeout: Option[Int] = None): T = {
     dbConfig.db.run(action.transactionally).andGetResult(timeout)
   }
 
+  /* Run and get the result from the future or catch any error*/
   def runDbActionCatchError[T](
       action: DBIOAction[T, NoStream, All],
       timeout: Option[Int] = None

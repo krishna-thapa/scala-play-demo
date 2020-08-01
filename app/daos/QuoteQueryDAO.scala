@@ -14,24 +14,26 @@ import utils.Implicits._
 /**
   * A repository for Quotes stored in quotations table.
   */
-class CSVQuotesQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunner {
+class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunner {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
-  private lazy val randomFunction                    = SimpleFunction.nullary[Double]("rand")
+  private lazy val randomFunction                    = SimpleFunction.nullary[Double]("random")
 
   /**
     * @return list of all stored quotes
     */
-  def listAllQuotes(): Seq[CSVQuotesQuery] =
+  def allQuotes(): Seq[CSVQuotesQuery] =
     runDbAction(CSVQuoteQueriesTable.CSVQuoteQueries.result)
 
-  def randomQuote(): Option[CSVQuotesQuery] =
+  /**
+    * @return random quote from the database table
+    */
+  def randomQuote(records: Int): Seq[CSVQuotesQuery] =
     runDbAction(
       CSVQuoteQueriesTable.CSVQuoteQueries
         .sortBy(_ => randomFunction)
-        .take(1)
+        .take(records)
         .result
-        .headOption
     )
 
   /**

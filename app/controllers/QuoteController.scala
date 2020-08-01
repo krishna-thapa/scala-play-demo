@@ -1,6 +1,6 @@
 package controllers
 
-import daos.{ CSVQuotesQueryDAO, FavQuoteQueryDAO }
+import daos.{ QuoteQueryDAO, FavQuoteQueryDAO }
 import javax.inject._
 import models.CSVQuotesQuery
 import models.Genre.Genre
@@ -19,37 +19,42 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class QuoteController @Inject()(
     cc: ControllerComponents,
-    csvQuotesDAO: CSVQuotesQueryDAO,
+    csvQuotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc)
+    with Responses
     with Logging {
 
   /**
     * The mapping for the FavQuote form.
     */
-  val favQuotesForm: Form[FavQuoteForm] = Form {
-    mapping(
-      "csvid"  -> nonEmptyText,
-      "favtag" -> boolean
-    )(FavQuoteForm.apply)(FavQuoteForm.unapply)
-  }
+//  val favQuotesForm: Form[FavQuoteForm] = Form {
+//    mapping(
+//      "csvid"  -> nonEmptyText,
+//      "favtag" -> boolean
+//    )(FavQuoteForm.apply)(FavQuoteForm.unapply)
+//  }
 
   /**
     * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    val allQuotes: Seq[CSVQuotesQuery] = csvQuotesDAO.listAllQuotes()
-    Ok(Json.toJson(allQuotes))
+    responseResult(csvQuotesDAO.randomQuote(1))
   }
 
-  //def getRandomQuote
+  /**
+    * A REST endpoint that gets all the quotes as JSON from CSV quotes table.
+    */
+  def getAllQuotes: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    responseResult(csvQuotesDAO.allQuotes())
+  }
 
   /**
-    * A REST endpoint that gets first 10 quotes as JSON.
+    * A REST endpoint that gets random 10 quotes as JSON from CSV quotes table.
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(Json.toJson(csvQuotesDAO.listAllQuotes().take(10)))
+    responseResult(csvQuotesDAO.randomQuote(10))
   }
 
   /**
@@ -66,7 +71,7 @@ class QuoteController @Inject()(
     * A REST endpoint that gets all favorite quotes as JSON.
     */
   def getFavQuotes: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(Json.toJson(csvQuotesDAO.listAllFavQuotes()))
+    responseResult(csvQuotesDAO.listAllFavQuotes())
   }
 
   /**
@@ -77,9 +82,13 @@ class QuoteController @Inject()(
       csvQuotesDAO.getGenreQuote(genre) match {
         case Some(quote) => Ok(Json.toJson(quote))
         case None =>
-          log.warn(s"Database is empty with that genre: $genre")
-          NotFound("Database is empty with that genre!")
+          notFound(s"Database is empty with that genre: $genre!")
       }
+  }
+
+  def responseResult(quotes: Seq[CSVQuotesQuery]): Result = {
+    if (quotes.nonEmpty) Ok(Json.toJson(quotes))
+    else notFound("Database is empty!")
   }
 
   case class FavQuoteForm(csvid: String, favTag: Boolean)
