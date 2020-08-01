@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.v2.TODO
-
 name := """inspirational-quote-api"""
 organization := "com.krishna"
 
@@ -21,17 +19,11 @@ libraryDependencies ++= Seq(
   "com.byteslounge"        %% "slick-repo"            % "1.5.3",
   "org.slf4j"              % "slf4j-nop"              % "1.6.4",
   "com.h2database"         % "h2"                     % "1.4.199",
-  "org.webjars"            % "swagger-ui"             % "2.2.0" //play-swagger ui integration
+  "org.webjars"            % "swagger-ui"             % "2.2.0"
 )
 
 //add domain package names for play-swagger to auto generate swagger definitions for domain classes mentioned in your routes
 swaggerDomainNameSpaces := Seq("models")
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
 
 scalacOptions ++= Seq(
   "-feature",
@@ -40,43 +32,3 @@ scalacOptions ++= Seq(
   // Enable routes file splitting
   "-language:reflectiveCalls"
 )
-
-lazy val codeartifact_token = sys.env.get("CODEARTIFACT_AUTH_TOKEN")
-
-publishMavenStyle := true
-publishArtifact in Test := false
-pomExtra := (
-  <profiles>
-    <profile>
-      <id>krishna--inspirational-api</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <repositories>
-        <repository>
-          <id>krishna--inspirational-api</id>
-          <url>https://krishna-634798335225.d.codeartifact.us-east-1.amazonaws.com/maven/inspirational-api/</url>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
-  <servers>
-    <server>
-      <id>krishna--inspirational-api</id>
-      <username>aws</username>
-      <password>${codeartifact_token}</password>
-    </server>
-  </servers>
-)
-
-//TODO: this below codes
-// No need to run tests while building jar
-/*test in assembly := {}
-// Simple and constant jar name
-assemblyJarName in assembly := s"inspirational-quote-api.jar"
-// Merge strategy for assembling conflicts
-assemblyMergeStrategy in assembly := {
-  case PathList("reference.conf")          => MergeStrategy.concat
-  case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
-  case _                                   => MergeStrategy.first
-}*/
