@@ -1,14 +1,14 @@
-package controllers.csv
+package controllers
 
 import daos.{ CSVQuotesQueryDAO, FavQuoteQueryDAO }
 import javax.inject._
 import models.CSVQuotesQuery
 import models.Genre.Genre
-import org.slf4j.LoggerFactory
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.mvc._
+import utils.Logging
 
 import scala.concurrent.ExecutionContext
 
@@ -17,14 +17,13 @@ import scala.concurrent.ExecutionContext
   * application's quotes from CSV Query table.
   */
 @Singleton
-class CSVQueryController @Inject()(
+class QuoteController @Inject()(
     cc: ControllerComponents,
     csvQuotesDAO: CSVQuotesQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
-    extends AbstractController(cc) {
-
-  private val logger = LoggerFactory.getLogger(classOf[CSVQueryController])
+    extends AbstractController(cc)
+    with Logging {
 
   /**
     * The mapping for the FavQuote form.
@@ -39,22 +38,18 @@ class CSVQueryController @Inject()(
   /**
     * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
-  def getRandomQuote: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    csvQuotesDAO.listAllQuotes().map { quoteQueries =>
-      val randomQuotes: CSVQuotesQuery =
-        quoteQueries(scala.util.Random.nextInt(quoteQueries.size))
-      Ok(Json.toJson(randomQuotes))
-    }
+  def getRandomQuote: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val allQuotes: Seq[CSVQuotesQuery] = csvQuotesDAO.listAllQuotes()
+    Ok(Json.toJson(allQuotes))
   }
+
+  //def getRandomQuote
 
   /**
     * A REST endpoint that gets first 10 quotes as JSON.
     */
-  def getFirst10Quotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    csvQuotesDAO.listAllQuotes().map { quoteQueries =>
-      val first100Quotes: Seq[CSVQuotesQuery] = quoteQueries.take(10)
-      Ok(Json.toJson(first100Quotes))
-    }
+  def getFirst10Quotes: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(Json.toJson(csvQuotesDAO.listAllQuotes().take(10)))
   }
 
   /**
@@ -70,21 +65,19 @@ class CSVQueryController @Inject()(
   /**
     * A REST endpoint that gets all favorite quotes as JSON.
     */
-  def getFavQuotes: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    csvQuotesDAO.listAllFavQuotes().map { quoteQueries =>
-      Ok(Json.toJson(quoteQueries))
-    }
+  def getFavQuotes: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(Json.toJson(csvQuotesDAO.listAllFavQuotes()))
   }
 
   /**
     * A REST endpoint that gets a random quote as per selected genre from the table.
     */
-  def getGenreQuote(genre: Genre): Action[AnyContent] = Action.async {
+  def getGenreQuote(genre: Genre): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      csvQuotesDAO.getGenreQuote(genre).map {
+      csvQuotesDAO.getGenreQuote(genre) match {
         case Some(quote) => Ok(Json.toJson(quote))
         case None =>
-          logger.warn(s"Database is empty with that genre: $genre")
+          log.warn(s"Database is empty with that genre: $genre")
           NotFound("Database is empty with that genre!")
       }
   }

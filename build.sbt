@@ -13,12 +13,11 @@ libraryDependencies ++= Seq(
   guice,
   evolutions,
   "org.scalatestplus.play" %% "scalatestplus-play"    % "4.0.3" % Test,
-  "org.postgresql"         % "postgresql"             % "9.4-1201-jdbc41",
+  "org.postgresql"         % "postgresql"             % "42.2.12",
   "com.typesafe.play"      %% "play-slick"            % "4.0.2",
   "com.typesafe.play"      %% "play-slick-evolutions" % "4.0.2",
   "com.byteslounge"        %% "slick-repo"            % "1.5.3",
   "org.slf4j"              % "slf4j-nop"              % "1.6.4",
-  "com.h2database"         % "h2"                     % "1.4.199",
   "org.webjars"            % "swagger-ui"             % "2.2.0"
 )
 

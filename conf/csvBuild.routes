@@ -3,30 +3,30 @@
 ###
 #  summary: Get a random quote from a csv build quotation table
 #  tags:
-#    - CSV Query table
+#    - Quote Query table
 #  responses:
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /random               controllers.csv.CSVQueryController.getRandomQuote
+GET      /random               controllers.QuoteController.getRandomQuote
 
 ###
 #  summary: Get a first 10 quote from a csv build quotation table
 #  tags:
-#    - CSV Query table
+#    - Quote Query table
 #  responses:
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /firstTen             controllers.csv.CSVQueryController.getFirst10Quotes
+GET      /firstTen             controllers.QuoteController.getFirst10Quotes
 
 ###
 #  summary: Add a favorite quote in the fav_quotations table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - CSV Query table
+#    - Quote Query table
 #  parameters:
 #    - name: "csvid"
 #      in: "path"
@@ -40,24 +40,24 @@ GET      /firstTen             controllers.csv.CSVQueryController.getFirst10Quot
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
 + nocsrf
-POST     /fav/:csvid            controllers.csv.CSVQueryController.favQuote(csvid: String)
+POST     /fav/:csvid            controllers.QuoteController.favQuote(csvid: String)
 
 ###
 #  summary: Get all the quotes that are marked as favorite in the fav_quotations table
 #  tags:
-#    - CSV Query table
+#    - Quote Query table
 #  responses:
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /favQuotes             controllers.csv.CSVQueryController.getFavQuotes
+GET      /favQuotes             controllers.QuoteController.getFavQuotes
 
 ###
 #  summary: Get a genre selected random quote from a csv build quotation table
 #  description: "Only the hard-coded genre should be used"
 #  tags:
-#    - CSV Query table
+#    - Quote Query table
 #  parameters:
 #    - name: "genre"
 #      in: "path"
@@ -70,4 +70,4 @@ GET      /favQuotes             controllers.csv.CSVQueryController.getFavQuotes
 #      schema:
 #        $ref: '#/definitions/models.CSVQuotesQuery'
 ###
-GET      /:genre                controllers.csv.CSVQueryController.getGenreQuote(genre: models.Genre.Value)
+GET      /:genre                controllers.QuoteController.getGenreQuote(genre: models.Genre.Value)
