@@ -7,8 +7,8 @@ import utils.Logging
 
 trait Responses extends Logging {
 
-  def badRequest(msg: String, error: JsError): Result = {
-    log.warn(JsError.toJson(error).toString)
+  def badRequest(msg: String): Result = {
+    log.warn(s"Bad request error: $msg")
     BadRequest(Json.toJson(Response(msg)))
   }
 

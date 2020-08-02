@@ -17,11 +17,11 @@ class QuoteQueriesTable(tag: Tag) extends Table[QuotesQuery](tag, "quotations") 
   def * : ProvenShape[QuotesQuery] =
     (id, csvid, quote, author, genre) <> ((QuotesQuery.apply _).tupled, QuotesQuery.unapply)
 
-  // TODO need to use
+  // A foreign key constraint can be defined with a Table’s foreignKey method
   def favQuote: ForeignKeyQuery[FavQuoteQueriesTable, FavQuoteQuery] =
     foreignKey("fav_quotations", csvid, FavQuoteQueriesTable.favQuoteQueries)(_.csvid)
 }
 
 object QuoteQueriesTable {
-  val QuoteQueries = TableQuery[QuoteQueriesTable]
+  val quoteQueries = TableQuery[QuoteQueriesTable]
 }

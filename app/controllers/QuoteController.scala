@@ -1,16 +1,16 @@
 package controllers
 
-import daos.{ QuoteQueryDAO, FavQuoteQueryDAO }
+import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import javax.inject._
 import models.QuotesQuery
 import models.Genre.Genre
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.mvc._
 import utils.Logging
 
 import scala.concurrent.ExecutionContext
+import scala.util.{ Failure, Success }
+import scala.util.matching.Regex
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
@@ -19,29 +19,21 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class QuoteController @Inject()(
     cc: ControllerComponents,
-    csvQuotesDAO: QuoteQueryDAO,
+    quotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc)
     with Responses
     with Logging {
 
-  /**
-    * The mapping for the FavQuote form.
-    */
-//  val favQuotesForm: Form[FavQuoteForm] = Form {
-//    mapping(
-//      "csvid"  -> nonEmptyText,
-//      "favtag" -> boolean
-//    )(FavQuoteForm.apply)(FavQuoteForm.unapply)
-//  }
+  protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
   /**
     * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseResult(csvQuotesDAO.randomQuote(1))
+    responseResult(quotesDAO.randomQuote(1))
   }
 
   /**
@@ -49,7 +41,7 @@ class QuoteController @Inject()(
     */
   def getAllQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAllQuotes")
-    responseResult(csvQuotesDAO.allQuotes())
+    responseResult(quotesDAO.allQuotes())
   }
 
   /**
@@ -57,17 +49,22 @@ class QuoteController @Inject()(
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
-    responseResult(csvQuotesDAO.randomQuote(10))
+    responseResult(quotesDAO.randomQuote(10))
   }
 
   /**
     * A REST endpoint that creates or altered the fav tag in the fav_quotes table.
     */
-  def favQuote(csvid: String): Action[AnyContent] = Action.async {
-    log.info("Executing favQuote")
+  def favQuote(csvid: String): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      favQuotesDAO.modifyFavquote(csvid).map { quote =>
-        Ok(Json.toJson(quote))
+      log.info("Executing favQuote")
+      if (csvIdPattern.matches(csvid)) {
+        favQuotesDAO.modifyFavQuote(csvid) match {
+          case Success(favQuote)  => Ok(Json.toJson(favQuote))
+          case Failure(exception) => notFound(exception.getMessage)
+        }
+      } else {
+        badRequest("Id of quote should be in CSV123 format!")
       }
   }
 
@@ -76,7 +73,7 @@ class QuoteController @Inject()(
     */
   def getFavQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFavQuotes")
-    responseResult(csvQuotesDAO.listAllFavQuotes())
+    responseResult(quotesDAO.listAllFavQuotes())
   }
 
   /**
@@ -84,7 +81,7 @@ class QuoteController @Inject()(
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
-    Ok(Json.toJson(csvQuotesDAO.getGenreQuote(genre)))
+    Ok(Json.toJson(quotesDAO.getGenreQuote(genre)))
   }
 
   def responseResult(quotes: Seq[QuotesQuery]): Result = {
@@ -92,5 +89,4 @@ class QuoteController @Inject()(
     else notFound("Database is empty!")
   }
 
-  case class FavQuoteForm(csvid: String, favTag: Boolean)
 }

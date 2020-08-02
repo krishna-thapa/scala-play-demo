@@ -23,7 +23,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
     * @return List of all stored quotes
     */
   def allQuotes(): Seq[QuotesQuery] =
-    runDbAction(QuoteQueriesTable.QuoteQueries.result)
+    runDbAction(QuoteQueriesTable.quoteQueries.result)
 
   /**
     * @param records number of records to return
@@ -31,7 +31,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
     */
   def randomQuote(records: Int): Seq[QuotesQuery] =
     runDbAction(
-      QuoteQueriesTable.QuoteQueries
+      QuoteQueriesTable.quoteQueries
         .sortBy(_ => randomFunction)
         .take(records)
         .result
@@ -41,12 +41,11 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
     * @return Quotes that are marked as favorite
     */
   def listAllFavQuotes(): Seq[QuotesQuery] = {
-    val query = QuoteQueriesTable.QuoteQueries
+    val query = QuoteQueriesTable.quoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter(_.favTag))
       .on(_.csvid === _.csvid)
 
     runDbAction(query.result).map(_._1)
-    //.map(_.map(_._1))
   }
 
   /**
@@ -55,7 +54,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
     */
   def getGenreQuote(genre: Genre): Option[QuotesQuery] = {
     runDbAction(
-      QuoteQueriesTable.QuoteQueries
+      QuoteQueriesTable.quoteQueries
         .filter(_.genre === genre)
         .sortBy(_ => randomFunction)
         .result
