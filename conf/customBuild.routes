@@ -11,7 +11,7 @@
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
-GET         /all            controllers.custom.CustomQueryController.getCustomQuotes
+GET         /all            controllers.CustomQuoteController.getCustomQuotes
 
 ###
 #  summary: Get a random quote from a custom build quote table
@@ -22,7 +22,7 @@ GET         /all            controllers.custom.CustomQueryController.getCustomQu
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
-GET         /random         controllers.custom.CustomQueryController.getRandomCustomQuote
+GET         /random         controllers.CustomQuoteController.getRandomCustomQuote
 
 ###
 #  summary: Get a selected quote from a custom build quote table
@@ -33,7 +33,7 @@ GET         /random         controllers.custom.CustomQueryController.getRandomCu
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
-GET         /:id            controllers.custom.CustomQueryController.getSelectedQuote(id: Int)
+GET         /:id            controllers.CustomQuoteController.getSelectedQuote(id: Int)
 
 ###
 #  summary: Create a new custom quote to the table
@@ -46,7 +46,7 @@ GET         /:id            controllers.custom.CustomQueryController.getSelected
 #      required: true
 #      description: Create a new Quote
 #      schema:
-#        $ref: '#/definitions/models.CustomQuoteForm'
+#        $ref: '#/definitions/forms.CustomQuoteForm'
 #  responses:
 #    200:
 #      description: success
@@ -54,7 +54,7 @@ GET         /:id            controllers.custom.CustomQueryController.getSelected
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
 + nocsrf
-POST        /               controllers.custom.CustomQueryController.addCustomQuote
+POST        /               controllers.CustomQuoteController.addCustomQuote
 
 ###
 #  summary: Delete a selected quote from a custom build quote table
@@ -67,7 +67,7 @@ POST        /               controllers.custom.CustomQueryController.addCustomQu
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
 + nocsrf
-DELETE      /:id            controllers.custom.CustomQueryController.deleteCustomQuote(id: Int)
+DELETE      /:id            controllers.CustomQuoteController.deleteCustomQuote(id: Int)
 
 ###
 #  summary: Update a existing custom quote record in the table
@@ -114,4 +114,4 @@ DELETE      /:id            controllers.custom.CustomQueryController.deleteCusto
 #      description: "Validation exception"
 ###
 + nocsrf
-PUT         /:id            controllers.custom.CustomQueryController.updateCustomQuote(id: Int)
+PUT         /:id            controllers.CustomQuoteController.updateCustomQuote(id: Int)

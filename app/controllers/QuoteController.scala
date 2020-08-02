@@ -1,6 +1,7 @@
 package controllers
 
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
+import helper.ResponseMethod
 import javax.inject._
 import models.QuotesQuery
 import models.Genre.Genre
@@ -23,7 +24,7 @@ class QuoteController @Inject()(
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc)
-    with Responses
+    with ResponseMethod
     with Logging {
 
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
@@ -61,7 +62,7 @@ class QuoteController @Inject()(
       if (csvIdPattern.matches(csvid)) {
         favQuotesDAO.modifyFavQuote(csvid) match {
           case Success(favQuote)  => Ok(Json.toJson(favQuote))
-          case Failure(exception) => notFound(exception.getMessage)
+          case Failure(exception) => internalServerError(exception.getMessage)
         }
       } else {
         badRequest("Id of quote should be in CSV123 format!")

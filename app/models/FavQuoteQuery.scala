@@ -8,6 +8,7 @@ case class FavQuoteQuery(
     favTag: Boolean
 )
 
+// not needed
 object FavQuoteQuery {
   implicit lazy val favQuoteFormat: OFormat[FavQuoteQuery] =
     Json.format[FavQuoteQuery]
