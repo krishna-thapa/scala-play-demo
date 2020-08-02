@@ -1,26 +1,35 @@
-# An example controller showing how to use dependency injection
-
 ###
-#  summary: Get a random quote from a csv build quotation table
+#  summary: Get a random quote from a quotations table
 #  tags:
 #    - Quote Query table
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/models.CSVQuotesQuery'
+#        $ref: '#/definitions/models.QuotesQuery'
 ###
 GET      /random               controllers.QuoteController.getRandomQuote
 
 ###
-#  summary: Get a first 10 quote from a csv build quotation table
+#  summary: Get a first 10 quote from a quotations table
 #  tags:
 #    - Quote Query table
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/models.CSVQuotesQuery'
+#        $ref: '#/definitions/models.QuotesQuery'
 ###
 GET      /firstTen             controllers.QuoteController.getFirst10Quotes
+
+###
+#  summary: Get all the quotes from a quotations table
+#  tags:
+#    - Quote Query table
+#  responses:
+#    200:
+#      schema:
+#        $ref: '#/definitions/models.QuotesQuery'
+###
+GET      /allQuotes            controllers.QuoteController.getAllQuotes
 
 ###
 #  summary: Add a favorite quote in the fav_quotations table
@@ -37,7 +46,7 @@ GET      /firstTen             controllers.QuoteController.getFirst10Quotes
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/models.CSVQuotesQuery'
+#        $ref: '#/definitions/models.QuotesQuery'
 ###
 + nocsrf
 POST     /fav/:csvid            controllers.QuoteController.favQuote(csvid: String)
@@ -49,12 +58,12 @@ POST     /fav/:csvid            controllers.QuoteController.favQuote(csvid: Stri
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/models.CSVQuotesQuery'
+#        $ref: '#/definitions/models.QuotesQuery'
 ###
 GET      /favQuotes             controllers.QuoteController.getFavQuotes
 
 ###
-#  summary: Get a genre selected random quote from a csv build quotation table
+#  summary: Get a genre selected random quote from a quotations table
 #  description: "Only the hard-coded genre should be used"
 #  tags:
 #    - Quote Query table
@@ -68,6 +77,6 @@ GET      /favQuotes             controllers.QuoteController.getFavQuotes
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/models.CSVQuotesQuery'
+#        $ref: '#/definitions/models.QuotesQuery'
 ###
 GET      /:genre                controllers.QuoteController.getGenreQuote(genre: models.Genre.Value)

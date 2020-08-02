@@ -1,13 +1,13 @@
 package daos
 
 import javax.inject.Inject
-import models.CSVQuotesQuery
+import models.QuotesQuery
 import models.Genre.Genre
 import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
-import table.{ CSVQuoteQueriesTable, FavQuoteQueriesTable }
+import table.{ QuoteQueriesTable, FavQuoteQueriesTable }
 import utils.DbRunner
 import utils.Implicits._
 
@@ -20,27 +20,28 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
   private lazy val randomFunction                    = SimpleFunction.nullary[Double]("random")
 
   /**
-    * @return list of all stored quotes
+    * @return List of all stored quotes
     */
-  def allQuotes(): Seq[CSVQuotesQuery] =
-    runDbAction(CSVQuoteQueriesTable.CSVQuoteQueries.result)
+  def allQuotes(): Seq[QuotesQuery] =
+    runDbAction(QuoteQueriesTable.QuoteQueries.result)
 
   /**
-    * @return random quote from the database table
+    * @param records number of records to return
+    * @return Random quote from the database table
     */
-  def randomQuote(records: Int): Seq[CSVQuotesQuery] =
+  def randomQuote(records: Int): Seq[QuotesQuery] =
     runDbAction(
-      CSVQuoteQueriesTable.CSVQuoteQueries
+      QuoteQueriesTable.QuoteQueries
         .sortBy(_ => randomFunction)
         .take(records)
         .result
     )
 
   /**
-    * @return quotes that are marked as favorite
+    * @return Quotes that are marked as favorite
     */
-  def listAllFavQuotes(): Seq[CSVQuotesQuery] = {
-    val query = CSVQuoteQueriesTable.CSVQuoteQueries
+  def listAllFavQuotes(): Seq[QuotesQuery] = {
+    val query = QuoteQueriesTable.QuoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter(_.favTag))
       .on(_.csvid === _.csvid)
 
@@ -50,11 +51,11 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends 
 
   /**
     * @param genre to filter records with that genre
-    * @return lists of quotes that matches input genre
+    * @return Random quote that matches input genre
     */
-  def getGenreQuote(genre: Genre): Option[CSVQuotesQuery] = {
+  def getGenreQuote(genre: Genre): Option[QuotesQuery] = {
     runDbAction(
-      CSVQuoteQueriesTable.CSVQuoteQueries
+      QuoteQueriesTable.QuoteQueries
         .filter(_.genre === genre)
         .sortBy(_ => randomFunction)
         .result

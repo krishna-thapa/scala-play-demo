@@ -3,7 +3,7 @@ package models
 import models.Genre.Genre
 import play.api.libs.json._
 
-case class CSVQuotesQuery(
+case class QuotesQuery(
     id: Int,
     csvid: String,
     quote: String,
@@ -11,7 +11,7 @@ case class CSVQuotesQuery(
     genre: Genre
 ) extends QuotesTable
 
-object CSVQuotesQuery {
-  implicit lazy val quotesFormat: OFormat[CSVQuotesQuery] =
-    Json.format[CSVQuotesQuery]
+object QuotesQuery {
+  implicit lazy val quotesFormat: OFormat[QuotesQuery] =
+    Json.format[QuotesQuery]
 }

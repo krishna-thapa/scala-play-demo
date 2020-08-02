@@ -1,14 +1,14 @@
 package controllers
 
-import play.api.libs.json.{ Json, Writes }
+import play.api.libs.json.{ JsError, Json, Writes }
 import play.api.mvc.Result
 import play.api.mvc.Results._
 import utils.Logging
 
 trait Responses extends Logging {
 
-  def badRequest(msg: String): Result = {
-    log.warn(s"Bad Request error: $msg")
+  def badRequest(msg: String, error: JsError): Result = {
+    log.warn(JsError.toJson(error).toString)
     BadRequest(Json.toJson(Response(msg)))
   }
 

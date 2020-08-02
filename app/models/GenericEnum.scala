@@ -1,14 +1,12 @@
 package models
 
-import org.slf4j.LoggerFactory
 import play.api.data.FormError
 import play.api.data.format.Formatter
 import play.api.libs.json.{ Format, JsResult, JsString, JsSuccess, JsValue }
 import play.api.mvc.PathBindable
+import utils.Logging
 
-abstract class GenericEnum extends Enumeration {
-
-  private val logger = LoggerFactory.getLogger(classOf[GenericEnum])
+abstract class GenericEnum extends Enumeration with Logging {
 
   // Bind an enum to a play framework form:
   implicit def EnumFormatter: Formatter[Value] = new Formatter[Value] {
@@ -23,8 +21,8 @@ abstract class GenericEnum extends Enumeration {
         Right(GenericEnum.this.withName(enumValue))
       } catch {
         case e: NoSuchElementException =>
-          logger.error(s"Invalid Enum type: $enumValue")
-          Left(Seq(FormError(key, s"Invalid Enum type: $enumValue}")))
+          log.error(s"Database is empty with that genre: ${e.getMessage}:  $enumValue")
+          Left(Seq(FormError(key, s"Database is empty with that genre: $enumValue}")))
       }
     }
 
@@ -51,8 +49,8 @@ abstract class GenericEnum extends Enumeration {
         .find(_.toString.toLowerCase == value.toLowerCase) match {
         case Some(v) => Right(v)
         case None =>
-          logger.error(s"Invalid Enum type: $value")
-          Left(s"Invalid Enum type: $value")
+          log.error(s"Database is empty with that genre: $value")
+          Left(s"Database is empty with that genre: $value")
       }
 
     override def unbind(key: String, value: Value): String = value.toString
