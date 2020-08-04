@@ -1,5 +1,7 @@
 package models
 
+import utils.GenericEnum
+
 // format: off
 //https://scalameta.org/scalafmt/docs/known-issues.html#deeply-nested-code
 object Genre extends GenericEnum {

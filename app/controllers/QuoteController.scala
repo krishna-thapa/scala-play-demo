@@ -3,14 +3,11 @@ package controllers
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import helper.ResponseMethod
 import javax.inject._
-import models.QuotesQuery
 import models.Genre.Genre
-import play.api.libs.json._
 import play.api.mvc._
 import utils.Logging
 
 import scala.concurrent.ExecutionContext
-import scala.util.{ Failure, Success }
 import scala.util.matching.Regex
 
 /**
@@ -34,7 +31,7 @@ class QuoteController @Inject()(
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseResult(quotesDAO.randomQuote(1))
+    responseSeqResult(quotesDAO.randomQuote(1))
   }
 
   /**
@@ -42,7 +39,7 @@ class QuoteController @Inject()(
     */
   def getAllQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAllQuotes")
-    responseResult(quotesDAO.allQuotes())
+    responseSeqResult(quotesDAO.allQuotes())
   }
 
   /**
@@ -50,7 +47,7 @@ class QuoteController @Inject()(
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
-    responseResult(quotesDAO.randomQuote(10))
+    responseSeqResult(quotesDAO.randomQuote(10))
   }
 
   /**
@@ -60,10 +57,7 @@ class QuoteController @Inject()(
     implicit request: Request[AnyContent] =>
       log.info("Executing favQuote")
       if (csvIdPattern.matches(csvid)) {
-        favQuotesDAO.modifyFavQuote(csvid) match {
-          case Success(favQuote)  => Ok(Json.toJson(favQuote))
-          case Failure(exception) => internalServerError(exception.getMessage)
-        }
+        responseTryResult(favQuotesDAO.modifyFavQuote(csvid))
       } else {
         badRequest("Id of quote should be in CSV123 format!")
       }
@@ -74,7 +68,7 @@ class QuoteController @Inject()(
     */
   def getFavQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFavQuotes")
-    responseResult(quotesDAO.listAllFavQuotes())
+    responseSeqResult(quotesDAO.listAllFavQuotes())
   }
 
   /**
@@ -82,12 +76,7 @@ class QuoteController @Inject()(
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
-    Ok(Json.toJson(quotesDAO.getGenreQuote(genre)))
-  }
-
-  def responseResult(quotes: Seq[QuotesQuery]): Result = {
-    if (quotes.nonEmpty) Ok(Json.toJson(quotes))
-    else notFound("Database is empty!")
+    responseOptionResult(quotesDAO.getGenreQuote(genre))
   }
 
 }

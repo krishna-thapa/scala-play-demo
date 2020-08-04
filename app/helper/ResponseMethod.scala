@@ -1,13 +1,13 @@
 package helper
 
 import controllers.Assets.Ok
-import models.{ CustomQuotesQuery, QuotesTable }
 import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.{ Json, Writes }
+import play.api.libs.json.{ Json, OFormat, Writes }
 import play.api.mvc.Result
 import play.api.mvc.Results._
 import utils.Logging
+
+import scala.util.{ Failure, Success, Try }
 
 trait ResponseMethod extends Logging {
 
@@ -33,10 +33,24 @@ trait ResponseMethod extends Logging {
       Json.writes[Response]
   }
 
-  // update the upper bound with more generic subtype
-  def responseRedsult[T <: CustomQuotesQuery](records: Seq[T]): Result = {
+  def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
     else notFound("Database is empty!")
+  }
+
+  def responseOptionResult[T](record: Option[T])(implicit conv: OFormat[T]): Result = {
+    record match {
+      case Some(quote) => Ok(Json.toJson(quote))
+      case None =>
+        notFound("Database is empty!")
+    }
+  }
+
+  def responseTryResult[T](record: Try[T])(implicit conv: OFormat[T]): Result = {
+    record match {
+      case Success(quote)     => Ok(Json.toJson(quote))
+      case Failure(exception) => internalServerError(exception.getMessage)
+    }
   }
 
 }

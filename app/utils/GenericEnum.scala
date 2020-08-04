@@ -1,10 +1,9 @@
-package models
+package utils
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import play.api.libs.json.{ Format, JsResult, JsString, JsSuccess, JsValue }
+import play.api.libs.json._
 import play.api.mvc.PathBindable
-import utils.Logging
 
 abstract class GenericEnum extends Enumeration with Logging {
 

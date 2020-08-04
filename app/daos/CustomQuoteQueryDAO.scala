@@ -51,7 +51,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   def listRandomQuote(): Option[CustomQuotesQuery] = {
     val randomFunction = SimpleFunction.nullary[Double]("random")
     runDbAction(
-      CustomQuotesQueriesTable.customQuoteQueries.sortBy(x => randomFunction).result.headOption
+      CustomQuotesQueriesTable.customQuoteQueries.sortBy(_ => randomFunction).result.headOption
     )
   }
 

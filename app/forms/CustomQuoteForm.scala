@@ -1,6 +1,7 @@
-package models
+package forms
 
 import models.Genre.Genre
+import models.QuotesTable
 
 case class CustomQuoteForm(
     quote: String,
