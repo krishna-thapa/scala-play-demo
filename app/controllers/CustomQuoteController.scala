@@ -7,10 +7,12 @@ import helper.ResponseMethod
 import javax.inject.{ Inject, Singleton }
 import models.CustomQuotesQuery
 import play.api.libs.json.Json
+import play.api.mvc.Results.Ok
 import play.api.mvc._
 import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 @Singleton
 class CustomQuoteController @Inject()(
@@ -50,26 +52,28 @@ class CustomQuoteController @Inject()(
     */
   def deleteCustomQuote(id: Int): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      customerQuotesDAO.deleteQuote(id)
-      log.warn(s"Successfully delete entry $id")
-      Ok(s"Successfully delete entry $id")
+      if (customerQuotesDAO.deleteQuote(id) > 0) {
+        log.warn(s"Successfully delete entry $id")
+        Ok(s"Successfully delete entry $id")
+      } else {
+        val error = s"Error on request with id: $id"
+        badRequest(error)
+      }
   }
 
   /**
     * A REST endpoint that add a new quote as JSON to Custom quotes table.
     */
   def addCustomQuote(): Action[AnyContent] = Action { implicit request =>
-    Ok("Your new application is ready.")
-  /*    RequestForm.quotesQueryForm.bindFromRequest.fold(
+    log.info("Executing addCustomQuote")
+    RequestForm.quotesQueryForm.bindFromRequest.fold(
       formWithErrors => {
-        Future.successful(BadRequest("error" + formWithErrors))
+        badRequest("error" + formWithErrors)
       },
       customQuote => {
-        customerQuotesDAO.createQuote(customQuote).map { _ =>
-          Redirect(routes.CustomQueryController.getCustomQuotes())
-        }
+        Ok(Json.toJson(customerQuotesDAO.createQuote(customQuote)))
       }
-    )*/
+    )
   }
 
   /**
@@ -77,17 +81,18 @@ class CustomQuoteController @Inject()(
     */
   def updateCustomQuote(id: Int): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      Ok("Your new application is ready.")
-    /*      RequestForm.quotesQueryForm.bindFromRequest.fold(
+      log.info("Executing updateCustomQuote")
+      RequestForm.quotesQueryForm.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest("error" + formWithErrors))
+          badRequest("error" + formWithErrors)
         },
         customQuote => {
-          customerQuotesDAO.updateQuote(id, customQuote).map { _ =>
-            Redirect(routes.CustomQueryController.getCustomQuotes())
+          customerQuotesDAO.updateQuote(id, customQuote) match {
+            case Success(id)        => Ok(s"Successfully updated entry row $id")
+            case Failure(exception) => internalServerError(exception.getMessage)
           }
         }
-      )*/
+      )
   }
 
 }

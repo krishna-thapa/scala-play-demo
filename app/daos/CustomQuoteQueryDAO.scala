@@ -11,6 +11,8 @@ import table.CustomQuotesQueriesTable
 import utils.Implicits.genreEnumMapper
 import utils.{ DbRunner, Logging }
 
+import scala.util.Try
+
 /**
   * A repository for the custom quotes
   *
@@ -85,8 +87,8 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param customQuote updated custom quote object
     * @return number of updated records, just 1 here
     */
-  def updateQuote(id: Int, customQuote: CustomQuoteForm): Int = {
-    runDbAction(
+  def updateQuote(id: Int, customQuote: CustomQuoteForm): Try[Int] = {
+    runDbActionCatchError(
       CustomQuotesQueriesTable.customQuoteQueries
         .filter(_.id === id)
         .map(quote => (quote.quote, quote.author, quote.genre, quote.ownquote))
@@ -103,7 +105,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * Delete the record from the table
     * @param id of the selected row from the CustomQuotesQuery table
     */
-  def deleteQuote(id: Int): Unit = {
+  def deleteQuote(id: Int): Int = {
     runDbAction(CustomQuotesQueriesTable.customQuoteQueries.filter(_.id === id).delete)
   }
 }

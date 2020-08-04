@@ -68,3 +68,13 @@ And then go to <http://localhost:9000> to see the running web application.
 - Use of enumeration with slick in play framework
     - Update a column with type enumeration using play-slick: Need to define the custom column type: https://stackoverflow.com/questions/47944361/play-slick-updating-enumeration-column
     - Implement an implicit Writes or Format for a case class including an Enumeration: https://github.com/jethrogillgren/play-samples/blob/workingversion/play-scala-hello-world-tutorial/app/models/Search.scala
+    
+## Coming improvements:
+- Enable log info
+- Change the type of Genre to Option
+- Change the created date to Instant type
+- Put validation in the create custom and update record
+- Test
+
+## Epic to resolve not to get random record that has been called like within past 500 records
+- See [play caching](https://www.playframework.com/documentation/2.8.x/ScalaCache)
