@@ -1,5 +1,10 @@
 # Over-view of the project
 
+## Initialise the postgres database
+- Run the script file under `/scripts/setup-db`
+- Script should create the database and run the `dbsetup.sql`
+- Data from `data/Quotes.csv` file should be loaded to the tables that are coded in the `dbsetup.sql`
+
 ## Run the Project using sbt
 ```bash
 sbt clean compile test run
@@ -59,22 +64,22 @@ And then go to <http://localhost:9000> to see the running web application.
 - Do random read operation using NoSQL JSON data file 
 - Introduce feature of making favorite in selected quotes
 
-## Tickets to do un Front-end
-- Create a Vue.js project inside the same repo of inspirational-quote using vue ui 
-
 ## Major issues faces so far
-- Splitted routes are not recompiled: https://stackoverflow.com/questions/55289199/the-generated-route-files-of-play-framework-are-re-generated-automatically-even
+- Split routes are not recompiled: https://stackoverflow.com/questions/55289199/the-generated-route-files-of-play-framework-are-re-generated-automatically-even
 - Disable the CSRF filter for a specific route in the routes file: add the nocsrf modifier tag before your route (for POST, PUT and DELETE)
 - Use of enumeration with slick in play framework
     - Update a column with type enumeration using play-slick: Need to define the custom column type: https://stackoverflow.com/questions/47944361/play-slick-updating-enumeration-column
     - Implement an implicit Writes or Format for a case class including an Enumeration: https://github.com/jethrogillgren/play-samples/blob/workingversion/play-scala-hello-world-tutorial/app/models/Search.scala
     
 ## Coming improvements:
-- Enable log info
-- Change the type of Genre to Option
 - Change the created date to Instant type
 - Put validation in the create custom and update record
-- Test
+- Test using H2
 
 ## Epic to resolve not to get random record that has been called like within past 500 records
 - See [play caching](https://www.playframework.com/documentation/2.8.x/ScalaCache)
+- Use of stack to store and remove the old one once the new are added and give size 
+
+## Epic to put the functionality for search (filter, pagination, auto-complete) 
+
+## Epic to insert a new genre and store list of genre and get all distinct genre from all tables

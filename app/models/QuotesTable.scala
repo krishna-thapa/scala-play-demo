@@ -4,12 +4,12 @@ import models.Genre.Genre
 
 trait QuotesTable {
 
-  val quote: String
+  def quote: String
 
-  val author: String
+  def author: String
 
-  val genre: Genre
+  def genre: Option[Genre]
 
-  //def hasGenre: Boolean = genre
+  def hasGenre: Boolean = genre.isDefined
 
 }

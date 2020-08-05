@@ -8,7 +8,7 @@ case class QuotesQuery(
     csvid: String,
     quote: String,
     author: String,
-    genre: Genre
+    genre: Option[Genre] = None
 ) extends QuotesTable
 
 object QuotesQuery {

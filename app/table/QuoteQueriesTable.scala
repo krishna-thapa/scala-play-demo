@@ -8,11 +8,11 @@ import utils.Implicits._
 
 class QuoteQueriesTable(tag: Tag) extends Table[QuotesQuery](tag, "quotations") {
 
-  def id: Rep[Int]        = column[Int]("id", O.AutoInc)
-  def csvid: Rep[String]  = column[String]("csvid", O.PrimaryKey)
-  def quote: Rep[String]  = column[String]("quote")
-  def author: Rep[String] = column[String]("author")
-  def genre: Rep[Genre]   = column[Genre]("genre")
+  def id: Rep[Int]              = column[Int]("id", O.AutoInc)
+  def csvid: Rep[String]        = column[String]("csvid", O.PrimaryKey)
+  def quote: Rep[String]        = column[String]("quote")
+  def author: Rep[String]       = column[String]("author")
+  def genre: Rep[Option[Genre]] = column[Option[Genre]]("genre")
 
   def * : ProvenShape[QuotesQuery] =
     (id, csvid, quote, author, genre) <> ((QuotesQuery.apply _).tupled, QuotesQuery.unapply)

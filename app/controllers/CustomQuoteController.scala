@@ -1,17 +1,14 @@
 package controllers
 
-//import controllers.custom.routes
 import daos.CustomQuoteQueryDAO
 import forms.RequestForm
 import helper.ResponseMethod
 import javax.inject.{ Inject, Singleton }
-import models.CustomQuotesQuery
 import play.api.libs.json.Json
-import play.api.mvc.Results.Ok
 import play.api.mvc._
 import utils.Logging
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }
 
 @Singleton
@@ -66,6 +63,7 @@ class CustomQuoteController @Inject()(
     */
   def addCustomQuote(): Action[AnyContent] = Action { implicit request =>
     log.info("Executing addCustomQuote")
+    // Add request validation
     RequestForm.quotesQueryForm.bindFromRequest.fold(
       formWithErrors => {
         badRequest("error" + formWithErrors)

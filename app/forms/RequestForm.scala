@@ -13,7 +13,7 @@ object RequestForm {
     mapping(
       "quote"    -> nonEmptyText.verifying(_.nonEmpty),
       "author"   -> nonEmptyText,
-      "genre"    -> Forms.of[Genre],
+      "genre"    -> optional(Forms.of[Genre]),
       "ownquote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }

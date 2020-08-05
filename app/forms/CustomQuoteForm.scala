@@ -6,6 +6,6 @@ import models.QuotesTable
 case class CustomQuoteForm(
     quote: String,
     author: String,
-    genre: Genre,
+    genre: Option[Genre] = None,
     ownquote: Boolean
 ) extends QuotesTable

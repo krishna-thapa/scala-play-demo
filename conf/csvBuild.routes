@@ -10,7 +10,7 @@
 GET      /random               controllers.QuoteController.getRandomQuote
 
 ###
-#  summary: Get a first 10 quote from a quotations table
+#  summary: Get a random 10 quotes from a quotations table
 #  tags:
 #    - Quote Query table
 #  responses:
@@ -18,7 +18,7 @@ GET      /random               controllers.QuoteController.getRandomQuote
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /firstTen             controllers.QuoteController.getFirst10Quotes
+GET      /randomTen             controllers.QuoteController.getFirst10Quotes
 
 ###
 #  summary: Get all the quotes from a quotations table

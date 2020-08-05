@@ -9,7 +9,7 @@ case class CustomQuotesQuery(
     id: Int,
     quote: String,
     author: String,
-    genre: Genre,
+    genre: Option[Genre] = None,
     storeddate: Date,
     ownquote: Boolean
 ) extends QuotesTable
