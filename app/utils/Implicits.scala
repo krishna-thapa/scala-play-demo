@@ -2,8 +2,6 @@ package utils
 
 import models.Genre
 import models.Genre.Genre
-import play.api.data.FormError
-import play.api.data.format.Formatter
 import slick.ast.BaseTypedType
 import slick.jdbc.PostgresProfile.api._
 

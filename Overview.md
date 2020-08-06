@@ -80,6 +80,9 @@ And then go to <http://localhost:9000> to see the running web application.
 - See [play caching](https://www.playframework.com/documentation/2.8.x/ScalaCache)
 - Use of stack to store and remove the old one once the new are added and give size 
 
-## Epic to put the functionality for search (filter, pagination, auto-complete) 
+## Epic to put the functionality for search (filter, pagination, auto-complete)
+- Text search using postgres
+- https://github.com/tminglei/slick-pg
+- https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/ 
 
 ## Epic to insert a new genre and store list of genre and get all distinct genre from all tables

@@ -2,37 +2,31 @@ package helper
 
 import controllers.Assets.Ok
 import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.{ Json, OFormat, Writes }
+import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
 import play.api.mvc.Results._
 import utils.Logging
 
 import scala.util.{ Failure, Success, Try }
 
-trait ResponseMethod extends Logging {
+trait ResponseMethod extends ErrorResponses with Logging {
 
   def badRequest(msg: String): Result = {
     log.warn(s"Bad request error: $msg")
-    BadRequest(Json.toJson(Response(msg)))
+    BadRequest(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def notFound(msg: String): Result = {
     log.warn(s"Not Found error: $msg")
-    NotFound(Json.toJson(Response(msg)))
+    NotFound(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def internalServerError(msg: String): Result = {
     log.warn(s"Internal server error: $msg")
-    InternalServerError(Json.toJson(Response(msg)))
+    InternalServerError(Json.toJson(ResponseErrorMsg(msg)))
   }
 
-  case class Response(userMsg: String)
-
-  object Response {
-    implicit val responseError: Writes[Response] =
-      Json.writes[Response]
-  }
-
+  //implicit val write[T]: OFormat[T]
   def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
     else notFound("Database is empty!")
