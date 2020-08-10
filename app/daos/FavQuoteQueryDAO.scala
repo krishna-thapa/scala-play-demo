@@ -1,13 +1,13 @@
 package daos
 
 import javax.inject.{ Inject, Singleton }
-import models.FavQuoteQuery
+import models.{ FavQuoteQuery, QuotesQuery }
 import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
 import slick.dbio.Effect
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
-import table.FavQuoteQueriesTable
+import table.{ FavQuoteQueriesTable, QuoteQueriesTable }
 import utils.{ DbRunner, Logging }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,9 +16,23 @@ import scala.util.Try
 @Singleton
 class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     extends DbRunner
+    with CommonMethods
     with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+
+  type T = QuotesQuery
+
+  /**
+    * @return Quotes that are marked as favorite
+    */
+  def listAllQuotes(): Seq[QuotesQuery] = {
+    val query = QuoteQueriesTable.quoteQueries
+      .join(FavQuoteQueriesTable.favQuoteQueries.filter(_.favTag))
+      .on(_.csvid === _.csvid)
+
+    runDbAction(query.result).map(_._1)
+  }
 
   // list all records from the fav_quotes table
   //def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)

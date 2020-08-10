@@ -1,6 +1,5 @@
 package helper
 
-import play.api.libs.json.OFormat
 import play.api.mvc.Result
 
 trait ErrorResponses {
@@ -10,7 +9,5 @@ trait ErrorResponses {
   def notFound(msg: String): Result
 
   def internalServerError(msg: String): Result
-
-  def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result
 
 }

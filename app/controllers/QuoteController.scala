@@ -31,7 +31,7 @@ class QuoteController @Inject()(
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseSeqResult(quotesDAO.randomQuote(1))
+    responseSeqResult(quotesDAO.listRandomQuote(1))
   }
 
   /**
@@ -39,7 +39,7 @@ class QuoteController @Inject()(
     */
   def getAllQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAllQuotes")
-    responseSeqResult(quotesDAO.allQuotes())
+    responseSeqResult(quotesDAO.listAllQuotes())
   }
 
   /**
@@ -47,7 +47,7 @@ class QuoteController @Inject()(
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
-    responseSeqResult(quotesDAO.randomQuote(10))
+    responseSeqResult(quotesDAO.listRandomQuote(10))
   }
 
   /**
@@ -68,7 +68,7 @@ class QuoteController @Inject()(
     */
   def getFavQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFavQuotes")
-    responseSeqResult(quotesDAO.listAllFavQuotes())
+    responseSeqResult(favQuotesDAO.listAllQuotes())
   }
 
   /**

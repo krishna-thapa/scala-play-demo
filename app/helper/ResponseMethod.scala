@@ -9,7 +9,7 @@ import utils.Logging
 
 import scala.util.{ Failure, Success, Try }
 
-trait ResponseMethod extends ErrorResponses with Logging {
+trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
 
   def badRequest(msg: String): Result = {
     log.warn(s"Bad request error: $msg")
@@ -26,7 +26,6 @@ trait ResponseMethod extends ErrorResponses with Logging {
     InternalServerError(Json.toJson(ResponseErrorMsg(msg)))
   }
 
-  //implicit val write[T]: OFormat[T]
   def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
     else notFound("Database is empty!")

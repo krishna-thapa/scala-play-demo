@@ -25,7 +25,7 @@ class CustomQuoteController @Inject()(
     */
   def getCustomQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getCustomQuotes")
-    responseSeqResult(customerQuotesDAO.listCustomQuotes())
+    responseSeqResult(customerQuotesDAO.listAllQuotes())
   }
 
   /**
@@ -33,7 +33,7 @@ class CustomQuoteController @Inject()(
     */
   def getRandomCustomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomCustomQuote")
-    responseOptionResult(customerQuotesDAO.listRandomQuote())
+    responseSeqResult(customerQuotesDAO.listRandomQuote(1))
   }
 
   /**
