@@ -3,7 +3,7 @@ package models
 import models.Genre.Genre
 import play.api.libs.json._
 
-case class QuotesQuery(
+final case class QuotesQuery(
     id: Int,
     csvid: String,
     quote: String,

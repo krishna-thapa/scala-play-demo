@@ -2,7 +2,7 @@ package models
 
 import play.api.libs.json.{ Json, OFormat }
 
-case class FavQuoteQuery(
+final case class FavQuoteQuery(
     id: Int,
     csvid: String,
     favTag: Boolean

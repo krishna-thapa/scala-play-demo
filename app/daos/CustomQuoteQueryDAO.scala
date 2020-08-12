@@ -24,13 +24,13 @@ import scala.util.Try
 
 @Singleton
 class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends DbRunner
-    with CommonMethods
+    extends CommonMethods[CustomQuotesQuery]
+    with DbRunner
     with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
-  type T = CustomQuotesQuery
+  //type T = CustomQuotesQuery
 
   /**
     * List all the records from the table

@@ -15,8 +15,8 @@ import scala.util.Try
 
 @Singleton
 class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends DbRunner
-    with CommonMethods
+    extends CommonMethods[QuotesQuery]
+    with DbRunner
     with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]

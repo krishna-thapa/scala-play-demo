@@ -3,9 +3,9 @@ package daos
 import slick.ast.ScalaBaseType.doubleType
 import slick.lifted.{ Rep, SimpleFunction }
 
-trait CommonMethods {
+abstract class CommonMethods[T] {
 
-  type T
+  //type T  //https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics
 
   def listAllQuotes(): Seq[T]
 

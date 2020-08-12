@@ -15,7 +15,7 @@ import utils.Implicits._
   * A repository for Quotes stored in quotations table.
   */
 class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends CommonMethods
+    extends CommonMethods[QuotesQuery]
     with DbRunner {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
