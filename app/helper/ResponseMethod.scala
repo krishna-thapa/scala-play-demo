@@ -1,6 +1,5 @@
 package helper
 
-import controllers.Assets.Ok
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
