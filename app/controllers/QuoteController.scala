@@ -4,11 +4,15 @@ import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import helper.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
+import models.QuotesQuery
 import play.api.mvc._
 import utils.Logging
+import play.api.cache.redis.{ CacheApi, RedisList, RedisSet, SynchronousResult }
 
 import scala.concurrent.ExecutionContext
 import scala.util.matching.Regex
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
@@ -16,6 +20,7 @@ import scala.util.matching.Regex
   */
 @Singleton
 class QuoteController @Inject()(
+    cache: CacheApi,
     cc: ControllerComponents,
     quotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
@@ -26,12 +31,28 @@ class QuoteController @Inject()(
 
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
+  //val cacheSet: RedisSet[String, SynchronousResult]                  = cache.set[String]("my-set")
+  protected lazy val cacheList: RedisList[String, SynchronousResult] = cache.list[String]("my-list")
+
   /**
     * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseSeqResult(quotesDAO.listRandomQuote(1))
+    val demo: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
+    redisActions(demo.head.csvid)
+    log.info("Cache in the demolist: " + cacheList.toList)
+    responseSeqResult(demo)
+  }
+
+  def redisActions(csvid: String): Unit = {
+    val demolist = cacheList.toList
+    if (demolist.size < 5 && !demolist.toList.contains(csvid)) {
+      cacheList.append(csvid)
+    } else {
+      cacheList.removeAt(position = 0)
+      cacheList.append(csvid)
+    }
   }
 
   /**

@@ -13,6 +13,8 @@ lazy val root = (project in file("."))
     scalaVersion := "2.13.1",
     libraryDependencies ++= Seq(
       guice,
+      cacheApi,
+      playRedis,
       postgres,
       playSlickEvolutions,
       playSlick,

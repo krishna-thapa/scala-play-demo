@@ -19,3 +19,10 @@ libraryDependencies ++= Seq(
 )
 ```
 
+enable the RedisCacheModule. See `application.conf`
+```
+play.modules.enabled += play.api.cache.redis.RedisCacheModule
+```
+
+
+
