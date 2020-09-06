@@ -32,4 +32,4 @@ CREATE TABLE fav_quotations (
 );
 
 -- Have to be full path for the csv file
-COPY quotations(quote,author,genre) FROM '/Users/santosh/gitHome/Inspirational-quote-api/data/Quotes.csv' DELIMITER ';' CSV HEADER;
+COPY quotations(quote,author,genre) FROM '/Users/santosh/gitHome/Inspirational-quote-api/data/Quotes-test.csv' DELIMITER ';' CSV HEADER;

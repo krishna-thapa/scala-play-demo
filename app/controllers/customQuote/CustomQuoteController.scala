@@ -1,4 +1,4 @@
-package controllers
+package controllers.customQuote
 
 import daos.CustomQuoteQueryDAO
 import forms.RequestForm

@@ -1,18 +1,17 @@
-package controllers
+package controllers.quote
 
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import helper.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
 import models.QuotesQuery
+import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
+import play.api.libs.json.Json
 import play.api.mvc._
 import utils.Logging
-import play.api.cache.redis.{ CacheApi, RedisList, RedisSet, SynchronousResult }
 
 import scala.concurrent.ExecutionContext
 import scala.util.matching.Regex
-import scala.concurrent.Future
-import scala.concurrent.duration._
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
@@ -31,28 +30,45 @@ class QuoteController @Inject()(
 
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
-  //val cacheSet: RedisSet[String, SynchronousResult]                  = cache.set[String]("my-set")
-  protected lazy val cacheList: RedisList[String, SynchronousResult] = cache.list[String]("my-list")
+  // A cache API that uses synchronous calls rather than async calls.
+  // Useful when you know you have a fast in-memory cache.
+  protected lazy val cacheList: RedisList[String, SynchronousResult] =
+    cache.list[String]("cacheIdsList")
+  // TODO: make the max list size to 500
+  protected lazy val maxListSize: Int = 5
 
   /**
     * A REST endpoint that gets a random quote as JSON from CSV quotes table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    val demo: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
-    redisActions(demo.head.csvid)
-    log.info("Cache in the demolist: " + cacheList.toList)
-    responseSeqResult(demo)
+    val getRandomQuery: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
+    log.info("ID of the record: " + getRandomQuery.head.csvid)
+    if (getRandomQuery.nonEmpty) {
+      if (cacheList.toList.toList.contains(getRandomQuery.head.csvid)) {
+        log.warn("Duplicate record has been called with id: " + getRandomQuery.head.csvid)
+        //Ok(Json.toJson(getRandomQuery))
+        Redirect(routes.QuoteController.getRandomQuote())
+      } else {
+        redisActions(getRandomQuery.head.csvid)
+        Ok(Json.toJson(getRandomQuery))
+      }
+    } else {
+      notFound("Database is empty!")
+    }
+  //responseSeqResult(getRandomQuery)
   }
 
-  def redisActions(csvid: String): Unit = {
-    val demolist = cacheList.toList
-    if (demolist.size < 5 && !demolist.toList.contains(csvid)) {
-      cacheList.append(csvid)
-    } else {
-      cacheList.removeAt(position = 0)
-      cacheList.append(csvid)
-    }
+  /**
+    * Unit return method that stores the ids in redis list
+    * if the list exceeds max length, it deletes the first one and appends to last element
+    * @param csvid Unique id of the record
+    */
+  private def redisActions(csvid: String): Unit = {
+    // && !demolist.toList.contains(csvid)
+    if (cacheList.size >= maxListSize) cacheList.removeAt(0)
+    cacheList.append(csvid)
+    log.info("Ids in the Redis storage: " + cacheList.toList)
   }
 
   /**

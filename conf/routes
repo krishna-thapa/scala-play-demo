@@ -2,11 +2,11 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# CSV build endpoints for the table "csv_quotations"
-->      /csvQuote                   csvBuild.Routes
+# CSV build endpoints for the table "quotations"
+->      /quote                      quoteBuild.Routes
 
 # CRUD operation endpoints for the custom table "custom_quotations"
-->      /customQuote                customBuild.Routes
+->      /customQuote                customQuoteBuild.Routes
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index

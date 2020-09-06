@@ -7,7 +7,7 @@
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /random               controllers.QuoteController.getRandomQuote
+GET      /random               controllers.quote.QuoteController.getRandomQuote
 
 ###
 #  summary: Get a random 10 quotes from a quotations table
@@ -18,7 +18,7 @@ GET      /random               controllers.QuoteController.getRandomQuote
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /randomTen             controllers.QuoteController.getFirst10Quotes
+GET      /randomTen             controllers.quote.QuoteController.getFirst10Quotes
 
 ###
 #  summary: Get all the quotes from a quotations table
@@ -29,7 +29,7 @@ GET      /randomTen             controllers.QuoteController.getFirst10Quotes
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /allQuotes            controllers.QuoteController.getAllQuotes
+GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 
 ###
 #  summary: Add a favorite quote in the fav_quotations table
@@ -49,7 +49,7 @@ GET      /allQuotes            controllers.QuoteController.getAllQuotes
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
 + nocsrf
-POST     /fav/:csvid            controllers.QuoteController.favQuote(csvid: String)
+POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid: String)
 
 ###
 #  summary: Get all the quotes that are marked as favorite in the fav_quotations table
@@ -60,7 +60,7 @@ POST     /fav/:csvid            controllers.QuoteController.favQuote(csvid: Stri
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /favQuotes             controllers.QuoteController.getFavQuotes
+GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 
 ###
 #  summary: Get a genre selected random quote from a quotations table
@@ -79,4 +79,4 @@ GET      /favQuotes             controllers.QuoteController.getFavQuotes
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
 ###
-GET      /:genre                controllers.QuoteController.getGenreQuote(genre: models.Genre.Value)
+GET      /:genre                controllers.quote.QuoteController.getGenreQuote(genre: models.Genre.Value)
