@@ -1,33 +1,49 @@
 ###
 #  summary: Get a random quote from a quotations table
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  responses:
 #    200:
+#      description: Success response of the quote.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 GET      /random               controllers.quote.QuoteController.getRandomQuote
 
 ###
 #  summary: Get a random 10 quotes from a quotations table
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  responses:
 #    200:
+#      description: Success response of the quotes.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 GET      /randomTen             controllers.quote.QuoteController.getFirst10Quotes
 
 ###
 #  summary: Get all the quotes from a quotations table
+#  description: "This can only be done by the logged in user."
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  responses:
 #    200:
+#      description: Success response of the quotes.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 
@@ -35,7 +51,7 @@ GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 #  summary: Add a favorite quote in the fav_quotations table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  parameters:
 #    - name: "csvid"
 #      in: "path"
@@ -44,9 +60,17 @@ GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 #      type: "string"
 #  responses:
 #    200:
-#      description: success
+#      description: Success response of adding quote to favorite table.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    400:
+#      description: Bad request. ID should be in CSV[0-9] format
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 + nocsrf
 POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid: String)
@@ -54,11 +78,16 @@ POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid
 ###
 #  summary: Get all the quotes that are marked as favorite in the fav_quotations table
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  responses:
 #    200:
+#      description: Success response of the favourite quotes.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 
@@ -66,7 +95,7 @@ GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 #  summary: Get a genre selected random quote from a quotations table
 #  description: "Only the hard-coded genre should be used"
 #  tags:
-#    - Quote Query table
+#    - QuoteQueryBuild
 #  parameters:
 #    - name: "genre"
 #      in: "path"
@@ -76,7 +105,12 @@ GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 #      enum: ["love", "freedom", "famous", "romantic", "sad", "suspense", "demo"]
 #  responses:
 #    200:
+#      description: Success response of the quotes.
 #      schema:
 #        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
 ###
 GET      /:genre                controllers.quote.QuoteController.getGenreQuote(genre: models.Genre.Value)

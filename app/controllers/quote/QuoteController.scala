@@ -15,7 +15,7 @@ import scala.util.matching.Regex
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
-  * application's quotes from CSV Query table.
+  * application's quotes from 'quotations' table.
   */
 @Singleton
 class QuoteController @Inject()(
@@ -38,25 +38,23 @@ class QuoteController @Inject()(
   protected lazy val maxListSize: Int = 5
 
   /**
-    * A REST endpoint that gets a random quote as JSON from CSV quotes table.
+    * A REST endpoint that gets a random quote as JSON from quotations table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    val getRandomQuery: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
-    log.info("ID of the record: " + getRandomQuery.head.csvid)
-    if (getRandomQuery.nonEmpty) {
-      if (cacheList.toList.toList.contains(getRandomQuery.head.csvid)) {
-        log.warn("Duplicate record has been called with id: " + getRandomQuery.head.csvid)
-        //Ok(Json.toJson(getRandomQuery))
+    val randomQuote: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
+    if (randomQuote.nonEmpty) {
+      val csvId: String = randomQuote.head.csvid
+      if (cacheList.toList.toList.contains(csvId)) {
+        log.warn("Duplicate record has been called with id: " + csvId)
         Redirect(routes.QuoteController.getRandomQuote())
       } else {
-        redisActions(getRandomQuery.head.csvid)
-        Ok(Json.toJson(getRandomQuery))
+        redisActions(csvId)
+        Ok(Json.toJson(randomQuote))
       }
     } else {
       notFound("Database is empty!")
     }
-  //responseSeqResult(getRandomQuery)
   }
 
   /**
@@ -65,7 +63,6 @@ class QuoteController @Inject()(
     * @param csvid Unique id of the record
     */
   private def redisActions(csvid: String): Unit = {
-    // && !demolist.toList.contains(csvid)
     if (cacheList.size >= maxListSize) cacheList.removeAt(0)
     cacheList.append(csvid)
     log.info("Ids in the Redis storage: " + cacheList.toList)

@@ -5,7 +5,7 @@
 ###
 #  summary: Get all the quotes from a custom build quote table
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  responses:
 #    200:
 #      schema:
@@ -16,7 +16,7 @@ GET         /all            controllers.customQuote.CustomQuoteController.getCus
 ###
 #  summary: Get a random quote from a custom build quote table
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  responses:
 #    200:
 #      schema:
@@ -27,7 +27,7 @@ GET         /random         controllers.customQuote.CustomQuoteController.getRan
 ###
 #  summary: Get a selected quote from a custom build quote table
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  responses:
 #    200:
 #      schema:
@@ -39,7 +39,7 @@ GET         /:id            controllers.customQuote.CustomQuoteController.getSel
 #  summary: Create a new custom quote to the table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  parameters:
 #    - name: body
 #      in: body
@@ -60,7 +60,7 @@ POST        /               controllers.customQuote.CustomQuoteController.addCus
 #  summary: Delete a selected quote from a custom build quote table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  responses:
 #    200:
 #      schema:
@@ -73,7 +73,7 @@ DELETE      /:id            controllers.customQuote.CustomQuoteController.delete
 #  summary: Update a existing custom quote record in the table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - Custom Query table
+#    - CustomQuoteQueryBuild
 #  parameters:
 #    - name: "id"
 #      in: "path"
