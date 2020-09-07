@@ -15,6 +15,29 @@
 GET      /random               controllers.quote.QuoteController.getRandomQuote
 
 ###
+#  summary: Get a quote of the day from a quotations table
+#  description: "It can take optional date path paramter in milliseconds format that can give past 5 days of quote of the day"
+#  tags:
+#    - QuoteQueryBuild
+#  parameters:
+#    - name: "date"
+#      in: "query"
+#      description: "Last five dates in milliseconds"
+#      required: false
+#      type: "Option[String]"
+#  responses:
+#    200:
+#      description: Success response of the quote of the day.
+#      schema:
+#        $ref: '#/definitions/models.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/helper.ResponseErrorMsg'
+###
+GET      /quoteOfTheDay         controllers.quote.QuoteController.getQuoteOfTheDay(date: Option[String])
+
+###
 #  summary: Get a random 10 quotes from a quotations table
 #  tags:
 #    - QuoteQueryBuild
@@ -49,13 +72,13 @@ GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 
 ###
 #  summary: Add a favorite quote in the fav_quotations table
-#  description: "This can only be done by the logged in user."
+#  description: "This can only be done by the logged in user. Post multiple times to change the status of tag"
 #  tags:
 #    - QuoteQueryBuild
 #  parameters:
 #    - name: "csvid"
 #      in: "path"
-#      description: "Post multiple times to change the status of tag"
+#      description: "Required"
 #      required: true
 #      type: "string"
 #  responses:

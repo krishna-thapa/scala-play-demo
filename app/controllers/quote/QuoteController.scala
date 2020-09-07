@@ -1,16 +1,21 @@
 package controllers.quote
 
+import java.text.SimpleDateFormat
+import java.util.{ Calendar, Date }
+
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import helper.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
 import models.QuotesQuery
-import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
+import play.api.cache.redis.{ CacheApi, RedisList, RedisMap, SynchronousResult }
 import play.api.libs.json.Json
 import play.api.mvc._
 import utils.Logging
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
+import scala.util.{ Failure, Success, Try }
 import scala.util.matching.Regex
 
 /**
@@ -34,8 +39,13 @@ class QuoteController @Inject()(
   // Useful when you know you have a fast in-memory cache.
   protected lazy val cacheList: RedisList[String, SynchronousResult] =
     cache.list[String]("cacheIdsList")
-  // TODO: make the max list size to 500
+  // TODO: make the max list size to 50
   protected lazy val maxListSize: Int = 5
+
+  val now: Date                     = Calendar.getInstance().getTime
+  val dateFormatter: Date => String = value => new SimpleDateFormat("yyyy-MM-dd").format(value)
+
+  val quotePerDayMap: RedisMap[String, SynchronousResult] = cache.map[String]("quotesMap")
 
   /**
     * A REST endpoint that gets a random quote as JSON from quotations table.
@@ -50,10 +60,46 @@ class QuoteController @Inject()(
         Redirect(routes.QuoteController.getRandomQuote())
       } else {
         redisActions(csvId)
-        Ok(Json.toJson(randomQuote))
+        Ok(Json.toJson(randomQuote.head))
       }
     } else {
       notFound("Database is empty!")
+    }
+  }
+
+  // for now date is coming as milliseconds in string type
+  def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
+    val contentDate: String =
+      date.fold(dateFormatter(now))((strDate: String) => convertToDate(strDate))
+
+    cache.get[String](contentDate) match {
+      case Some(quote) =>
+        Ok(Json.parse(quote))
+      case None =>
+        val randomQuote: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
+        if (randomQuote.nonEmpty) {
+          cache.set(
+            key = contentDate,
+            value = Json.toJson(randomQuote.head).toString,
+            expiration = 1.minute
+          )
+          Ok(Json.toJson(randomQuote.head))
+        } else notFound("Database is empty!")
+    }
+  }
+
+  /**
+    * @param strDate: Takes the string date in milliseconds format
+    * @return converts to simple yyyy-MM-dd format if no exception,
+    *         if exception then it returns current date
+    */
+  private def convertToDate(strDate: String): String = {
+    val date = Try(new Date(strDate.toLong))
+    date match {
+      case Failure(ex) =>
+        log.warn("Failure in the date conversion: " + ex.getMessage)
+        dateFormatter(now)
+      case Success(value) => dateFormatter(value)
     }
   }
 
