@@ -4,5 +4,12 @@ set -e
 
 # https://superuser.com/questions/1179844/what-does-dev-null-21-true-mean-in-linux
 # shellcheck disable=SC2039
-createdb inspiration_db &> /dev/null || true
-psql -h localhost -U santosh -d inspiration_db -f ../data/dbsetup.sql
+
+# If psql is not installed, then exit
+if ! command -v psql > /dev/null; then
+  echo "PostgreSQL is required..."
+  exit 1
+fi
+
+createdb inspiration_db
+psql -h localhost -U santosh -d inspiration_db

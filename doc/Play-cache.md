@@ -49,7 +49,8 @@ LRANGE <list-name> 0 -1
 - Was planning to use the Set collection instead of list but Set doesn't have delete with index functionality
 - List will store the duplicate ids, and it [doesn't provide the contains boolean method like Set does](https://stackoverflow.com/questions/9312838/checking-if-a-value-exists-in-a-list-already-redis/25368572)
 - Decided to use list since it has sorted order of the ids while storing them, so I can delete the first index by giving 0 as index number. To filter the ids I can convert the redis list to Scala list and use contains method on top of it. 
-- If the record is already ion the list, either recursive the controller method or redirect the api call with the same call
+- If the record is already on the list, either recursive the controller method or redirect the api call with the same call
+- Use the [Play Redirect routes](https://stackoverflow.com/questions/55289199/the-generated-route-files-of-play-framework-are-re-generated-automatically-even) to call the same controller method if the record is already on the list
 
 ## Further improvements on
 - Look into how it can be stored and how to check the contains in efficient manner 

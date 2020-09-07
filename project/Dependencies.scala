@@ -4,7 +4,7 @@ object Dependencies {
 
   object Versions {
     val postgresql     = "42.2.12"
-    val playSlick      = "4.0.2"
+    val playSlick      = "5.0.0"
     val scalaTest      = "3.2.0"
     val swagger        = "3.32.5"
     val testcontainers = "0.36.0"
