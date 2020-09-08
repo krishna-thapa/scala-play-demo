@@ -1,4 +1,4 @@
-package helper
+package response
 
 import play.api.libs.json.OFormat
 import play.api.mvc.Result

@@ -1,10 +1,8 @@
-package helper
+package response
 
 import play.api.libs.json.{ Json, Writes }
 
-sealed trait Response
-
-case class ResponseErrorMsg(userMsg: String) extends Response
+case class ResponseErrorMsg(userMsg: String)
 
 object ResponseErrorMsg {
   implicit val responseError: Writes[ResponseErrorMsg] =

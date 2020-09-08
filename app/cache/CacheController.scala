@@ -1,53 +1,92 @@
 package cache
 
-import controllers.quote.routes
-import helper.ResponseMethod
+import daos.QuoteQueryDAO
+import response._
 import javax.inject._
 import models.QuotesQuery
 import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
 import play.api.libs.json.Json
-import play.api.mvc.Results.{ Ok, Redirect }
-import play.api.mvc._
+import response.ResponseMsg._
 import utils.DateConversion._
 import utils.Logging
 
 import scala.concurrent.duration.DurationInt
 
-class CacheController @Inject()(cache: CacheApi) extends Logging with ResponseMethod {
+class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
+    extends Logging
+    with ResponseMethod {
 
-  // A cache API that uses synchronous calls rather than async calls.
-  // Useful when you know you have a fast in-memory cache.
-  protected lazy val cacheList: RedisList[String, SynchronousResult] =
-    cache.list[String]("cacheIdsList")
+  /*
+    A cache API that uses synchronous calls rather than async calls.
+    Useful when you know you have a fast in-memory cache.
+   */
+  protected lazy val randomQuoteCacheList: RedisList[String, SynchronousResult] =
+    cache.list[String]("cache-random-quote")
+
+  protected lazy val quoteOfTheDayCacheList: RedisList[String, SynchronousResult] =
+    cache.list[String]("cache-quoteOfTheDay")
+
   // TODO: make the max list size to 50
   protected lazy val maxListSize: Int = 5
 
-  def cacheQuoteOfTheDay(contentDate: String, randomQuote: Option[QuotesQuery]): Result = {
+  private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
+
+  /**
+    * Cache previous 5 days of quote of the day in the Redis storage
+    * @param contentDate: To check the date as a key in the Redis
+    * @return Response Quote in the JSON
+    */
+  def cacheQuoteOfTheDay(contentDate: String): Either[ResponseMsg, QuotesQuery] = {
     if (contentDate.contentEquals(getCurrentDate)) {
-      randomQuote.fold(badRequest("Database is empty!"))((quote: QuotesQuery) => {
-        log.info("Storing today's quote in the cache storage")
-        cache.set(
-          key = contentDate,
-          value = Json.toJson(quote).toString,
-          expiration = 5.days // Key is only store for 5 days
-        )
-        Ok(Json.toJson(quote))
+      randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+        val uniqueQuote: Either[ResponseMsg, QuotesQuery] =
+          getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
+
+        // Side effect to store the cache storage
+        if (uniqueQuote.isRight) {
+          log.info("Storing today's quote in the cache storage")
+          cache.set(
+            key = contentDate,
+            value = Json.toJson(uniqueQuote.toOption.get).toString, // best way to get the right value from either
+            expiration = 5.days                                     // Key is only store for 5 days
+          )
+        }
+
+        uniqueQuote
       })
     } else {
-      val errorMsg: String = s"Date has to be within last 5 days: $contentDate"
-      badRequest(errorMsg)
+      log.warn(s"Date has to be within last 5 days: $contentDate")
+      Left(InvalidDate(contentDate))
     }
   }
 
-  def cacheRandomQuote(csvId: String, quote: QuotesQuery): Result = {
+  def getUniqueQuoteFromDB(
+      quote: QuotesQuery,
+      cachedQuotes: RedisList[String, SynchronousResult]
+  ): Either[ResponseMsg, QuotesQuery] = {
+
     // Have to covert Redis list to Scala list to use contains method
-    if (cacheList.toList.toList.contains(csvId)) {
-      log.warn("Duplicate record has been called with id: " + csvId)
-      Redirect(routes.QuoteController.getRandomQuote())
+    if (cachedQuotes.toList.toList.contains(quote.csvid)) {
+      log.warn("Duplicate record has been called with id: " + quote.csvid)
+      randomQuote
+        .fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+          getUniqueQuoteFromDB(quote, cachedQuotes)
+        })
     } else {
-      redisActions(csvId)
-      Ok(Json.toJson(quote))
+      redisActions(quote.csvid, cachedQuotes)
+      Right(quote)
     }
+  }
+
+  /**
+    * Cache storage for the random quote API
+    * First 500 response should be unique quote
+    * @return the quote in the JSON format
+    */
+  def cacheRandomQuote(): Either[ResponseMsg, QuotesQuery] = {
+    randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+      getUniqueQuoteFromDB(quote, randomQuoteCacheList)
+    })
   }
 
   /**
@@ -55,9 +94,12 @@ class CacheController @Inject()(cache: CacheApi) extends Logging with ResponseMe
     * if the list exceeds max length, it deletes the first one and appends to last element
     * @param csvid Unique id of the record
     */
-  private def redisActions(csvid: String): Unit = {
-    if (cacheList.size >= maxListSize) cacheList.removeAt(0)
-    cacheList.append(csvid)
-    log.info("Ids in the Redis storage: " + cacheList.toList)
+  private def redisActions(
+      csvid: String,
+      cachedQuotes: RedisList[String, SynchronousResult]
+  ): Unit = {
+    if (cachedQuotes.size >= maxListSize) cachedQuotes.removeAt(0)
+    cachedQuotes.append(csvid)
+    log.info("Ids in the Redis storage: " + cachedQuotes.toList)
   }
 }

@@ -2,7 +2,7 @@ package controllers.customQuote
 
 import daos.CustomQuoteQueryDAO
 import forms.RequestForm
-import helper.ResponseMethod
+import response.ResponseMethod
 import javax.inject.{ Inject, Singleton }
 import play.api.libs.json.Json
 import play.api.mvc._

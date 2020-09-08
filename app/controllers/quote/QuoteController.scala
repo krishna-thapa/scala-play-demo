@@ -2,13 +2,13 @@ package controllers.quote
 
 import cache.CacheController
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
-import helper.ResponseMethod
+import response.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
-import models.QuotesQuery
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
+import response.ResponseMsg.InvalidCsvId
 import utils.DateConversion._
 import utils.Logging
 
@@ -38,22 +38,18 @@ class QuoteController @Inject()(
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-
-    val randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
-    randomQuote.fold(badRequest("Database is empty!"))((quote: QuotesQuery) => {
-      cacheController.cacheRandomQuote(quote.csvid, quote: QuotesQuery)
-    })
+    responseEitherResult(cacheController.cacheRandomQuote())
   }
 
   /**
-    *
-    * @param date
-    * @return
+    * A REST endpoint that gets a quote of the day as JSON from quotations table
+    *  @param date: Can take milliseconds date format as a path parameter to gets the
+    *  previous 5 days quote of the day
+    *  It stores the past 5 quote of the day in the Redis cache storage
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
 
-    val randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
     val contentDate: String =
       date.fold[String](getCurrentDate)((strDate: String) => convertToDate(strDate))
     log.info("Content Date from the API call: " + contentDate)
@@ -65,7 +61,7 @@ class QuoteController @Inject()(
         Ok(Json.parse(quote))
       case None =>
         log.warn("Content date is not found in the cache storage")
-        cacheController.cacheQuoteOfTheDay(contentDate, randomQuote)
+        responseEitherResult(cacheController.cacheQuoteOfTheDay(contentDate))
     }
   }
 
@@ -94,7 +90,7 @@ class QuoteController @Inject()(
       if (csvIdPattern.matches(csvid)) {
         responseTryResult(favQuotesDAO.modifyFavQuote(csvid))
       } else {
-        badRequest("Id of quote should be in CSV123 format!")
+        badRequest(InvalidCsvId(csvid).msg)
       }
   }
 
@@ -111,6 +107,7 @@ class QuoteController @Inject()(
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
+    // TODO build response when the genre is invalid type
     responseOptionResult(quotesDAO.getGenreQuote(genre))
   }
 

@@ -10,7 +10,7 @@
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /random               controllers.quote.QuoteController.getRandomQuote
 
@@ -33,7 +33,7 @@ GET      /random               controllers.quote.QuoteController.getRandomQuote
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /quoteOfTheDay         controllers.quote.QuoteController.getQuoteOfTheDay(date: Option[String])
 
@@ -49,7 +49,7 @@ GET      /quoteOfTheDay         controllers.quote.QuoteController.getQuoteOfTheD
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /randomTen             controllers.quote.QuoteController.getFirst10Quotes
 
@@ -66,13 +66,13 @@ GET      /randomTen             controllers.quote.QuoteController.getFirst10Quot
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 
 ###
 #  summary: Add a favorite quote in the fav_quotations table
-#  description: "This can only be done by the logged in user. Post multiple times to change the status of tag"
+#  description: "This can only be done by the logged in user. Post multiple times to change the status of tag as boolean type. Assuming that the csvId is present in the database."
 #  tags:
 #    - QuoteQueryBuild
 #  parameters:
@@ -89,11 +89,11 @@ GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 #    400:
 #      description: Bad request. ID should be in CSV[0-9] format
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 + nocsrf
 POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid: String)
@@ -110,7 +110,7 @@ POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 
@@ -134,6 +134,6 @@ GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/helper.ResponseErrorMsg'
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /:genre                controllers.quote.QuoteController.getGenreQuote(genre: models.Genre.Value)

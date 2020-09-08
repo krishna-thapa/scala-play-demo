@@ -16,4 +16,4 @@ COPY quotations(quote,author,genre) FROM '/Users/santosh/gitHome/Inspirational-q
 --- !Downs
 
 DROP SEQUENCE if exists serial_csvid;
-DROP TABLE if exists quotations;
+DROP TABLE if exists quotations CASCADE;
