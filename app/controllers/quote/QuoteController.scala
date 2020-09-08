@@ -45,8 +45,6 @@ class QuoteController @Inject()(
   val now: Date                     = Calendar.getInstance().getTime
   val dateFormatter: Date => String = value => new SimpleDateFormat("yyyy-MM-dd").format(value)
 
-  val quotePerDayMap: RedisMap[String, SynchronousResult] = cache.map[String]("quotesMap")
-
   /**
     * A REST endpoint that gets a random quote as JSON from quotations table.
     */
@@ -71,19 +69,21 @@ class QuoteController @Inject()(
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     val contentDate: String =
       date.fold(dateFormatter(now))((strDate: String) => convertToDate(strDate))
-
+    log.info("Content Date is: " + contentDate)
     cache.get[String](contentDate) match {
       case Some(quote) =>
         Ok(Json.parse(quote))
       case None =>
         val randomQuote: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
         if (randomQuote.nonEmpty) {
-          cache.set(
-            key = contentDate,
-            value = Json.toJson(randomQuote.head).toString,
-            expiration = 1.minute
-          )
-          Ok(Json.toJson(randomQuote.head))
+          if (contentDate.contentEquals(dateFormatter(now))) {
+            cache.set(
+              key = contentDate,
+              value = Json.toJson(randomQuote.head).toString,
+              expiration = 5.days
+            )
+            Ok(Json.toJson(randomQuote.head))
+          } else badRequest("Date has to be within last 5 days")
         } else notFound("Database is empty!")
     }
   }
