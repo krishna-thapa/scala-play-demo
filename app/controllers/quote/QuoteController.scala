@@ -65,8 +65,8 @@ class QuoteController @Inject()(
     }
   }
 
-  /**
-    * A REST endpoint that gets all the quotes as JSON from CSV quotes table.
+  /**quotations
+    * A REST endpoint that gets all the quotes as JSON from quotations table
     */
   def getAllQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAllQuotes")
@@ -74,7 +74,7 @@ class QuoteController @Inject()(
   }
 
   /**
-    * A REST endpoint that gets random 10 quotes as JSON from CSV quotes table.
+    * A REST endpoint that gets random 10 quotes as JSON from quotations table
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
@@ -95,7 +95,7 @@ class QuoteController @Inject()(
   }
 
   /**
-    * A REST endpoint that gets all favorite quotes as JSON.
+    * A REST endpoint that gets all favorite quotes as JSON from fav_quotes table.
     */
   def getFavQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFavQuotes")
@@ -103,7 +103,7 @@ class QuoteController @Inject()(
   }
 
   /**
-    * A REST endpoint that gets a random quote as per selected genre from the table.
+    * A REST endpoint that gets a random quote as per selected genre from the table from quotations table.
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")

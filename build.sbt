@@ -12,18 +12,19 @@ lazy val root = (project in file("."))
     version := "1.0-SNAPSHOT",
     scalaVersion := "2.13.1",
     libraryDependencies ++= Seq(
+      jdbc,
       guice,
       cacheApi,
       playRedis,
       postgres,
       playSlickEvolutions,
       playSlick,
-      scalaTest,
+      //scalaTest,
       swaggerUi,
-      testcontainersScalaTest,
-      testcontainersPostgres,
-      playScalaTest
-    )
+      playScalaTest,
+      h2Database
+    ),
+    Test / fork := true
   )
 /*
  add domain package names for play-swagger to auto generate swagger

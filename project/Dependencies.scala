@@ -3,13 +3,13 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val postgresql     = "42.2.12"
-    val playSlick      = "5.0.0"
-    val scalaTest      = "3.2.0"
-    val swagger        = "3.32.5"
-    val testcontainers = "0.36.0"
-    val playtest       = "5.0.0"
-    val playRedis      = "2.6.1"
+    val postgresql = "42.2.12"
+    val playSlick  = "5.0.0"
+    val scalaTest  = "3.2.0"
+    val swagger    = "3.32.5"
+    val playtest   = "5.0.0"
+    val playRedis  = "2.6.1"
+    val h2Database = "1.4.192"
   }
 
   object Libraries {
@@ -18,21 +18,20 @@ object Dependencies {
     def postgresLib(artifact: String): ModuleID  = "org.postgresql" % artifact  % Versions.postgresql
     def scalaTestLib(artifact: String): ModuleID = "org.scalatest"  %% artifact % Versions.scalaTest
     def swaggerLib(artifact: String): ModuleID   = "org.webjars"    % artifact  % Versions.swagger
-    def testcontainersLib(artifact: String): ModuleID =
-      "com.dimafeng" %% artifact % Versions.testcontainers
     def playScalaTestlib(artifact: String): ModuleID =
       "org.scalatestplus.play" %% artifact % Versions.playtest
     def playRedisLib(artifact: String): ModuleID =
       "com.github.karelcemus" %% artifact % Versions.playRedis
+    def h2DatabaseLib(artifact: String): ModuleID =
+      "com.h2database" % artifact % Versions.h2Database
 
-    val playSlick               = playSlickLib("play-slick")
-    val playSlickEvolutions     = playSlickLib("play-slick-evolutions")
-    val postgres                = postgresLib("postgresql")
-    val scalaTest               = scalaTestLib("scalatest") % "test"
-    val swaggerUi               = swaggerLib("swagger-ui")
-    val playRedis               = playRedisLib("play-redis")
-    val testcontainersScalaTest = testcontainersLib("testcontainers-scala-scalatest") % "test"
-    val testcontainersPostgres  = testcontainersLib("testcontainers-scala-postgresql") % "test"
-    val playScalaTest           = playScalaTestlib("scalatestplus-play") % "test"
+    val playSlick           = playSlickLib("play-slick")
+    val playSlickEvolutions = playSlickLib("play-slick-evolutions")
+    val postgres            = postgresLib("postgresql")
+    val scalaTest           = scalaTestLib("scalatest") % "test"
+    val swaggerUi           = swaggerLib("swagger-ui")
+    val playRedis           = playRedisLib("play-redis")
+    val playScalaTest       = playScalaTestlib("scalatestplus-play") % "test"
+    val h2Database          = h2DatabaseLib("h2")
   }
 }
