@@ -11,17 +11,17 @@ import scala.util.{ Failure, Success, Try }
 trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
 
   def badRequest(msg: String): Result = {
-    log.warn(s"Bad request error: $msg")
+    log.error(s"Bad request error: $msg")
     BadRequest(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def notFound(msg: String): Result = {
-    log.warn(s"Not Found error: $msg")
+    log.error(s"Not Found error: $msg")
     NotFound(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def internalServerError(msg: String): Result = {
-    log.warn(s"Internal server error: $msg")
+    log.error(s"Internal server error: $msg")
     InternalServerError(Json.toJson(ResponseErrorMsg(msg)))
   }
 

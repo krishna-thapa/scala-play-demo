@@ -15,3 +15,11 @@ Each script contains two parts:
 Play splits your `.sql` files into a series of semicolon-delimited statements before executing them one-by-one against the database. So if you need to use a semicolon within a statement, escape it by entering `;;` instead of `;`
 
 To enable autoApply for all evolutions, you might set `play.evolutions.autoApply=true` in application.conf or in a system property.
+
+
+1599523900990   3
+1599606000000   5
+1599692400000   3
+1599778800000   3
+1599865200000   6
+1599951600000   3

@@ -1,21 +1,18 @@
 package controllers.quote
 
-import java.text.SimpleDateFormat
-import java.util.{ Calendar, Date }
-
+import cache.CacheController
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import helper.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
 import models.QuotesQuery
-import play.api.cache.redis.{ CacheApi, RedisList, RedisMap, SynchronousResult }
+import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
+import utils.DateConversion._
 import utils.Logging
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.DurationInt
-import scala.util.{ Failure, Success, Try }
 import scala.util.matching.Regex
 
 /**
@@ -25,6 +22,7 @@ import scala.util.matching.Regex
 @Singleton
 class QuoteController @Inject()(
     cache: CacheApi,
+    cacheController: CacheController,
     cc: ControllerComponents,
     quotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
@@ -35,83 +33,40 @@ class QuoteController @Inject()(
 
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
-  // A cache API that uses synchronous calls rather than async calls.
-  // Useful when you know you have a fast in-memory cache.
-  protected lazy val cacheList: RedisList[String, SynchronousResult] =
-    cache.list[String]("cacheIdsList")
-  // TODO: make the max list size to 50
-  protected lazy val maxListSize: Int = 5
-
-  val now: Date                     = Calendar.getInstance().getTime
-  val dateFormatter: Date => String = value => new SimpleDateFormat("yyyy-MM-dd").format(value)
-
   /**
     * A REST endpoint that gets a random quote as JSON from quotations table.
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    val randomQuote: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
-    if (randomQuote.nonEmpty) {
-      val csvId: String = randomQuote.head.csvid
-      if (cacheList.toList.toList.contains(csvId)) {
-        log.warn("Duplicate record has been called with id: " + csvId)
-        Redirect(routes.QuoteController.getRandomQuote())
-      } else {
-        redisActions(csvId)
-        Ok(Json.toJson(randomQuote.head))
-      }
-    } else {
-      notFound("Database is empty!")
-    }
+
+    val randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
+    randomQuote.fold(badRequest("Database is empty!"))((quote: QuotesQuery) => {
+      cacheController.cacheRandomQuote(quote.csvid, quote: QuotesQuery)
+    })
   }
 
-  // for now date is coming as milliseconds in string type
+  /**
+    *
+    * @param date
+    * @return
+    */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing getQuoteOfTheDay")
+
+    val randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
     val contentDate: String =
-      date.fold(dateFormatter(now))((strDate: String) => convertToDate(strDate))
-    log.info("Content Date is: " + contentDate)
+      date.fold[String](getCurrentDate)((strDate: String) => convertToDate(strDate))
+    log.info("Content Date from the API call: " + contentDate)
+
+    // Get the quote from the content date key from global cache storage in Redis
     cache.get[String](contentDate) match {
-      case Some(quote) =>
+      case Some(quote: String) =>
+        log.info("Content date found in the cache storage")
         Ok(Json.parse(quote))
       case None =>
-        val randomQuote: Seq[QuotesQuery] = quotesDAO.listRandomQuote(1)
-        if (randomQuote.nonEmpty) {
-          if (contentDate.contentEquals(dateFormatter(now))) {
-            cache.set(
-              key = contentDate,
-              value = Json.toJson(randomQuote.head).toString,
-              expiration = 5.days
-            )
-            Ok(Json.toJson(randomQuote.head))
-          } else badRequest("Date has to be within last 5 days")
-        } else notFound("Database is empty!")
+        log.warn("Content date is not found in the cache storage")
+        cacheController.cacheQuoteOfTheDay(contentDate, randomQuote)
     }
-  }
-
-  /**
-    * @param strDate: Takes the string date in milliseconds format
-    * @return converts to simple yyyy-MM-dd format if no exception,
-    *         if exception then it returns current date
-    */
-  private def convertToDate(strDate: String): String = {
-    val date = Try(new Date(strDate.toLong))
-    date match {
-      case Failure(ex) =>
-        log.warn("Failure in the date conversion: " + ex.getMessage)
-        dateFormatter(now)
-      case Success(value) => dateFormatter(value)
-    }
-  }
-
-  /**
-    * Unit return method that stores the ids in redis list
-    * if the list exceeds max length, it deletes the first one and appends to last element
-    * @param csvid Unique id of the record
-    */
-  private def redisActions(csvid: String): Unit = {
-    if (cacheList.size >= maxListSize) cacheList.removeAt(0)
-    cacheList.append(csvid)
-    log.info("Ids in the Redis storage: " + cacheList.toList)
   }
 
   /**
