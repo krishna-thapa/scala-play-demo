@@ -137,3 +137,29 @@ GET      /favQuotes             controllers.quote.QuoteController.getFavQuotes
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /:genre                controllers.quote.QuoteController.getGenreQuote(genre: models.Genre.Value)
+
+###
+#  summary: Get a autocomplete list of authors from search parameter
+#  description: "This can only be done by the logged in user. Minimum required input parameter length is 3"
+#  tags:
+#    - Search Queries
+#  parameters:
+#    - name: "author"
+#      in: "path"
+#      description: "Required"
+#      required: true
+#      type: "string"
+#      minLength: 3
+#  responses:
+#    200:
+#      description: Success response of the quotes.
+#      schema:
+#        type: "array"
+#        items:
+#          type: "string"
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+GET      /search/:author                controllers.quote.QuoteController.getAuthorsAutocomplete(author: String)

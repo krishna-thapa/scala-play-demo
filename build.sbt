@@ -21,8 +21,7 @@ lazy val root = (project in file("."))
       playSlick,
       //scalaTest,
       swaggerUi,
-      playScalaTest,
-      h2Database
+      playScalaTest
     ),
     Test / fork := true
   )

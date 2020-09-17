@@ -32,6 +32,11 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
     else notFound(EmptyDbMsg.msg)
   }
 
+  def responseWithSeq(records: Seq[String]): Result = {
+    if (records.nonEmpty) Ok(Json.toJson(records))
+    else notFound(EmptyDbMsg.msg)
+  }
+
   def responseOptionResult[T](record: Option[T])(implicit conv: OFormat[T]): Result = {
     record match {
       case Some(quote) => Ok(Json.toJson(quote))

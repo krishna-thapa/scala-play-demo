@@ -5,8 +5,11 @@ import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import response.ResponseMethod
 import javax.inject._
 import models.Genre.Genre
+import models.QuotesQuery
 import play.api.cache.redis.CacheApi
-import play.api.libs.json.Json
+import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
+import play.api.mvc.Results.Ok
 import play.api.mvc._
 import response.ResponseMsg.InvalidCsvId
 import utils.DateConversion._
@@ -109,6 +112,14 @@ class QuoteController @Inject()(
     log.info("Executing getGenreQuote")
     // TODO build response when the genre is invalid type
     responseOptionResult(quotesDAO.getGenreQuote(genre))
+  }
+
+  /**
+    * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
+    */
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing getAuthorsAutocomplete")
+    responseWithSeq(quotesDAO.searchAuthors(parameter))
   }
 
 }
