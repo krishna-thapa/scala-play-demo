@@ -1,0 +1,16 @@
+###
+#  summary: Login API endpoints for the login form
+#  description: "This can only be done by the user that have existing account."
+#  tags:
+#    - AuthQueryBuild
+#  parameters:
+#    - name: body
+#      in: body
+#      required: true
+#      description: Create a new Quote
+#  responses:
+#    200:
+#      description: success
+###
++ nocsrf
+POST        /login               controllers.authController.AuthController.login
