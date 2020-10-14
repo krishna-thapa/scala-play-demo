@@ -95,7 +95,6 @@ GET      /allQuotes            controllers.quote.QuoteController.getAllQuotes
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-+ nocsrf
 POST     /fav/:csvid            controllers.quote.QuoteController.favQuote(csvid: String)
 
 ###

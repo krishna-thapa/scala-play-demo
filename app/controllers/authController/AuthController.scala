@@ -2,13 +2,12 @@ package controllers.authController
 
 import java.time.Clock
 
+import auth.form.LoginForm
 import auth.model.UserDetail
 import javax.inject.{Inject, Singleton}
 import pdi.jwt.JwtSession._
 import play.api.Configuration
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsPath, JsValue, Reads}
-import play.api.mvc.{AbstractController, Action, ControllerComponents, Request}
+import play.api.mvc.{ AbstractController, Action, AnyContent, ControllerComponents, Request }
 import response.ResponseMethod
 import utils.Logging
 
@@ -24,27 +23,22 @@ class AuthController @Inject()(cc: ControllerComponents)
 
   private val passwords: Seq[String] = Seq("foo", "poo")
 
-  private val loginForm: Reads[(String, String)] =
-    ((JsPath \ "username"). read[String] and (JsPath \ "password").read[String]).tupled
-
   implicit val clock: Clock = Clock.systemUTC
 
-  def login: Action[JsValue] = Action(parse.json).async { implicit request: Request[JsValue] =>
-    val loginResult = request.body
-      .validate(loginForm)
-      .fold(
-        errors => {
-          log.error(s"Error on authentication: $errors")
-          badRequest(errors.toString())
-        }, {
-          case (username, password) =>
-            if(passwords.contains(password)) {
-              log.info("Success on authentication!")
-              Ok.addingToJwtSession("user", UserDetail(username))
-            } else
-              Unauthorized
-        }
-      )
+  def login: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+
+    val loginResult = LoginForm.loginForm.bindFromRequest.fold(
+      formWithErrors => {
+        badRequest("The form was not in the expected format: " + formWithErrors)
+      },
+      loginDetails => {
+        if(passwords.contains(loginDetails.password)) {
+          log.info("Success on authentication!")
+          Ok.addingToJwtSession("user", UserDetail(loginDetails.username))
+        } else
+          unauthorized(s"Unauthorized error for user: ${loginDetails.username}")
+      }
+    )
     Future(loginResult)
   }
 

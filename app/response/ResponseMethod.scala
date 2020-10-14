@@ -26,6 +26,11 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
     InternalServerError(Json.toJson(ResponseErrorMsg(msg)))
   }
 
+  def unauthorized(msg: String): Result = {
+    log.error(s"Unauthorized error: $msg")
+    Unauthorized(Json.toJson(ResponseErrorMsg(msg)))
+  }
+
   // TODO: Might need to separate in different trait
   def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
