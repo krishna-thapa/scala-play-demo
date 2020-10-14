@@ -11,7 +11,8 @@ CREATE TABLE quotations (
 );
 
 -- Have to be Absolute Path for the csv file
-COPY quotations(quote,author,genre) FROM '/Users/santosh/gitHome/Inspirational-quote-api/data/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
+-- For mac the url is: /Users/santosh/gitHome..
+COPY quotations(quote,author,genre) FROM '/home/krishna/gitHome/Inspirational-quote-api/data/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
 
 --- !Downs
 

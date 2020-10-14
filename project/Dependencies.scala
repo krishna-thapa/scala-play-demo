@@ -9,6 +9,7 @@ object Dependencies {
     val swagger    = "3.32.5"
     val playtest   = "5.0.0"
     val playRedis  = "2.6.1"
+    val playjwt    = "4.2.0"
   }
 
   object Libraries {
@@ -21,6 +22,7 @@ object Dependencies {
       "org.scalatestplus.play" %% artifact % Versions.playtest
     def playRedisLib(artifact: String): ModuleID =
       "com.github.karelcemus" %% artifact % Versions.playRedis
+    def playJWTLib(artifact: String): ModuleID = "com.pauldijou" %% artifact % Versions.playjwt
 
     val playSlick           = playSlickLib("play-slick")
     val playSlickEvolutions = playSlickLib("play-slick-evolutions")
@@ -29,5 +31,6 @@ object Dependencies {
     val swaggerUi           = swaggerLib("swagger-ui")
     val playRedis           = playRedisLib("play-redis")
     val playScalaTest       = playScalaTestlib("scalatestplus-play") % "test"
+    val playJwt             = playJWTLib("jwt-play")
   }
 }

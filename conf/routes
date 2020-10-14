@@ -8,6 +8,9 @@
 # CRUD operation endpoints for the custom table "custom_quotations"
 ->      /customQuote                CustomQuoteQueryBuild.Routes
 
+# API endpoints for the auth of user service
+->      /auth                       AuthQueryBuild.Routes
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
