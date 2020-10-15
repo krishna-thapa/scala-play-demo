@@ -1,6 +1,6 @@
 package auth.model
 
-trait LoginDetail {
+trait Login {
   def email: String
   def password: String
 }

@@ -1,10 +1,10 @@
 package auth.form
 
-import auth.model.LoginDetail
+import auth.model.Login
 
 case class SignUpForm(
     firstName: String,
     lastName: String,
     email: String,
     password: String
-) extends LoginDetail
+) extends Login

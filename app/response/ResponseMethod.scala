@@ -3,7 +3,7 @@ package response
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
-import play.api.mvc.Results._
+import play.api.mvc.Results.{ NotAcceptable, _ }
 import response.ResponseMsg._
 import utils.Logging
 
@@ -29,6 +29,11 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
   def unauthorized(msg: String): Result = {
     log.error(s"Unauthorized error: $msg")
     Unauthorized(Json.toJson(ResponseErrorMsg(msg)))
+  }
+
+  def notAcceptable(msg: String): Result = {
+    log.error(s"Account already exist with: $msg")
+    NotAcceptable(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   // TODO: Might need to separate in different trait

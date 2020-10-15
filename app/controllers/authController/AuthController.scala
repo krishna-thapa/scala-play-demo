@@ -3,7 +3,7 @@ package controllers.authController
 import java.time.Clock
 
 import auth.form.AuthForms
-import auth.model.UserDetail
+import auth.model.UserToken
 import daos.AuthDAO
 import javax.inject.{ Inject, Singleton }
 import pdi.jwt.JwtSession._
@@ -24,8 +24,6 @@ class AuthController @Inject()(
     with Logging
     with ResponseMethod {
 
-  private val passwords: Seq[String] = Seq("foo", "poo")
-
   implicit val clock: Clock = Clock.systemUTC
 
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
@@ -36,11 +34,15 @@ class AuthController @Inject()(
         badRequest(s"The form was not in the expected format: $formWithErrors")
       },
       signInDetails => {
-        if (passwords.contains(signInDetails.password)) {
-          log.info("Success on authentication!")
-          Ok.addingToJwtSession("user", UserDetail(signInDetails.email))
-        } else
-          unauthorized(s"Unauthorized error for user: ${signInDetails.email}")
+        // Need to check if the user has enter wrong password but has an account already
+        if (authDAO.isAccountExist(signInDetails.email)) {
+          authDAO.isValidLogin(signInDetails) match {
+            case Some(validUser) =>
+              log.info("Success on authentication!")
+              Ok.addingToJwtSession("user", UserToken(validUser.email))
+            case None => unauthorized(s"Wrong password for: ${signInDetails.email}")
+          }
+        } else notFound(s"User account is not found for : ${signInDetails.email}")
       }
     )
     Future(signInResult)
@@ -55,7 +57,9 @@ class AuthController @Inject()(
       },
       signUpDetails => {
         // need to check if the account already exist
-        Ok(Json.toJson(authDAO.signUpUser(signUpDetails)))
+        if (!authDAO.isAccountExist(signUpDetails.email))
+          Ok(Json.toJson(authDAO.signUpUser(signUpDetails)))
+        else notAcceptable(s"${signUpDetails.email}")
       }
     )
 

@@ -13,10 +13,12 @@
 #  responses:
 #    200:
 #      description: success
-#    401:
-#      description: Unauthorized
 #    400:
 #      description: Bad request (min length of password is 3)
+#    401:
+#      description: Unauthorized for wrong password but with valid email
+#    404:
+#      description: User account is not found in the database
 ###
 POST        /signIn               controllers.authController.AuthController.signIn
 
@@ -39,5 +41,7 @@ POST        /signIn               controllers.authController.AuthController.sign
 #      description: Unauthorized
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
+#    406:
+#      description: Account already exist in the database
 ###
 POST        /signUp               controllers.authController.AuthController.signUp
