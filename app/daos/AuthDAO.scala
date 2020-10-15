@@ -48,6 +48,11 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunn
     runDbAction(createUser.filter(_.email === email).result).nonEmpty
   }
 
+  /**
+    * Check if the email and password provided are valid
+    * @param details user details with email and password
+    * @return UserInfo oif the valid user
+    */
   def isValidLogin(details: SignInForm): Option[UserInfo] = {
     runDbAction(createUser.filter { user =>
       user.email === details.email && user.password === details.password
