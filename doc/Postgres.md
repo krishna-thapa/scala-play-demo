@@ -7,6 +7,8 @@
 Connect to the postgres server:
 ```
 sudo su - postgres
+psql
+\c inspiration_db 
 ```
 Create a database:
 ```

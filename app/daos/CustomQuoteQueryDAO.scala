@@ -30,6 +30,9 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
+  val customQuotes: TableQuery[CustomQuotesQueriesTable] =
+    CustomQuotesQueriesTable.customQuoteQueries
+
   //type T = CustomQuotesQuery
 
   /**
@@ -37,7 +40,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return sequence of the CustomQuotesQuery records
     */
   def listAllQuotes(): Seq[CustomQuotesQuery] =
-    runDbAction(CustomQuotesQueriesTable.customQuoteQueries.sortBy(_.id).result)
+    runDbAction(customQuotes.sortBy(_.id).result)
 
   /**
     * List the JSON format of the selected record from the table
@@ -45,7 +48,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return Option of the CustomQuotesQuery record
     */
   override def listSelectedQuote(id: Int): Option[CustomQuotesQuery] = {
-    runDbAction(CustomQuotesQueriesTable.customQuoteQueries.filter(_.id === id).result.headOption)
+    runDbAction(customQuotes.filter(_.id === id).result.headOption)
   }
 
   /**
@@ -55,7 +58,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   override def listRandomQuote(records: Int): Seq[CustomQuotesQuery] = {
     runDbAction(
-      CustomQuotesQueriesTable.customQuoteQueries
+      customQuotes
         .sortBy(_ => randomFunction)
         .take(records)
         .result
@@ -69,8 +72,8 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   def createQuote(customQuoteForm: CustomQuoteForm): CustomQuotesQuery = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
-    val insertQuery = CustomQuotesQueriesTable.customQuoteQueries returning
-      CustomQuotesQueriesTable.customQuoteQueries.map(_.id) into (
+    val insertQuery = customQuotes returning
+      customQuotes.map(_.id) into (
         (
             fields,
             id
@@ -94,7 +97,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   def updateQuote(id: Int, customQuoteForm: CustomQuoteForm): Try[Int] = {
     runDbActionCatchError(
-      CustomQuotesQueriesTable.customQuoteQueries
+      customQuotes
         .filter(_.id === id)
         .map(quote => (quote.quote, quote.author, quote.genre, quote.ownquote))
         .update(
@@ -111,7 +114,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param id of the selected row from the CustomQuotesQuery table
     */
   def deleteQuote(id: Int): Int = {
-    runDbAction(CustomQuotesQueriesTable.customQuoteQueries.filter(_.id === id).delete)
+    runDbAction(customQuotes.filter(_.id === id).delete)
   }
 
 }

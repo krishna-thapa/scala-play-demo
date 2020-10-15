@@ -1,5 +1,5 @@
 ###
-#  summary: Login API endpoints for the login form
+#  summary: Sign In API endpoints to login into the account
 #  description: "This can only be done by the user that have existing account."
 #  tags:
 #    - AuthQueryBuild
@@ -7,9 +7,9 @@
 #    - name: body
 #      in: body
 #      required: true
-#      description: Login form details
+#      description: Sign in form details
 #      schema:
-#        $ref: '#/definitions/auth.model.LoginDetails'
+#        $ref: '#/definitions/auth.form.SignInForm'
 #  responses:
 #    200:
 #      description: success
@@ -18,4 +18,26 @@
 #    400:
 #      description: Bad request (min length of password is 3)
 ###
-POST        /login               controllers.authController.AuthController.login
+POST        /signIn               controllers.authController.AuthController.signIn
+
+###
+#  summary: Sing up API endpoints to creater a new account
+#  description: "This can be done by any new user."
+#  tags:
+#    - AuthQueryBuild
+#  parameters:
+#    - name: body
+#      in: body
+#      required: true
+#      description: Sing up form details
+#      schema:
+#        $ref: '#/definitions/auth.form.SignUpForm'
+#  responses:
+#    200:
+#      description: success with id of newly created record
+#    401:
+#      description: Unauthorized
+#    400:
+#      description: Bad request (min length of password is 3 and have to be in correct email format)
+###
+POST        /signUp               controllers.authController.AuthController.signUp
