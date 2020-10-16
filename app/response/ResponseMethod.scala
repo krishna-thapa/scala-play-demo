@@ -32,8 +32,9 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
   }
 
   def notAcceptable(msg: String): Result = {
-    log.error(s"Account already exist with: $msg")
-    NotAcceptable(Json.toJson(ResponseErrorMsg(msg)))
+    val errorMessage: String = s"Account already exist with: $msg"
+    log.error(errorMessage)
+    NotAcceptable(Json.toJson(ResponseErrorMsg(errorMessage)))
   }
 
   // TODO: Might need to separate in different trait

@@ -2,6 +2,8 @@ package daos
 
 import java.sql.Date
 
+import auth.bcrypt.BcryptException
+import auth.bcrypt.BcryptObject.encryptPassword
 import auth.form.{ SignInForm, SignUpForm }
 import auth.model.UserInfo
 import auth.table.UserTable
@@ -12,6 +14,8 @@ import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 import utils.{ DbRunner, Logging }
+
+import scala.util.{ Failure, Success }
 
 @Singleton
 class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunner with Logging {
@@ -25,18 +29,23 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunn
     * @param details user sign up form details
     * @return New id of the record
     */
-  def signUpUser(details: SignUpForm): Int = {
+  def signUpUser(details: SignUpForm): Either[Throwable, Int] = {
     val currentDate = new Date(System.currentTimeMillis())
-    val action = createUser returning createUser
-      .map(_.id) += UserInfo(
-      -1,
-      details.firstName,
-      details.lastName,
-      details.email,
-      details.password,
-      currentDate
-    )
-    runDbAction(action)
+    encryptPassword(details.password) match {
+      case Success(encrypted) =>
+        val action = createUser returning createUser
+          .map(_.id) += UserInfo(
+          -1,
+          details.firstName,
+          details.lastName,
+          details.email,
+          encrypted,
+          currentDate
+        )
+        Right(runDbAction(action))
+      case Failure(exception) => Left(BcryptException(exception.getMessage))
+    }
+
   }
 
   /**

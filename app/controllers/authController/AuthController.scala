@@ -57,9 +57,12 @@ class AuthController @Inject()(
       },
       signUpDetails => {
         // need to check if the account already exist
-        if (!authDAO.isAccountExist(signUpDetails.email))
-          Ok(Json.toJson(authDAO.signUpUser(signUpDetails)))
-        else notAcceptable(s"${signUpDetails.email}")
+        if (!authDAO.isAccountExist(signUpDetails.email)) {
+          authDAO.signUpUser(signUpDetails) match {
+            case Right(value)    => Ok(Json.toJson(value))
+            case Left(exception) => badRequest(exception.getMessage)
+          }
+        } else notAcceptable(s"${signUpDetails.email}")
       }
     )
 
