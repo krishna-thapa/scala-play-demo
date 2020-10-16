@@ -39,7 +39,15 @@ class AuthController @Inject()(
           authDAO.isValidLogin(signInDetails) match {
             case Right(validUser) =>
               log.info("Success on authentication!")
-              Ok.addingToJwtSession("user", UserToken(validUser.email))
+              Ok.addingToJwtSession(
+                "user",
+                UserToken(
+                  validUser.email,
+                  s"${validUser.firstName.capitalize} ${validUser.lastName.capitalize}",
+                  validUser.isAdmin,
+                  validUser.createdDate
+                )
+              )
             case Left(exceptionResult) => exceptionResult
           }
         } else notFound(s"User account is not found for : ${signInDetails.email}")

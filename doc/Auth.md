@@ -12,9 +12,10 @@
     - /signIn: sign in for an existing user with email and password form
     - /signUp: sign up for a new user with user details form
     - /signOut: delete the session token for the signed user
-    - /updateDetail: let the user update the details
+    - /updateDetail: let the user update the details(only the user can do)
     - /allUser: get all the users that have an account in the database(only admin can do)
     - /adminRole: make the user as an admin or remove from an admin role(only admin can do)
+    - /removeUser: only the admin can do
     
 ### Hashing the password
 Postgres allows the functionality to add hashing passwords in the database. Read more [here](https://www.postgresql.org/docs/9.0/pgcrypto.html).
