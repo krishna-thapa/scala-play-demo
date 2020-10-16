@@ -26,6 +26,9 @@ class AuthController @Inject()(
 
   implicit val clock: Clock = Clock.systemUTC
 
+  def isEmailValid(email: String): Boolean =
+    if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
+
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
     // Add request validation
@@ -73,7 +76,29 @@ class AuthController @Inject()(
         } else notAcceptable(s"${signUpDetails.email}")
       }
     )
-
   }
 
+  def getAllUser: Action[AnyContent] = Action { implicit request =>
+    log.info("Executing getAllUser Controller")
+    responseSeqResult(authDAO.listAllUser())
+  }
+
+  def toggleAdminRole(email: String): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing toggleAdminRole Controller")
+    if (isEmailValid(email)) {
+      authDAO.toggleAdmin(email) match {
+        case Right(value)    => Ok(Json.toJson(value))
+        case Left(exception) => exception
+      }
+    } else badRequest(s"Email in wrong format: $email")
+  }
+
+  def removeUser(email: String): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing removeUser Controller")
+    if (isEmailValid(email))
+      authDAO.removeUserAccount(email) match {
+        case Right(value)    => Ok(Json.toJson(value))
+        case Left(exception) => exception
+      } else badRequest(s"Email in wrong format: $email")
+  }
 }
