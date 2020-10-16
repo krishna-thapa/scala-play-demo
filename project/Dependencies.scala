@@ -10,6 +10,7 @@ object Dependencies {
     val playtest   = "5.0.0"
     val playRedis  = "2.6.1"
     val playjwt    = "4.2.0"
+    val bcrypt     = "4.1"
   }
 
   object Libraries {
@@ -23,6 +24,8 @@ object Dependencies {
     def playRedisLib(artifact: String): ModuleID =
       "com.github.karelcemus" %% artifact % Versions.playRedis
     def playJWTLib(artifact: String): ModuleID = "com.pauldijou" %% artifact % Versions.playjwt
+    def scalaBcryptLib(artifact: String): ModuleID =
+      "com.github.t3hnar" %% artifact % Versions.bcrypt
 
     val playSlick           = playSlickLib("play-slick")
     val playSlickEvolutions = playSlickLib("play-slick-evolutions")
@@ -32,5 +35,6 @@ object Dependencies {
     val playRedis           = playRedisLib("play-redis")
     val playScalaTest       = playScalaTestlib("scalatestplus-play") % "test"
     val playJwt             = playJWTLib("jwt-play")
+    val scalaBcrypt         = scalaBcryptLib("scala-bcrypt")
   }
 }

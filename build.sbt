@@ -15,6 +15,7 @@ lazy val root = (project in file("."))
       jdbc,
       guice,
       playJwt,
+      scalaBcrypt,
       cacheApi,
       playRedis,
       postgres,
