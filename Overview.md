@@ -77,31 +77,33 @@ And then go to <http://localhost:9000> to see the running web application.
 - Test using H2
 
 # Major epic for the future work:
-1. Add Play Cache
+-[x] Add Play Cache
     - To resolve not to get random record that has been called like within past 500 records
     - See [play caching](https://www.playframework.com/documentation/2.8.x/ScalaCache)
     - Use of stack to store and remove the old one once the new are added and give size
     - Look into how it can be stored and how to check the contains in efficient manner 
     - Time limit and speed and where to store the codes
     
-2. Authorization and Authentication (might create a different microservice)
+-[ ] Authorization and Authentication (might create a different microservice)
     - Use of JWT to create a token and use for auth and authentication
     - Have to create a different database to store roles and user details
     - Use that in the backend to give authorization and in front-end can use to hid/show the UI (fav button)
 
-3. Search functionality for the project 
+-[ ] Search functionality for the project 
     - Text search using postgres
     - https://github.com/tminglei/slick-pg
     - https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/ 
     - filter, pagination, auto-complete
 
-4. GET API using the Wordnik token and endpoints (separate microservice)
+-[x] GET API using the Wordnik token and endpoints (separate microservice)
     - Get a word of the day 
     - Use different technology: ZIO, Http4s, Circe ..?
     - Run in different port and connect to font-end 
 
-5. Improvement with the Genre field
+-[ ] Improvement with the Genre field
     - Make a table that holds Genre
     - Allows user to create a genre 
     - Record should have list of genre, wrapper in Option
     - Have to be a distinct genre in the table
+
+-[ ] Use JSON data with NoSQL database 

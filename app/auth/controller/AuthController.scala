@@ -125,4 +125,10 @@ class AuthController @Inject()(
         case Left(exception) => exception
       } else badRequest(s"Email in wrong format: $email")
   }
+
+  // get the user info from selected email: only the logged in user can
+
+  // update the user info: Only the logged in user can
+
+  // sign out
 }
