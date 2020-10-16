@@ -27,7 +27,7 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
   }
 
   def unauthorized(msg: String): Result = {
-    val errorMessage: String = s"Unauthorized error for user: $msg"
+    val errorMessage: String = s"Wrong password for user: $msg"
     log.error(errorMessage)
     Unauthorized(Json.toJson(ResponseErrorMsg(errorMessage)))
   }

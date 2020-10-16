@@ -1,4 +1,4 @@
-package daos
+package auth.dao
 
 import java.sql.Date
 
@@ -17,7 +17,7 @@ import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 import utils.{ DbRunner, Logging }
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Success }
 
 @Singleton
 class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
@@ -29,6 +29,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   val userInfo: TableQuery[UserTable] = UserTable.userTableQueries
 
+  // Common anonymous method to check if the selected email exists in the database
   val checkValidEmail: String => Seq[UserInfo] = (email: String) =>
     runDbAction(userInfo.filter(_.email === email).result)
 
@@ -84,21 +85,41 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     }
   }
 
+  /**
+    * List all the users from the database: Only Admin can perform this action
+    * @return list of existing users
+    */
   def listAllUser(): Seq[UserList] = {
     val result = runDbAction(userInfo.sortBy(_.email).result)
     result.map(UserList(_))
   }
 
+  /**
+    * Toggle the user admin role: Only Admin can perform this action
+    * @param email to select the account
+    * @return Either exception or success record id
+    */
   def toggleAdmin(email: String): Either[Result, Int] = {
     val removeUser = (user: UserInfo) => alterAdminRole(user.id, user.isAdmin)
     findValidEmail(email)(removeUser)
   }
 
+  /**
+    * Remove the account from the database: Only the Admin can perform this action
+    * @param email to select the account
+    * @return Either exception or success record id
+    */
   def removeUserAccount(email: String): Either[Result, Int] = {
     val removeUser = (user: UserInfo) => runDbAction(userInfo.filter(_.id === user.id).delete)
     findValidEmail(email)(removeUser)
   }
 
+  /**
+    * Checks if the email exist in the database and perform the action on the account
+    * @param email to select the account
+    * @param fun function to be apply in the account
+    * @return Either exception or success record id
+    */
   def findValidEmail(email: String)(fun: UserInfo => Int): Either[Result, Int] = {
     // check if the account exists with that email
     checkValidEmail(email).headOption match {
@@ -106,12 +127,14 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
         log.info(s"Account is already in the table with id: ${account.id}")
         Right(fun(account))
       case None =>
-        log.info(s"User account is not found for : $email")
-        Left(notFound(s"User account is not found for: $email"))
+        val errorMsg: String = s"User account is not found: $email"
+        log.info(errorMsg)
+        Left(notFound(errorMsg))
     }
   }
 
   /**
+    * Alter the admin role on the selected account
     * @param id   id from user_detail_table
     * @param role boolean tag to alter the admin role
     * @return user account with updated admin role

@@ -14,16 +14,22 @@
 #    200:
 #      description: success
 #    400:
-#      description: Bad request (min length of password is 3)
+#      description: Bad request (min length of password is 3 and have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 #    401:
-#      description: Unauthorized for wrong password but with valid email
+#      description: Unauthorized with wrong password but with valid email
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 #    404:
 #      description: User account is not found in the database
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST        /signIn               controllers.authController.AuthController.signIn
+POST        /signIn               auth.controller.AuthController.signIn
 
 ###
-#  summary: Sing up API endpoints to creater a new account
+#  summary: Sign up API endpoints to creater a new account
 #  description: "This can be done by any new user."
 #  tags:
 #    - AuthQueryBuild
@@ -39,9 +45,84 @@ POST        /signIn               controllers.authController.AuthController.sign
 #      description: success with id of newly created record
 #    401:
 #      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 #    406:
 #      description: Account already exist in the database
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST        /signUp               controllers.authController.AuthController.signUp
+POST        /signUp               auth.controller.AuthController.signUp
+
+###
+#  summary: List all the user accounts from database
+#  description: "This can only be done by Admin role."
+#  tags:
+#    - AuthQueryBuild
+#  responses:
+#    200:
+#      description: All the existing users
+#      schema:
+#        $ref: '#/definitions/auth.model.UserList'
+#    401:
+#      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+GET        /getAllUser               auth.controller.AuthController.getAllUser
+
+###
+#  summary: Toggle the user account for admin role
+#  description: "This can only be done by Admin role."
+#  tags:
+#    - AuthQueryBuild
+#  responses:
+#    200:
+#      description: success with id of toggled account
+#    400:
+#      description: Bad request (have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    401:
+#      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+POST     /toggleAdmin/:email              auth.controller.AuthController.toggleAdminRole(email: String)
+
+###
+#  summary: Delete the user from the database
+#  description: "This can only be done by Admin role."
+#  tags:
+#    - AuthQueryBuild
+#  responses:
+#    200:
+#      description: success with id of deleted account
+#    400:
+#      description: Bad request (have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    401:
+#      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+DELETE     /deleteUser/:email              auth.controller.AuthController.removeUser(email: String)
+
+

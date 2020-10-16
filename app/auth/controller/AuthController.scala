@@ -1,10 +1,10 @@
-package controllers.authController
+package auth.controller
 
 import java.time.Clock
 
+import auth.dao.AuthDAO
 import auth.form.AuthForms
 import auth.model.UserToken
-import daos.AuthDAO
 import javax.inject.{ Inject, Singleton }
 import pdi.jwt.JwtSession._
 import play.api.Configuration
@@ -26,9 +26,14 @@ class AuthController @Inject()(
 
   implicit val clock: Clock = Clock.systemUTC
 
+  // Regex to validate the email pattern
   def isEmailValid(email: String): Boolean =
     if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
 
+  /**
+    * Sing In the existing user
+    * @return Auth JWT token in the header if success
+    */
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
     // Add request validation
@@ -59,6 +64,10 @@ class AuthController @Inject()(
     Future(signInResult)
   }
 
+  /**
+    * Sign up the new account in the database
+    * @return Record id or an exception
+    */
   def signUp: Action[AnyContent] = Action { implicit request =>
     log.info("Executing signUp Controller")
     // Add request validation
@@ -78,21 +87,36 @@ class AuthController @Inject()(
     )
   }
 
+  /**
+    * Get all the existing users from the database
+    * @return Seq of users
+    */
   def getAllUser: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAllUser Controller")
     responseSeqResult(authDAO.listAllUser())
   }
 
+  /**
+    * Alter the admin role to the selected user
+    * @param email to select the user's account
+    * @return Record id or an exception
+    */
   def toggleAdminRole(email: String): Action[AnyContent] = Action { implicit request =>
     log.info("Executing toggleAdminRole Controller")
     if (isEmailValid(email)) {
       authDAO.toggleAdmin(email) match {
+        // TODO Might want to response with the user details instead of a success id
         case Right(value)    => Ok(Json.toJson(value))
         case Left(exception) => exception
       }
-    } else badRequest(s"Email in wrong format: $email")
+    } else badRequest(s"Email is in wrong format: $email")
   }
 
+  /**
+    * Remove the user account from the database
+    * @param email to select the user's account
+    * @return Record id or an exception
+    */
   def removeUser(email: String): Action[AnyContent] = Action { implicit request =>
     log.info("Executing removeUser Controller")
     if (isEmailValid(email))
