@@ -27,14 +27,21 @@ trait ResponseMethod extends ErrorResponses with ResultResponse with Logging {
   }
 
   def unauthorized(msg: String): Result = {
-    log.error(s"Unauthorized error: $msg")
-    Unauthorized(Json.toJson(ResponseErrorMsg(msg)))
+    val errorMessage: String = s"Unauthorized error for user: $msg"
+    log.error(errorMessage)
+    Unauthorized(Json.toJson(ResponseErrorMsg(errorMessage)))
   }
 
   def notAcceptable(msg: String): Result = {
     val errorMessage: String = s"Account already exist with: $msg"
     log.error(errorMessage)
     NotAcceptable(Json.toJson(ResponseErrorMsg(errorMessage)))
+  }
+
+  def bcryptValidationFailed(msg: String): Result = {
+    val errorMessage: String = s"Bcrypt encryption failed: $msg"
+    log.error(errorMessage)
+    FailedDependency(Json.toJson(ResponseErrorMsg(errorMessage)))
   }
 
   // TODO: Might need to separate in different trait

@@ -3,12 +3,14 @@ package daos
 import java.sql.Date
 
 import auth.bcrypt.BcryptException
-import auth.bcrypt.BcryptObject.encryptPassword
+import auth.bcrypt.BcryptObject.{ encryptPassword, validatePassword }
 import auth.form.{ SignInForm, SignUpForm }
 import auth.model.UserInfo
 import auth.table.UserTable
 import javax.inject.{ Inject, Singleton }
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.mvc.Result
+import response.ResponseMethod
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
@@ -18,7 +20,10 @@ import utils.{ DbRunner, Logging }
 import scala.util.{ Failure, Success }
 
 @Singleton
-class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunner with Logging {
+class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+    extends DbRunner
+    with ResponseMethod
+    with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
@@ -27,7 +32,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunn
   /**
     * Create a new user account in the table
     * @param details user sign up form details
-    * @return New id of the record
+    * @return New id of the record and exception if the password hashing goes wrong
     */
   def signUpUser(details: SignUpForm): Either[Throwable, Int] = {
     val currentDate = new Date(System.currentTimeMillis())
@@ -60,11 +65,18 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends DbRunn
   /**
     * Check if the email and password provided are valid
     * @param details user details with email and password
-    * @return UserInfo oif the valid user
+    * @return UserInfo if the valid user or else exception result
     */
-  def isValidLogin(details: SignInForm): Option[UserInfo] = {
-    runDbAction(createUser.filter { user =>
-      user.email === details.email && user.password === details.password
-    }.result)
-  }.headOption
+  def isValidLogin(details: SignInForm): Either[Result, UserInfo] = {
+    // Already know that account exist with that email
+    val user: UserInfo = runDbAction(createUser.filter { user =>
+      user.email === details.email
+    }.result).head
+    // Check for the password match
+    validatePassword(details.password, user.password) match {
+      case Success(true)      => Right(user)
+      case Success(false)     => Left(unauthorized(s"${details.email}"))
+      case Failure(exception) => Left(bcryptValidationFailed(exception.getMessage))
+    }
+  }
 }

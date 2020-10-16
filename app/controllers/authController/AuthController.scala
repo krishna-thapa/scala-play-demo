@@ -37,10 +37,10 @@ class AuthController @Inject()(
         // Need to check if the user has enter wrong password but has an account already
         if (authDAO.isAccountExist(signInDetails.email)) {
           authDAO.isValidLogin(signInDetails) match {
-            case Some(validUser) =>
+            case Right(validUser) =>
               log.info("Success on authentication!")
               Ok.addingToJwtSession("user", UserToken(validUser.email))
-            case None => unauthorized(s"Wrong password for: ${signInDetails.email}")
+            case Left(exceptionResult) => exceptionResult
           }
         } else notFound(s"User account is not found for : ${signInDetails.email}")
       }
@@ -60,7 +60,7 @@ class AuthController @Inject()(
         if (!authDAO.isAccountExist(signUpDetails.email)) {
           authDAO.signUpUser(signUpDetails) match {
             case Right(value)    => Ok(Json.toJson(value))
-            case Left(exception) => badRequest(exception.getMessage)
+            case Left(exception) => bcryptValidationFailed(exception.getMessage)
           }
         } else notAcceptable(s"${signUpDetails.email}")
       }
