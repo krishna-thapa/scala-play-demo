@@ -14,7 +14,7 @@ import scala.concurrent.duration.DurationInt
 
 class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     extends Logging
-    with ResponseMethod {
+    with ResponseError {
 
   /*
     A cache API that uses synchronous calls rather than async calls.

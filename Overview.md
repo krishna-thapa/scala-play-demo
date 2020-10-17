@@ -107,3 +107,4 @@ And then go to <http://localhost:9000> to see the running web application.
     - Have to be a distinct genre in the table
 
 -[ ] Use JSON data with NoSQL database 
+-[ ] Use of lagom for the micro-service archtecture 

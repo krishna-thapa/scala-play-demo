@@ -53,7 +53,6 @@ GET         /:id            controllers.customQuote.CustomQuoteController.getSel
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 ###
-+ nocsrf
 POST        /               controllers.customQuote.CustomQuoteController.addCustomQuote
 
 ###
@@ -64,9 +63,8 @@ POST        /               controllers.customQuote.CustomQuoteController.addCus
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/models.CustomQuotesQuery'
+#        $ref: '#/definitions/response.OkResponse'
 ###
-+ nocsrf
 DELETE      /:id            controllers.customQuote.CustomQuoteController.deleteCustomQuote(id: Int)
 
 ###
@@ -113,5 +111,4 @@ DELETE      /:id            controllers.customQuote.CustomQuoteController.delete
 #    405:
 #      description: "Validation exception"
 ###
-+ nocsrf
 PUT         /:id            controllers.customQuote.CustomQuoteController.updateCustomQuote(id: Int)

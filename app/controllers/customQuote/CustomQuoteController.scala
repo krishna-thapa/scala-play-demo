@@ -2,9 +2,8 @@ package controllers.customQuote
 
 import daos.CustomQuoteQueryDAO
 import forms.RequestForm
-import response.ResponseMethod
+import response.{ OkResponse, ResponseResult }
 import javax.inject.{ Inject, Singleton }
-import play.api.libs.json.Json
 import play.api.mvc._
 import utils.Logging
 
@@ -17,7 +16,7 @@ class CustomQuoteController @Inject()(
     customerQuotesDAO: CustomQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc)
-    with ResponseMethod
+    with ResponseResult
     with Logging {
 
   /**
@@ -51,7 +50,7 @@ class CustomQuoteController @Inject()(
     implicit request: Request[AnyContent] =>
       if (customerQuotesDAO.deleteQuote(id) > 0) {
         log.warn(s"Successfully delete entry $id")
-        Ok(s"Successfully delete entry $id")
+        responseOk(OkResponse(s"Successfully delete entry $id"))
       } else {
         val error = s"Error on request with id: $id"
         badRequest(error)
@@ -69,13 +68,14 @@ class CustomQuoteController @Inject()(
         badRequest("error" + formWithErrors)
       },
       customQuote => {
-        Ok(Json.toJson(customerQuotesDAO.createQuote(customQuote)))
+        responseOk(customerQuotesDAO.createQuote(customQuote))
       }
     )
   }
 
   /**
     * A REST endpoint that updated selected quote to Custom quotes table.
+    * TODO: NOT WORKING
     */
   def updateCustomQuote(id: Int): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
@@ -86,7 +86,7 @@ class CustomQuoteController @Inject()(
         },
         customQuote => {
           customerQuotesDAO.updateQuote(id, customQuote) match {
-            case Success(id)        => Ok(s"Successfully updated entry row $id")
+            case Success(id)        => responseOk(OkResponse(s"Successfully updated entry row $id"))
             case Failure(exception) => internalServerError(exception.getMessage)
           }
         }

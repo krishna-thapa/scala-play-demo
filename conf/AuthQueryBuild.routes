@@ -26,7 +26,7 @@
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST        /signIn               auth.controller.AuthController.signIn
+POST        /signIn                     auth.controller.AuthController.signIn
 
 ###
 #  summary: Sign up API endpoints to creater a new account
@@ -43,6 +43,8 @@ POST        /signIn               auth.controller.AuthController.signIn
 #  responses:
 #    200:
 #      description: success with id of newly created record
+#      schema:
+#        $ref: '#/definitions/response.OkResponse'
 #    401:
 #      description: Unauthorized
 #      schema:
@@ -56,7 +58,7 @@ POST        /signIn               auth.controller.AuthController.signIn
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST        /signUp               auth.controller.AuthController.signUp
+POST        /signUp                     auth.controller.AuthController.signUp
 
 ###
 #  summary: List all the user accounts from database
@@ -77,7 +79,32 @@ POST        /signUp               auth.controller.AuthController.signUp
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-GET        /getAllUser               auth.controller.AuthController.getAllUser
+GET        /getAllUser                      auth.controller.AuthController.getAllUser
+
+###
+#  summary: Get the selected user details
+#  description: "This can only be done by logged in user or Admin role."
+#  tags:
+#    - AuthQueryBuild
+#  responses:
+#    200:
+#      description: success with user detail info
+#      schema:
+#        $ref: '#/definitions/auth.model.UserList'
+#    400:
+#      description: Bad request (have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    401:
+#      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+GET        /user/:email                      auth.controller.AuthController.getUserInfo(email: String)
 
 ###
 #  summary: Toggle the user account for admin role
@@ -87,6 +114,8 @@ GET        /getAllUser               auth.controller.AuthController.getAllUser
 #  responses:
 #    200:
 #      description: success with id of toggled account
+#      schema:
+#        $ref: '#/definitions/response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
@@ -100,7 +129,7 @@ GET        /getAllUser               auth.controller.AuthController.getAllUser
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST     /toggleAdmin/:email              auth.controller.AuthController.toggleAdminRole(email: String)
+POST     /toggleAdmin/:email                    auth.controller.AuthController.toggleAdminRole(email: String)
 
 ###
 #  summary: Delete the user from the database
@@ -110,6 +139,8 @@ POST     /toggleAdmin/:email              auth.controller.AuthController.toggleA
 #  responses:
 #    200:
 #      description: success with id of deleted account
+#      schema:
+#        $ref: '#/definitions/response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
@@ -123,6 +154,6 @@ POST     /toggleAdmin/:email              auth.controller.AuthController.toggleA
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-DELETE     /deleteUser/:email              auth.controller.AuthController.removeUser(email: String)
+DELETE     /deleteUser/:email                   auth.controller.AuthController.removeUser(email: String)
 
 

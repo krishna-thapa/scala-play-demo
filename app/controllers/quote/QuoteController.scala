@@ -2,14 +2,11 @@ package controllers.quote
 
 import cache.CacheController
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
-import response.ResponseMethod
+import response.ResponseResult
 import javax.inject._
 import models.Genre.Genre
-import models.QuotesQuery
 import play.api.cache.redis.CacheApi
-import play.api.libs.json.{ Json, OFormat }
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.mvc.Results.Ok
+import play.api.libs.json.Json
 import play.api.mvc._
 import response.ResponseMsg.InvalidCsvId
 import utils.DateConversion._
@@ -31,7 +28,7 @@ class QuoteController @Inject()(
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
     extends AbstractController(cc)
-    with ResponseMethod
+    with ResponseResult
     with Logging {
 
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
@@ -119,7 +116,7 @@ class QuoteController @Inject()(
     */
   def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getAuthorsAutocomplete")
-    responseWithSeq(quotesDAO.searchAuthors(parameter))
+    responseSeqString(quotesDAO.searchAuthors(parameter))
   }
 
 }
