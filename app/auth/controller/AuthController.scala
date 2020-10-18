@@ -3,25 +3,27 @@ package auth.controller
 import java.time.Clock
 
 import auth.dao.AuthDAO
+import auth.depInject.{ SecuredController, SecuredControllerComponents }
 import auth.form.AuthForms
 import auth.model.{ UserList, UserToken }
 import javax.inject.{ Inject, Singleton }
 import pdi.jwt.JwtSession._
 import play.api.Configuration
-import play.api.mvc._
+import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.OFormat
 import response.ResponseResult
 import utils.Logging
+import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
 @Singleton
 class AuthController @Inject()(
-    cc: ControllerComponents,
+    scc: SecuredControllerComponents,
     authDAO: AuthDAO
 )(implicit executionContext: ExecutionContext, config: Configuration)
-    extends AbstractController(cc)
+    extends SecuredController(scc)
     with Logging
     with ResponseResult {
 
@@ -92,7 +94,7 @@ class AuthController @Inject()(
     * Get all the existing users from the database: Only the Admin can
     * @return Seq of users
     */
-  def getAllUser: Action[AnyContent] = Action { implicit request =>
+  def getAllUser: Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getAllUser Controller")
     responseSeqResult(authDAO.listAllUser())
   }
