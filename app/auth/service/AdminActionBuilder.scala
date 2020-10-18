@@ -28,6 +28,7 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
     request.jwtSession.getAs[UserToken]("user") match {
       case Some(userToken) if userToken.isAdmin =>
         block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
+      // If the logged in user doesn't have an admin role
       case Some(userToken) =>
         Future(forbidden(s"${userToken.email}").refreshJwtSession(request))
       case _ =>

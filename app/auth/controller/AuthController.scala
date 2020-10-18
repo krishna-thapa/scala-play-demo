@@ -94,7 +94,7 @@ class AuthController @Inject()(
     * Get all the existing users from the database: Only the Admin can
     * @return Seq of users
     */
-  def getAllUser: Action[AnyContent] = UserAction { implicit request =>
+  def getAllUser: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllUser Controller")
     responseSeqResult(authDAO.listAllUser())
   }
@@ -104,7 +104,7 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record id or an exception
     */
-  def toggleAdminRole(email: String): Action[AnyContent] = Action { implicit request =>
+  def toggleAdminRole(email: String): Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing toggleAdminRole Controller")
     val toggleAdmin = (email: String) => authDAO.toggleAdmin(email)
     runApiAction(email)(toggleAdmin)
@@ -137,7 +137,7 @@ class AuthController @Inject()(
     * @param id to select the user's account
     * @return User Info once the success update on the record or an error response
     */
-  def updateUserInfo(id: Int): Action[AnyContent] = Action { implicit request =>
+  def updateUserInfo(id: Int): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing updateUserInfo Controller")
     // Add request validation
     AuthForms.signUpForm.bindFromRequest.fold(

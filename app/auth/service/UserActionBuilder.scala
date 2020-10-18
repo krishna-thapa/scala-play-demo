@@ -23,8 +23,12 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
       request: Request[A],
       block: Request[A] => Future[Result]
   ): Future[Result] = {
-    log.info("Executing the auth service")
+    log.info("Executing the auth service for UserActionBuilder")
     request.jwtSession.getAs[UserToken]("user") match {
+      /*
+      If want to make the admin role NOT to have permission that logged in user have
+      Change to: case Some(userToken) if !userToken.isAdmin =>
+       */
       case Some(userToken) =>
         block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
       case _ =>

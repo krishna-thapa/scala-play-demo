@@ -3,7 +3,18 @@ swagger: "2.0"
 info:
   title: "Inspirations-Quotes-API"
   description: "API for the inspirational quotes project"
+  contact:
+    email: krishna.nature91@gmail.com
+  license:
+    name: Inspirations-Quotes
+    url: https://github.com/krishna-thapa/Inspirational-quote-api
+  version: 1.0.0
 consumes:
   - application/json
 produces:
   - application/json
+securityDefinitions:
+  TokenKey(Valid for 5min):
+    type: apiKey
+    in: header
+    name: Authorization

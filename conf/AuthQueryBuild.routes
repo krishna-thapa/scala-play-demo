@@ -1,6 +1,7 @@
 ###
-#  summary: Sign In API endpoints to login into the account
-#  description: "This can only be done by the user that have existing account."
+#  summary: Sign In API endpoint to login into the account
+#  description: >
+#   This can only be done by the user that have an existing account.
 #  tags:
 #    - AuthQueryBuild
 #  parameters:
@@ -29,8 +30,9 @@
 POST        /signIn                     auth.controller.AuthController.signIn
 
 ###
-#  summary: Sign up API endpoints to creater a new account
-#  description: "This can be done by any new user."
+#  summary: Sign up API endpoint to creater a new account
+#  description: >
+#   This can be done by any new user.
 #  tags:
 #    - AuthQueryBuild
 #  parameters:
@@ -62,7 +64,8 @@ POST        /signUp                     auth.controller.AuthController.signUp
 
 ###
 #  summary: List all the user accounts from database
-#  description: "This can only be done by Admin role."
+#  description: >
+#   This can only be done by Admin role.
 #  tags:
 #    - AuthQueryBuild
 #  responses:
@@ -78,12 +81,15 @@ POST        /signUp                     auth.controller.AuthController.signUp
 #      description: Not found. Database is empty.
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
-GET        /getAllUser                      auth.controller.AuthController.getAllUser
+GET        /users                      auth.controller.AuthController.getAllUser
 
 ###
 #  summary: Get the selected user details
-#  description: "This can only be done by logged in user or Admin role."
+#  description: >
+#   This can only be done by logged in user or Admin role.
 #  tags:
 #    - AuthQueryBuild
 #  responses:
@@ -103,12 +109,15 @@ GET        /getAllUser                      auth.controller.AuthController.getAl
 #      description: Not found. Database is empty.
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
 GET        /user/:email                      auth.controller.AuthController.getUserInfo(email: String)
 
 ###
 #  summary: Update the user details. Different email will replace the older email
-#  description: "This can be only be done by logged in userr."
+#  description: >
+#   This can only be done by logged in user or Admin role.
 #  tags:
 #    - AuthQueryBuild
 #  parameters:
@@ -131,12 +140,15 @@ GET        /user/:email                      auth.controller.AuthController.getU
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
-POST        /updateUser/:id                     auth.controller.AuthController.updateUserInfo(id:Int)
+POST        /user/:id                     auth.controller.AuthController.updateUserInfo(id:Int)
 
 ###
 #  summary: Toggle the user account for admin role
-#  description: "This can only be done by Admin role."
+#  description: >
+#   This can only be done by Admin role.
 #  tags:
 #    - AuthQueryBuild
 #  responses:
@@ -156,12 +168,15 @@ POST        /updateUser/:id                     auth.controller.AuthController.u
 #      description: Not found. Database is empty.
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
-POST     /toggleAdmin/:email                    auth.controller.AuthController.toggleAdminRole(email: String)
+POST     /admin/:email                    auth.controller.AuthController.toggleAdminRole(email: String)
 
 ###
 #  summary: Delete the user from the database
-#  description: "This can only be done by Admin role."
+#  description: >
+#   This can only be done by Admin role.
 #  tags:
 #    - AuthQueryBuild
 #  responses:
@@ -181,7 +196,9 @@ POST     /toggleAdmin/:email                    auth.controller.AuthController.t
 #      description: Not found. Database is empty.
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
-DELETE     /deleteUser/:email                   auth.controller.AuthController.removeUser(email: String)
+DELETE     /user/:email                   auth.controller.AuthController.removeUser(email: String)
 
 
