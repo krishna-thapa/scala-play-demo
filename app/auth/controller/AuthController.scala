@@ -94,7 +94,7 @@ class AuthController @Inject()(
     * Get all the existing users from the database: Only the Admin can
     * @return Seq of users
     */
-  def getAllUser: Action[AnyContent] = AdminAction { implicit request =>
+  def getAllUser: Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getAllUser Controller")
     responseSeqResult(authDAO.listAllUser())
   }

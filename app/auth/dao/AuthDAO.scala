@@ -77,6 +77,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     * @return list of existing users
     */
   def listAllUser(): Seq[UserList] = {
+    println("helloe" + encryptPassword("admin"))
     val result = runDbAction(userInfo.sortBy(_.email).result)
     result.map(UserList(_))
   }

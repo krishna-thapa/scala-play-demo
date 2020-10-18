@@ -10,8 +10,8 @@ CREATE TABLE user_details_table (
     is_admin boolean default true
 );
 
--- Admin account in the database with -1 as an ID
-INSERT INTO user_details_table VALUES (-1, 'admin', 'admin', 'admin@com', 'admin', '2020-10-15', true);
+-- Admin account in the database with -1 as an ID and admin as encrypted password
+INSERT INTO user_details_table VALUES (-1, 'admin', 'admin', 'admin@com', '$2a$05$qURyvfv6eJtoroIDL48ExuAeOGxN705UcTgrHYyrrDjBLm5UrBDgO', '2020-10-15', true);
 
 --- !Downs
 
