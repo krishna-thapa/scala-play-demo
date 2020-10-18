@@ -94,7 +94,7 @@ class AuthController @Inject()(
     * Get all the existing users from the database: Only the Admin can
     * @return Seq of users
     */
-  def getAllUser: Action[AnyContent] = UserAction { implicit request =>
+  def getAllUser: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllUser Controller")
     responseSeqResult(authDAO.listAllUser())
   }
@@ -115,7 +115,7 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record id or an exception
     */
-  def removeUser(email: String): Action[AnyContent] = Action { implicit request =>
+  def removeUser(email: String): Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing removeUser Controller")
     val removeAccount = (email: String) => authDAO.removeUserAccount(email)
     runApiAction(email)(removeAccount)
@@ -126,7 +126,7 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record details or an exception
     */
-  def getUserInfo(email: String): Action[AnyContent] = Action { implicit request =>
+  def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getUserInfo Controller")
     val getUserInfoDetails = (email: String) => authDAO.userAccount(email)
     runApiAction(email)(getUserInfoDetails)

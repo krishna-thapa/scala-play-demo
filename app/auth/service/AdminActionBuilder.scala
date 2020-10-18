@@ -4,14 +4,15 @@ import java.time.Clock
 
 import auth.model.UserToken
 import javax.inject.Inject
-import pdi.jwt.JwtSession._
-import play.api.Configuration
+import pdi.jwt.JwtSession.RichRequestHeader
 import play.api.mvc._
 import response.ResponseError
+import pdi.jwt.JwtSession._
+import play.api.Configuration
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
+class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
     implicit ec: ExecutionContext,
     conf: Configuration
 ) extends ActionBuilderImpl(parser)
@@ -23,10 +24,12 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
       request: Request[A],
       block: Request[A] => Future[Result]
   ): Future[Result] = {
-    log.info("Executing the auth service")
+    log.info("Executing the auth service for AdminActionBuilder")
     request.jwtSession.getAs[UserToken]("user") match {
-      case Some(userToken) =>
+      case Some(userToken) if userToken.isAdmin =>
         block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
+      case Some(userToken) =>
+        Future(forbidden(s"${userToken.email}").refreshJwtSession(request))
       case _ =>
         Future(unauthorized(s"Do not have access!"))
     }

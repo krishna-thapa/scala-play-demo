@@ -1,13 +1,14 @@
 package auth.depInject
 
-import auth.service.UserActionBuilder
+import auth.service.{ AdminActionBuilder, UserActionBuilder }
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{ Langs, MessagesApi }
 import play.api.mvc._
 
 case class SecuredControllerComponents @Inject()(
-    authenticatedActionBuilder: UserActionBuilder,
+    userActionBuilder: UserActionBuilder,
+    adminActionBuilder: AdminActionBuilder,
     actionBuilder: DefaultActionBuilder,
     parsers: PlayBodyParsers,
     messagesApi: MessagesApi,
