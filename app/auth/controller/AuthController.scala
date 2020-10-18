@@ -4,7 +4,7 @@ import java.time.Clock
 
 import auth.dao.AuthDAO
 import auth.form.AuthForms
-import auth.model.UserToken
+import auth.model.{ UserList, UserToken }
 import javax.inject.{ Inject, Singleton }
 import pdi.jwt.JwtSession._
 import play.api.Configuration
@@ -14,6 +14,7 @@ import response.ResponseResult
 import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 @Singleton
 class AuthController @Inject()(
@@ -129,7 +130,31 @@ class AuthController @Inject()(
     runApiAction(email)(getUserInfoDetails)
   }
 
-  // update the user info: Only the logged in user can
+  /**
+    * Update the user info details, different email will replace the older email. Only logged in user can do
+    * @param id to select the user's account
+    * @return User Info once the success update on the record or an error response
+    */
+  def updateUserInfo(id: Int): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing updateUserInfo Controller")
+    // Add request validation
+    AuthForms.signUpForm.bindFromRequest.fold(
+      formWithErrors => {
+        badRequest(s"The form was not in the expected format: $formWithErrors")
+      },
+      userDetails => {
+        authDAO.updateUserInfo(id, userDetails) match {
+          case Right(user) =>
+            user match {
+              case Success(_) =>
+                responseOk(UserList(authDAO.checkValidEmail(userDetails.email).head))
+              case Failure(exception) => badRequest(exception.getMessage)
+            }
+          case Left(exception) => bcryptValidationFailed(exception.getMessage)
+        }
+      }
+    )
+  }
 
   // sign out
 

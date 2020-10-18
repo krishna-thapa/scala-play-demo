@@ -37,7 +37,7 @@ POST        /signIn                     auth.controller.AuthController.signIn
 #    - name: body
 #      in: body
 #      required: true
-#      description: Sing up form details
+#      description: Sign up form details
 #      schema:
 #        $ref: '#/definitions/auth.form.SignUpForm'
 #  responses:
@@ -105,6 +105,34 @@ GET        /getAllUser                      auth.controller.AuthController.getAl
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET        /user/:email                      auth.controller.AuthController.getUserInfo(email: String)
+
+###
+#  summary: Update the user details. Different email will replace the older email
+#  description: "This can be only be done by logged in userr."
+#  tags:
+#    - AuthQueryBuild
+#  parameters:
+#    - name: body
+#      in: body
+#      required: true
+#      description: Update user detail form
+#      schema:
+#        $ref: '#/definitions/auth.form.SignUpForm'
+#  responses:
+#    200:
+#      description: success with id of newly created record
+#      schema:
+#        $ref: '#/definitions/auth.model.UserList'
+#    401:
+#      description: Unauthorized
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    400:
+#      description: Bad request (min length of password is 3 and have to be in correct email format)
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+POST        /updateUser/:id                     auth.controller.AuthController.updateUserInfo(id:Int)
 
 ###
 #  summary: Toggle the user account for admin role

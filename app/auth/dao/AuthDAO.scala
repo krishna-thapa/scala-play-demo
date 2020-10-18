@@ -14,7 +14,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 
-import scala.util.{ Failure, Success }
+import scala.util.{ Failure, Success, Try }
 
 @Singleton
 class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
@@ -115,5 +115,28 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
   def userAccount(email: String): Either[Result, UserList] = {
     val getUser = (user: UserInfo) => UserList(user)
     findValidEmail(email)(getUser)
+  }
+
+  /**
+    * Update the user info details: Only the logged in user can
+    * @param id to select the account
+    * @param details Update details form
+    * @return Either exception or success id of the updated record
+    */
+  def updateUserInfo(id: Int, details: SignUpForm): Either[Throwable, Try[Int]] = {
+    encryptPassword(details.password) match {
+      case Success(encrypted) =>
+        val action = userInfo
+          .filter(_.id === id)
+          .map(user => (user.firstName, user.lastName, user.email, user.password))
+          .update(
+            details.firstName,
+            details.lastName,
+            details.email,
+            encrypted
+          )
+        Right(runDbActionCatchError(action))
+      case Failure(exception) => Left(BcryptException(exception.getMessage))
+    }
   }
 }
