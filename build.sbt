@@ -23,7 +23,9 @@ lazy val root = (project in file("."))
       playSlick,
       //scalaTest,
       swaggerUi,
-      playScalaTest
+      //playScalaTest,
+      elastic4s,
+      elastic4sJson
     ),
     Test / fork := true
   )

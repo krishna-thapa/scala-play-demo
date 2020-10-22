@@ -11,6 +11,9 @@
 # API endpoints for the auth of user service
 ->      /auth                       AuthQueryBuild.Routes
 
+# API endpoints for the search on the database using quatations table
+->      /search                     SearchQueryBuild.Routes
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 

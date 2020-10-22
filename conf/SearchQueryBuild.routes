@@ -1,0 +1,44 @@
+###
+#  summary: Get a autocomplete list of authors from search parameter
+#  description: "This can only be done by the logged in user. Minimum required input parameter length is 3"
+#  tags:
+#    - SearchQueryBuild
+#  parameters:
+#    - name: "author"
+#      in: "path"
+#      description: "Required"
+#      required: true
+#      type: "string"
+#      minLength: 3
+#  responses:
+#    200:
+#      description: Success response of the quotes.
+#      schema:
+#        type: "array"
+#        items:
+#          type: "string"
+#    404:
+#      description: Not found. Database is empty.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+GET      /:author                controllers.quote.QuoteController.getAuthorsAutocomplete(author: String)
+
+###
+#  summary: Reads the quotes record from Postgres table and store in ElasticSearch Index under "quotes"
+#  description: "This can only be done by Admin role"
+#  tags:
+#    - SearchQueryBuild
+#  parameters:
+#    - name: "records"
+#      in: "path"
+#      description: "Number of records to be added in ElasticSearch DB"
+#      required: true
+#      type: "integer"
+#  responses:
+#    200:
+#      description: Success response of the quotes.
+#    404:
+#      description: Not found. Database is empty.
+###
+GET      /insertInEs/:records                search.controller.SearchController.writeInEs(records: Int)

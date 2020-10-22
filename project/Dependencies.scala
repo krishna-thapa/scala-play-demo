@@ -11,6 +11,7 @@ object Dependencies {
     val playRedis  = "2.6.1"
     val playjwt    = "4.2.0"
     val bcrypt     = "4.1"
+    val elastic4s  = "7.9.1"
   }
 
   object Libraries {
@@ -26,6 +27,8 @@ object Dependencies {
     def playJWTLib(artifact: String): ModuleID = "com.pauldijou" %% artifact % Versions.playjwt
     def scalaBcryptLib(artifact: String): ModuleID =
       "com.github.t3hnar" %% artifact % Versions.bcrypt
+    def elastic4sLib(artifact: String): ModuleID =
+      "com.sksamuel.elastic4s" %% artifact % Versions.elastic4s
 
     val playSlick           = playSlickLib("play-slick")
     val playSlickEvolutions = playSlickLib("play-slick-evolutions")
@@ -36,5 +39,7 @@ object Dependencies {
     val playScalaTest       = playScalaTestlib("scalatestplus-play") % "test"
     val playJwt             = playJWTLib("jwt-play")
     val scalaBcrypt         = scalaBcryptLib("scala-bcrypt")
+    val elastic4s           = elastic4sLib("elastic4s-client-esjava")
+    val elastic4sJson       = elastic4sLib("elastic4s-json-play")
   }
 }
