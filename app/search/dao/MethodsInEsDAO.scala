@@ -9,6 +9,7 @@ import javax.inject.Inject
 import models.QuotesQuery
 import _root_.search.util.InitEs
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
+import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import utils.Logging
 
 import scala.concurrent.Future
@@ -24,6 +25,13 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO) extends InitEs with Log
         indexInto(indexName).doc(quote).refresh(RefreshPolicy.Immediate).createOnly(true)
       }
     }
+  }
+
+  def deleteQuotesIndex(indexName: String): Future[Response[DeleteIndexResponse]] = {
+    log.warn(s"Deleting the index: $indexName")
+    client.execute(
+      deleteIndex(indexName)
+    )
   }
 
 }

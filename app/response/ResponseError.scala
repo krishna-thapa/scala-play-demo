@@ -12,6 +12,11 @@ trait ResponseError extends Logging {
     BadRequest(Json.toJson(ResponseErrorMsg(msg)))
   }
 
+  def badGateway(msg: String): Result = {
+    log.error(s"Bad Gateway from server error: $msg")
+    BadGateway(Json.toJson(ResponseErrorMsg(msg)))
+  }
+
   def notFound(msg: String): Result = {
     log.warn(s"Not Found error: $msg")
     NotFound(Json.toJson(ResponseErrorMsg(msg)))

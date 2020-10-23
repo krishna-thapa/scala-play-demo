@@ -42,3 +42,28 @@ GET      /:author                controllers.quote.QuoteController.getAuthorsAut
 #      description: Not found. Database is empty.
 ###
 GET      /insertInEs/:records                search.controller.SearchController.writeInEs(records: Int)
+
+###
+#  summary: Delete the index "quotes" - Should be used for the testing purpose only
+#  description: "This can only be done by Admin role"
+#  tags:
+#    - SearchQueryBuild
+#  parameters:
+#    - name: "indexName"
+#      in: "path"
+#      description: "Index name that will be deleted from ES"
+#      required: true
+#      type: "string"
+#  responses:
+#    200:
+#      description: Success response on deleting an es index.
+#    404:
+#      description: Not found with input index in an ES.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    502:
+#      description: Bad Gateway - Connection refused.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+GET      /deleteIndex/:indexName                search.controller.SearchController.deleteIndex(indexName: String)
