@@ -20,6 +20,12 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     with ResponseResult
     with Logging {
 
+  /**
+    * Write records in index name under "quotes", need to pass number of records that will be generated randomly from posgres table
+    * Can only be done by Admin role
+    * @param records will be fetched from database and store under ES
+    * @return success body or exception message
+    */
   def writeInEs(records: Int): Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing writeInEs Controller")
 
@@ -31,17 +37,21 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
       Future.sequence(listOfFutureResults)
 
     futureListResults
-      .map { response =>
-        Ok("Success")
-      }
+      .map(responseEsSeqResult)
       //add recover to handle the case where the future fails.
       .recover {
-        case e =>
-          log.warn(s"${e.getMessage}")
-          Ok("failure")
+        case exception =>
+          log.warn(s"Error while writing records on index: ${exception.getMessage}")
+          badGateway(s"${exception.getMessage}")
       }
   }
 
+  /**
+    * Delete an entire index from ES
+    * Can only be done by Admin role
+    * @param indexName that will be deleted from ES
+    * @return success body or exception message
+    */
   def deleteIndex(indexName: String): Action[AnyContent] = Action.async { implicit request =>
     log.warn(s"Executing deleteIndex controller for: $indexName")
     log.warn("Hope you know what you are doing!")

@@ -21,8 +21,11 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO) extends InitEs with Log
     val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
     quotes.map { quote =>
       client.execute {
+        // providing index with csvId to avoid duplicates records with same csvId
+        val csvId = quote.csvid
         // if createOnly set to true then trying to update a document will fail
-        indexInto(indexName).doc(quote).refresh(RefreshPolicy.Immediate).createOnly(true)
+        // have set as false (default) so that duplicate records can override the existing records
+        indexInto(indexName).id(csvId).doc(quote).refresh(RefreshPolicy.Immediate)
       }
     }
   }

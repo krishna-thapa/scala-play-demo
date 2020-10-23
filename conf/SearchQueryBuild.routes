@@ -37,9 +37,15 @@ GET      /:author                controllers.quote.QuoteController.getAuthorsAut
 #      type: "integer"
 #  responses:
 #    200:
-#      description: Success response of the quotes.
+#      description: Success response after writing on ES index.
 #    404:
-#      description: Not found. Database is empty.
+#      description: Not found with input index in an ES.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    502:
+#      description: Bad Gateway - Connection refused.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /insertInEs/:records                search.controller.SearchController.writeInEs(records: Int)
 

@@ -13,7 +13,7 @@ sudo systemctl stop kibana.service
 ## GET
 ```
 curl -X GET http://localhost:9200/_cat/indices
-curl -X GET http://localhost:9200/sink2/_doc/_search | jq
+curl -X GET http://localhost:9200/quotes/_doc/_search | jq
 ```
 
 ## DELETE
