@@ -73,3 +73,29 @@ GET      /insertInEs/:records                search.controller.SearchController.
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
 GET      /deleteIndex/:indexName                search.controller.SearchController.deleteIndex(indexName: String)
+
+###
+#  summary: Search quotes from the ES with text serach
+#  description: "This can only be done by Logged/Admin role"
+#  tags:
+#    - SearchQueryBuild
+#  parameters:
+#    - name: search request
+#      in: body
+#      description: Search request body
+#      required: true
+#      schema:
+#        $ref: '#/definitions/search.form.SearchRequest'
+#  responses:
+#    200:
+#      description: Success response on deleting an es index.
+#    404:
+#      description: Not found with input index in an ES.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+#    502:
+#      description: Bad Gateway - Connection refused.
+#      schema:
+#        $ref: '#/definitions/response.ResponseErrorMsg'
+###
+POST      /searchQuote                     search.controller.SearchController.searchQuote

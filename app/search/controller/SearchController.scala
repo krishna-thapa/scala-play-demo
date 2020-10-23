@@ -4,9 +4,12 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import javax.inject.{ Inject, Singleton }
+import play.api.libs.json.Json
+import play.api.mvc.Results.Ok
 import play.api.mvc._
 import response.ResponseResult
 import search.dao.MethodsInEsDAO
+import search.form.SearchForm
 import search.util.FutureConv
 import utils.Logging
 
@@ -68,6 +71,24 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
           )
           badGateway(s"${exception.getMessage}")
       }
+  }
+
+  def searchQuote: Action[AnyContent] = Action.async { implicit request =>
+    log.warn(s"Executing searchQuote controller")
+    // Add request validation
+    val searchResults = SearchForm.searchRequestForm.bindFromRequest.fold(
+      formWithErrors => {
+        Future(badRequest(s"The form was not in the expected format: $formWithErrors"))
+      },
+      searchRequest => {
+        methodsInEsDAO
+          .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
+          .map { result =>
+            Ok(Json.toJson(result._2))
+          }
+      }
+    )
+    searchResults
   }
 
 }

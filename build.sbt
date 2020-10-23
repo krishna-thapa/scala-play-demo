@@ -33,7 +33,7 @@ lazy val root = (project in file("."))
  add domain package names for play-swagger to auto generate swagger
  definitions for domain classes mentioned in your routes
  */
-swaggerDomainNameSpaces := Seq("models", "forms", "response", "auth")
+swaggerDomainNameSpaces := Seq("models", "forms", "response", "auth", "search")
 
 scalacOptions ++= Seq(
   "-feature",
