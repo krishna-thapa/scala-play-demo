@@ -63,7 +63,7 @@ trait ResponseResult extends ResponseError {
   def responseEsSeqResult[T](responses: Seq[Response[T]]): Result = {
     val headResponse: Response[T] = responses.head
     if (headResponse.isSuccess) {
-      Ok(s"Success: ${headResponse.body}")
+      Ok(s"Success with response code: ${responses.head.status}")
     } else {
       log.error(s"Error while writing on index: ${headResponse.error.reason}")
       notFound(s"${headResponse.error.reason}")

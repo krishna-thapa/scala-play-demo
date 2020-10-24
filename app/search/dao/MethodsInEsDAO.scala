@@ -10,7 +10,7 @@ import models.QuotesQuery
 import _root_.search.util.InitEs
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.searches.SearchRequest
+import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
 import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -40,20 +40,17 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
     )
   }
 
-  def searchQuote(text: String, offset: Int, limit: Int): Future[(Long, List[QuotesQuery])] = {
+  def searchQuote(text: String, offset: Int, limit: Int): Future[Response[SearchResponse]] = {
+    log.warn(s"Searching text : $text in the index: $indexName")
     client
       .execute(
         searchRequest(text)
           .from(offset)
           .size(limit)
       )
-      .map { response =>
-        response.body.foreach(body => log.info(s"Response body: $body"))
-        log.info(s"Hello: ${response.result}")
-        (response.result.totalHits, response.result.to[QuotesQuery].toList)
-      }
   }
 
+  // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
   val searchRequest: String => SearchRequest = (text: String) =>
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
 

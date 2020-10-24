@@ -1,11 +1,11 @@
 package search.controller
 
 import com.sksamuel.elastic4s.Response
+import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import javax.inject.{ Inject, Singleton }
-import play.api.libs.json.Json
-import play.api.mvc.Results.Ok
+import models.QuotesQuery
 import play.api.mvc._
 import response.ResponseResult
 import search.dao.MethodsInEsDAO
@@ -59,10 +59,8 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     log.warn(s"Executing deleteIndex controller for: $indexName")
     log.warn("Hope you know what you are doing!")
 
-    val deleteResult: Future[Response[DeleteIndexResponse]] =
-      methodsInEsDAO.deleteQuotesIndex(indexName)
-
-    deleteResult
+    methodsInEsDAO
+      .deleteQuotesIndex(indexName)
       .map(responseEsResult)
       .recover {
         case exception =>
@@ -73,6 +71,10 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
       }
   }
 
+  /**
+    * List of the quotes that match the search text
+    * @return Returns seq of matched quote
+    */
   def searchQuote: Action[AnyContent] = Action.async { implicit request =>
     log.warn(s"Executing searchQuote controller")
     // Add request validation
@@ -83,8 +85,18 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
       searchRequest => {
         methodsInEsDAO
           .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
-          .map { result =>
-            Ok(Json.toJson(result._2))
+          .map { response =>
+            log.info(
+              s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
+            )
+            responseSeqResult(response.result.to[QuotesQuery].toList)
+          }
+          .recover {
+            case exception =>
+              log.error(
+                s"Error while searching the text: ${exception.getMessage}"
+              )
+              badRequest(s"${exception.getMessage}")
           }
       }
     )
