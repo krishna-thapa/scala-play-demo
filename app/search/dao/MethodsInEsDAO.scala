@@ -22,6 +22,8 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
   def getAndStoreQuotes(records: Int): Seq[Future[Response[IndexResponse]]] = {
     log.info(s"Getting $records random quotes from database")
     val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
+    if (doesIndexExists) deleteQuotesIndex(indexName).await
+    log.info(s"Creating a new index in the ES: $indexName")
     quotes.map { quote =>
       client.execute {
         // providing index with csvId to avoid duplicates records with same csvId
@@ -54,4 +56,14 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
   val searchRequest: String => SearchRequest = (text: String) =>
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
 
+  def doesIndexExists: Boolean = {
+    log.warn(s"Checking if the index exists already")
+    client
+      .execute {
+        indexExists(indexName)
+      }
+      .await
+      .result
+      .isExists
+  }
 }

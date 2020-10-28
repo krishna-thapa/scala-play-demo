@@ -37,7 +37,7 @@ curl -X GET http://localhost:9200/quotes/_doc/_search | jq
 curl -X DELETE http://localhost:9200/sink2  
 ```
 
-## [Install jq in Ubuntu](https://www.howtoinstall.me/ubuntu/18-04/jq/)
+### [Install jq in Ubuntu](https://www.howtoinstall.me/ubuntu/18-04/jq/)
 
 ## Resources:
 - https://www.baeldung.com/elasticsearch-full-text-search-rest-api

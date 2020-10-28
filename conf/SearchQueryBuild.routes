@@ -1,12 +1,12 @@
 ###
 #  summary: Get a autocomplete list of authors from search parameter
-#  description: "This can only be done by the logged in user. Minimum required input parameter length is 3"
+#  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - SearchQueryBuild
 #  parameters:
 #    - name: "author"
 #      in: "path"
-#      description: "Required"
+#      description: "Required min lenght of 3"
 #      required: true
 #      type: "string"
 #      minLength: 3
@@ -25,8 +25,8 @@
 GET      /:author                controllers.quote.QuoteController.getAuthorsAutocomplete(author: String)
 
 ###
-#  summary: Reads the quotes record from Postgres table and store in ElasticSearch Index under "quotes"
-#  description: "This can only be done by Admin role"
+#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
+#  description: "The size of the records has to be passed as path parameter and this can only be done by Admin role"
 #  tags:
 #    - SearchQueryBuild
 #  parameters:
@@ -47,11 +47,11 @@ GET      /:author                controllers.quote.QuoteController.getAuthorsAut
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-GET      /insertInEs/:records                search.controller.SearchController.writeInEs(records: Int)
+GET      /create/:records                search.controller.SearchController.writeInEs(records: Int)
 
 ###
-#  summary: Delete the index "quotes" - Should be used for the testing purpose only
-#  description: "This can only be done by Admin role"
+#  summary: Delete the index "quotes" - Should be used for the testing purpose only.
+#  description: "The name of the index has to pass as a path parameter and this can only be done by Admin role"
 #  tags:
 #    - SearchQueryBuild
 #  parameters:
@@ -72,11 +72,11 @@ GET      /insertInEs/:records                search.controller.SearchController.
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-GET      /deleteIndex/:indexName                search.controller.SearchController.deleteIndex(indexName: String)
+GET      /delete/:indexName                search.controller.SearchController.deleteIndex(indexName: String)
 
 ###
 #  summary: Search quotes from the ES with text serach
-#  description: "This can only be done by Logged/Admin role"
+#  description: "Searched text has to be min length of 3 and this can only be done by Logged/Admin role"
 #  tags:
 #    - SearchQueryBuild
 #  parameters:
@@ -98,4 +98,4 @@ GET      /deleteIndex/:indexName                search.controller.SearchControll
 #      schema:
 #        $ref: '#/definitions/response.ResponseErrorMsg'
 ###
-POST      /searchQuote                     search.controller.SearchController.searchQuote
+POST      /quote                     search.controller.SearchController.searchQuote

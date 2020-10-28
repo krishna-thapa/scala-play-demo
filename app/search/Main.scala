@@ -9,6 +9,8 @@ import com.sksamuel.elastic4s.playjson._
 import play.api.libs.json.{ Json, OFormat }
 import utils.Logging
 
+// For testing purpose
+
 object Main extends App with Logging {
 
   // you must import the DSL to use the syntax helpers

@@ -3,14 +3,12 @@ package search.controller
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
-import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import javax.inject.{ Inject, Singleton }
 import models.QuotesQuery
 import play.api.mvc._
 import response.ResponseResult
 import search.dao.MethodsInEsDAO
 import search.form.SearchForm
-import search.util.FutureConv
 import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -19,13 +17,13 @@ import scala.concurrent.{ ExecutionContext, Future }
 class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerComponents)(
     implicit executionContext: ExecutionContext
 ) extends AbstractController(cc)
-    with FutureConv[Response[IndexResponse]]
     with ResponseResult
     with Logging {
 
   /**
-    * Write records in index name under "quotes", need to pass number of records that will be generated randomly from posgres table
+    * Write records in index name under "quotes", need to pass number of records that will be generated randomly from postgres table
     * Can only be done by Admin role
+    * Duplicate records will be overridden
     * @param records will be fetched from database and store under ES
     * @return success body or exception message
     */
@@ -56,7 +54,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     * @return success body or exception message
     */
   def deleteIndex(indexName: String): Action[AnyContent] = Action.async { implicit request =>
-    log.warn(s"Executing deleteIndex controller for: $indexName")
+    log.info(s"Executing deleteIndex controller for: $indexName")
     log.warn("Hope you know what you are doing!")
 
     methodsInEsDAO
@@ -76,7 +74,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     * @return Returns seq of matched quote
     */
   def searchQuote: Action[AnyContent] = Action.async { implicit request =>
-    log.warn(s"Executing searchQuote controller")
+    log.info(s"Executing searchQuote controller")
     // Add request validation
     val searchResults = SearchForm.searchRequestForm.bindFromRequest.fold(
       formWithErrors => {
