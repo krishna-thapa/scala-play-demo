@@ -11,4 +11,11 @@ services:
       # use obscure ports for the tests to reduce the risk of interfering with existing elastic installations/containers
       - 9200:9200
     volumes:
-      - "./conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "./conf/docker/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - "./conf/docker/redis.conf:/redis.conf"
+    command: [ "redis-server", "/redis.conf" ]

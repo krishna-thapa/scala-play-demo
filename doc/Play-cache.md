@@ -36,10 +36,16 @@ play.modules.enabled += play.api.cache.redis.RedisCacheModule
 
 ## Redis commands
 ```
+/etc/init.d/redis-server stop
+/etc/init.d/redis-server start
+/etc/init.d/redis-server restart
+
 brew services start redis 
 redis-cli  
+KEYS *  //Get all the lists
 DEL <list/set/map name>
-LRANGE <list-name> 0 -1
+LRANGE cache-random-quote 0 -1
+LRANGE cache-quoteOfTheDay 0 -1
 ```
 
 ## Implementation as a cache storage
