@@ -19,3 +19,16 @@ services:
     volumes:
       - "./conf/docker/redis.conf:/redis.conf"
     command: [ "redis-server", "/redis.conf" ]
+  postgres:
+    image: postgres
+    container_name: pg-docker
+    restart: always
+    environment:
+      POSTGRES_DB: inspiration_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - 5432:5432
+    volumes:
+      - "./conf/docker/postgres.conf:/etc/postgresql/postgresql.conf"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
