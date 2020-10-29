@@ -42,3 +42,16 @@ curl http://127.0.0.1:9200/_cat/health
 curl -X GET http://127.0.0.1:9200/_cat/indices
 curl -X GET http://127.0.0.1:9200/quotes/_doc/_search | jq
 ```
+
+## Install Redis with Docker
+[Configure and Run a Docker Container for Redis and Use it for Python](https://medium.com/better-programming/dockerizing-and-pythonizing-redis-41b1340979de)
+
+### Connect to Redis cli running in docker
+- Get the Container id of Redis container running in docker
+```
+docker ps
+```
+- Connect to the redis-cli
+```
+docker exec -it <container-id> redis-cli
+```
