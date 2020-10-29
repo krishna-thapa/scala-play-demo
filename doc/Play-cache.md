@@ -42,8 +42,12 @@ play.modules.enabled += play.api.cache.redis.RedisCacheModule
 
 brew services start redis 
 redis-cli  
+
 KEYS *  //Get all the lists
-DEL <list/set/map name>
+
+DEL cache-random-quote
+DEL cache-quoteOfTheDay
+
 LRANGE cache-random-quote 0 -1
 LRANGE cache-quoteOfTheDay 0 -1
 ```
