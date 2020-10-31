@@ -4,16 +4,6 @@
 
 [Steps to follow](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart)
 
-Connect to the postgres server:
-```
-sudo su - postgres
-psql
-\c inspiration_db 
-```
-Create a database:
-```
-CREATE DATABASE inspiration_db;
-```
 ### Create a user admin and make it as a super user
 ```
 CREATE USER admin WITH PASSWORD 'admin';
@@ -21,7 +11,6 @@ ALTER USER admin WITH SUPERUSER;
 ```
 
 ### Use systemctl command to manage postgresql service:
-
 1. stop service:
 `systemctl stop postgresql`
 
@@ -30,12 +19,49 @@ ALTER USER admin WITH SUPERUSER;
 
 3. show status of service:
 `systemctl status postgresql`
+
 4. disable service(not auto-start any more)
 `systemctl disable postgresql`
 
 5. enable service postgresql(auto-start)
 `systemctl enable postgresql`
 
-## Postgres using Docker
-- [DOCKER COMPOSE UP WITH POSTGRES QUICK TIPS](https://hashinteractive.com/blog/docker-compose-up-with-postgres-quick-tips/)
-- [How to import csv into Docker Postgresql database](https://medium.com/@sherryhsu/how-to-import-csv-into-docker-postgresql-database-22d56e2a1117)
+### Connect to the postgres server locally:
+```
+sudo su - postgres
+psql
+\c inspiration_db 
+```
+
+### Create a database:
+```
+CREATE DATABASE inspiration_db;
+```
+
+### Connect to the postgres server running in docker container:
+- First start the docker container with postgres image up and running
+`docker-compose up`
+- Connect to the postgres through terminal
+`psql -h localhost -p 5432 -U  admin postgres`
+- Password for admin role is *admin*
+- Connect to the right database
+`\c inspiration_db`
+- See all the tables 
+`\c dt`
+
+
+### How to import CSV into the Docker Postgres database
+- [Stackoverflow article](https://stackoverflow.com/questions/46849539/how-can-i-set-path-to-load-data-from-csv-file-into-postgresql-database-in-docker)
+- In the docker-compose yml file, under the volumes:
+`/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata`
+- Need to mount the path of the csv file in the db container if you are running the command in that container.
+- First create (if not already created) a folder in your local machine with the path 
+`/var/lib/postgresql/data/` and copy csv file under that folder 
+- When the docker is compose, it will mount the path in the db docker container under the path: `/var/lib/postgresql/data/pgdata`, from where we can read the csv file and copy to the database that has been initaliozed under the play migration evolutions sql script: 
+```
+COPY quotations(quote,author,genre) FROM '/var/lib/postgresql/data/pgdata/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
+```
+
+### Know errors:
+- Might need to change the local path in mac OS for storing the csv file to `-./pgdata/:/var/lib/postgresql/data/pgdata` see the comments on this s[tackoverflow for details](https://stackoverflow.com/questions/46849539/how-can-i-set-path-to-load-data-from-csv-file-into-postgresql-database-in-docker)
+- Docker-Compose postgres upgrade initdb: error: directory “/var/lib/postgresql/data” exists but is not empty: Have to add `PGDATA` to the environment section of the compose file. [For details](https://github.com/docker-library/postgres/issues/263)

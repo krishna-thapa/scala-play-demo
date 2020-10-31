@@ -10,9 +10,9 @@ CREATE TABLE quotations (
     genre varchar(100)
 );
 
--- Have to be Absolute Path for the csv file
--- For mac the url is: /Users/santosh/gitHome..
-COPY quotations(quote,author,genre) FROM '/home/krishna/gitHome/Inspirational-quote-api/data/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
+-- First have to manually import the csv file to the docker container by mounting the local folder to the docker pgdata path, see docker-compose yml file
+-- Copy the CSV that is stored in the docker container where postgres is running
+COPY quotations(quote,author,genre) FROM '/var/lib/postgresql/data/pgdata/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
 
 --- !Downs
 

@@ -22,7 +22,10 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
   def getAndStoreQuotes(records: Int): Seq[Future[Response[IndexResponse]]] = {
     log.info(s"Getting $records random quotes from database")
     val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
+
+    // if the index exist, have to wait until the index is deleted without any error
     if (doesIndexExists) deleteQuotesIndex(indexName).await
+
     log.info(s"Creating a new index in the ES: $indexName")
     quotes.map { quote =>
       client.execute {

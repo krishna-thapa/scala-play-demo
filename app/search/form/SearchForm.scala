@@ -7,7 +7,7 @@ object SearchForm {
 
   val searchRequestForm: Form[SearchRequest] = Form {
     mapping(
-      "text"   -> nonEmptyText(maxLength = 50),
+      "text"   -> nonEmptyText(minLength = 3, maxLength = 50),
       "offset" -> number(min = 0, max = 10),
       "limit"  -> default(number, 10)
     )(SearchRequest.apply)(SearchRequest.unapply)

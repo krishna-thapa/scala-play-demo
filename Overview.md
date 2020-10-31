@@ -1,4 +1,4 @@
-# Over-view of the project
+# Overview of the project
 
 ## Initialise the postgres database
 - Run the script file under `/scripts/setup-db`
@@ -71,10 +71,6 @@ And then go to <http://localhost:9000> to see the running web application.
     - Update a column with type enumeration using play-slick: Need to define the custom column type: https://stackoverflow.com/questions/47944361/play-slick-updating-enumeration-column
     - Implement an implicit Writes or Format for a case class including an Enumeration: https://github.com/jethrogillgren/play-samples/blob/workingversion/play-scala-hello-world-tutorial/app/models/Search.scala
     
-## Coming improvements:
-- Change the created date to Instant type
-- Put validation in the create custom and update record
-- Test using H2
 
 # Major epic for the future work:
 -[x] Add Play Cache
@@ -84,16 +80,25 @@ And then go to <http://localhost:9000> to see the running web application.
     - Look into how it can be stored and how to check the contains in efficient manner 
     - Time limit and speed and where to store the codes
     
--[ ] Authorization and Authentication (might create a different microservice)
+-[x] Authorization and Authentication (might create a different microservice) // update with password encrypt
     - Use of JWT to create a token and use for auth and authentication
     - Have to create a different database to store roles and user details
     - Use that in the backend to give authorization and in front-end can use to hid/show the UI (fav button)
 
--[ ] Search functionality for the project 
-    - Text search using postgres
-    - https://github.com/tminglei/slick-pg
-    - https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/ 
-    - filter, pagination, auto-complete
+-[x] Search functionality for the project
+    - Create an API endpoint that takes the author name and returns the first top 10 matched names from the Author columns in `quotaations` table. Minimum length for the input text is 3.  
+    - Author search in the `quotations` table using Postgres like command. Returns first 10 distinct matched result. 
+    - Can be searched using lastname or any matched 3 letters in the name itself
+    - TODO: Have to update the method so that first get the distinct authors from the table and apply the like command on top 10 data and sort the result 
+    - For the full text search on the quote, using the ElasticSearch database 
+    - Instead of installing the ES client locally, use the docker container 
+    - Create an API endpoint that takes the number of records in the path parameter and run the random API endpoint from the `quotations` table to get the records defined by the requested int parameter. Then it will store those data in the ES database under the index named: `quotes`. **This API should only be called by Admin role**. 
+    - If the index is already present in ES then when you call create API endpoint again, it will delete the old index and create a new one. 
+    - For the better performance on writing the data to an ES index for example if the input data records have size of 100000 then we need to use Akka streams batch to write in ES index. 
+    - Create an API endpoint to delete the index from an ES. It will take the index name as a string in a pth parameter. **This should be used only for testing env and can only be done by Admin role.**
+    - Create an API endpoint for the text search on the quote column. It should take a request body that has user input search text string and offset and limit integers. Offset and limit will be used for pagination for the UI front side. In the back-end I have used match with prefix ES API method that will match any text to the quote column and rules with the sorted score level. 
+    - Minimum length for the text search is 3 bu word with 2 letters and space will be counted and will returns the result.
+    - Future work: Can convert the Search as a microservice using lagom for the micro-service architecture 
 
 -[x] GET API using the Wordnik token and endpoints (separate microservice)
     - Get a word of the day 
@@ -101,11 +106,22 @@ And then go to <http://localhost:9000> to see the running web application.
     - Run in different port and connect to font-end 
 
 -[ ] Improvement with the Genre field
-    - Make a table that holds Genre
+    - Make a table that holds Genre ??
     - Allows user to create a genre 
     - Record should have list of genre, wrapper in Option
     - Have to be a distinct genre in the table
+    - `/quote/{genre}`: if not found then return meaningful error message body
 
--[ ] Use JSON data with NoSQL database 
--[ ] Use of lagom for the micro-service architecture 
 -[ ] Update the version of Swagger to Open API 3.0.1
+
+-[ ] Test using test containers
+
+-[ ] Maybe write sample aws lambda functions for the demo purpose for the Serverless Architecture 
+
+### Consolidation 
+-[ ] Fix the JWT authorization 
+-[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table
+-[ ] Getting `ERROR:  relation "play_evolutions" does not exist at character 72` while running docker container for postgres after applying play evolutions db migration. I can't see any error since the migration works fine and can see all the script running perfectly for now. Might have to check in more details regarding an error.  
+-[ ] Put for `/customQuote/{id}` is not working, have to update the swagger implementation by removing the in parameter for formData to in body parameter with case class for the response body. Might be the effect of updating the Swagger. If we need to make it appear like a form data then we need to find alternative solution or fix
+-[ ] Change the created date to Instant type
+-[ ] Put validation in the create custom and update record

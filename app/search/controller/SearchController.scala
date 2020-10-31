@@ -87,6 +87,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
             log.info(
               s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
             )
+            // Convert the success future result to the QuotesQuery case class
             responseSeqResult(response.result.to[QuotesQuery].toList)
           }
           .recover {
