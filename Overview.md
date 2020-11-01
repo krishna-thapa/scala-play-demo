@@ -1,15 +1,19 @@
 # Overview of the project
 
-## Initialise the postgres database
-- Run the script file under `/scripts/setup-db`
-- Script should create the database and run the `dbsetup.sql`
-- Data from `data/Quotes.csv` file should be loaded to the tables that are coded in the `dbsetup.sql`
+## To build and run the project
 
-## Run the Project using sbt
-```bash
-sbt clean compile test run
-```
-And then go to <http://localhost:9000> to see the running web application.
+### Prerequisite
+1. Download and install Java, Scala and sbt tool
+2. Download and install your choice of an IDEA(not needed for just to run the project)
+3. Download and install a docker and docker compose for your OS to run databases virtually needed for this project
+
+### Steps to run the project locally
+1. Git clone or download the project from github
+2. Import the sbt project using your choice of IDEA
+3. Run sbt command: `sbt clean compile test`
+4. Run Docker compose command to start and run databases: `docker-compose up`
+5. Run the sbt command to run the project in localhost: `sbt run`
+6. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
 
 ## References links
 - Markdown Cheatsheet: https://github.com/tchapi/markdown-cheatsheet
