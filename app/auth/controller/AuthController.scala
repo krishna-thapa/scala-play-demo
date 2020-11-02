@@ -29,6 +29,8 @@ class AuthController @Inject()(
 
   implicit val clock: Clock = Clock.systemUTC
 
+  private lazy val jwtSessionKey: String = "user"
+
   // Regex to validate the email pattern
   def isEmailValid(email: String): Boolean =
     if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
@@ -51,7 +53,7 @@ class AuthController @Inject()(
             case Right(validUser) =>
               log.info("Success on authentication!")
               Ok.addingToJwtSession(
-                "user",
+                jwtSessionKey,
                 UserToken(
                   validUser.email,
                   s"${validUser.firstName.capitalize} ${validUser.lastName.capitalize}",
@@ -91,7 +93,7 @@ class AuthController @Inject()(
   }
 
   /**
-    * Get all the existing users from the database: Only the Admin can
+    * List all the users from the database: Only Admin can perform this action
     * @return Seq of users
     */
   def getAllUser: Action[AnyContent] = AdminAction { implicit request =>
@@ -159,7 +161,12 @@ class AuthController @Inject()(
   }
 
   // sign out
-
+  /**
+    Sign out has to be implemented in the front-end side of the project
+    When the user is successfully sign in, then the token has to be stored in the Session storage in the web page
+    Once the user clicks the sign out button that is visible to logged in user only,
+    then the session storage has to be cleared out and redirect to login page
+    */
   /**
     * Common method to verify the email and run the called function
     * @param email to select the user account record
@@ -172,7 +179,6 @@ class AuthController @Inject()(
     log.info(s"Checking the format of an email: $email")
     if (isEmailValid(email)) {
       fun(email) match {
-        // TODO Might want to response with the user details instead of a success id
         case Right(value)    => responseOk(value)
         case Left(exception) => exception
       }

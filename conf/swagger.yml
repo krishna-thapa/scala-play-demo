@@ -14,7 +14,7 @@ consumes:
 produces:
   - application/json
 securityDefinitions:
-  TokenKey(Valid for 5min):
+  TokenKey:
     type: apiKey
     in: header
     name: Authorization

@@ -36,6 +36,12 @@ play.modules.enabled += play.api.cache.redis.RedisCacheModule
 
 ## Redis commands
 ```
+sudo systemctl disable redis-server     // Don't launch at boot.
+sudo systemctl enable redis-server      // Launch at boot.
+sudo systemctl start redis-server       // Launch it now.
+sudo systemctl stop redis-server        // Stop it now.
+sudo systemctl status redis-server      // To check if is running
+
 /etc/init.d/redis-server stop
 /etc/init.d/redis-server start
 /etc/init.d/redis-server restart

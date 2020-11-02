@@ -124,6 +124,13 @@
 
 -[ ] Dockerized the whole sbt play project in the docker container and pass the environment variables to connect the databases and build the docker and publish to docker hub
 
+-[ ] Upload images using play and MongoDB services
+    - https://www.playframework.com/documentation/2.8.x/ScalaFileUpload
+    - http://mongodb.github.io/mongo-java-driver/4.1/driver-scala/
+    - https://dev.to/sonyarianto/how-to-spin-mongodb-server-with-docker-and-docker-compose-2lef
+    - https://medium.com/@ievstrygul/wiring-scala-app-docker-container-with-mongodb-84b29c50ac5
+    - See the sample play project
+    
 ### Consolidation 
 -[ ] Fix the JWT authorization 
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table

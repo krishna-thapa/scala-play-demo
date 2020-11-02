@@ -35,6 +35,6 @@ It can be done implemented by [bcrypt](https://en.wikipedia.org/wiki/Bcrypt).
     - https://jwt.io
     - Another library - haven't used: [Silhouette](https://github.com/adamzareba/play-silhouette-rest-slick)
 
-### Future to-do
-- Let the user change the password without updating the details(case where user forgets the password)
-- Have to enter the admin password as hashing when the database is created initially
+### Keep in mind
+- Have to implement the functionality where the user forgets the password (might need to implement email callback system)
+- Have to enter the admin password as hashing when the database is initially created, run by play evolution in database migration.
