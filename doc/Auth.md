@@ -1,5 +1,15 @@
 ## Authorization and Authentication
 
+**TODO:** HAve to convert the auth package into separate scala module
+
+[jwt-scala](https://github.com/pauldijou/jwt-scala) library is used for the use of jwt with [play session](https://www.playframework.com/documentation/2.8.x/ScalaSessionFlash). Jwt token is used for the authorization process whereas the user login details are stored in the postgres with the hashed password. 
+
+The goal of the application is to demonstrate how to use JWT (Json Web Token) as a way to manage the user session rather than cookies, the default way in Play Framework. Using JWT, we take all the good parts (signature using play.http.secret.key), add a bit of JSON syntax, and put all that in an HTTP header. So it's just as secured as a cookie would be, it's just at a different place.
+
+When the user is successfully login with the correct email and password, the jwt token is created and stored in the session with the key and token is passed to the client-server(front-end). The token has to be stored in the client-server, either using session or cookies storage on the web app itself. And every time the user makes the api end-point call, the token has to be passed in the header. 
+
+Instead of using Play session, we can simply use JWT without persisting in any session storage. We simply have to store the JWT in the client-server and every time we request an API end-point, we need to pass the JWT token to the server. And as long as server have the secret key which is used to encrypt the token, we should be able to decrypt the token and check the validation of the user. 
+
 ### Requirements
 1. There will be three roles and permissions for now:
     - Admin that can see all the created user accounts and can make any user to admin
@@ -54,3 +64,6 @@ It can be done implemented by [bcrypt](https://en.wikipedia.org/wiki/Bcrypt).
 ### Keep in mind
 - Have to implement the functionality where the user forgets the password (might need to implement email verification system)
 - Have to enter the admin password as hashing when the database is initially created, run by play evolution in database migration.
+
+### Micro library to be used in the front-end for reading and storing token
+- https://github.com/pauldijou/jwt-client

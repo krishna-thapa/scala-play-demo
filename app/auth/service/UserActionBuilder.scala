@@ -30,6 +30,7 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
       Change to: case Some(userToken) if !userToken.isAdmin =>
        */
       case Some(userToken) =>
+        log.info(s"Giving access to the user: ${userToken.fullName}")
         block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
       case _ =>
         Future(unauthorized(s"Do not have access!"))

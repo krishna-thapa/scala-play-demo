@@ -78,16 +78,20 @@
 
 # Major epic for the future work:
 -[x] Add Play Cache
-    - To resolve not to get random record that has been called like within past 500 records
+    - To resolve not to get random record which has been called like within past 500 records
+    - Quote of the day has to be stored in cache for 5 days 
     - See [play caching](https://www.playframework.com/documentation/2.8.x/ScalaCache)
     - Use of stack to store and remove the old one once the new are added and give size
     - Look into how it can be stored and how to check the contains in efficient manner 
     - Time limit and speed and where to store the codes
     
--[x] Authorization and Authentication (might create a different microservice) // update with password encrypt
-    - Use of JWT to create a token and use for auth and authentication
+-[x] Authorization and Authentication (might create a different microservice)
+    - Use of JWT to create a token and use for authorization
     - Have to create a different database to store roles and user details
-    - Use that in the backend to give authorization and in front-end can use to hid/show the UI (fav button)
+    - Password has to be hashed in the database 
+    - Use of play session to store and validate jwt token in the backend
+    - Token has to be stored in the client-server to pass them on each api calls in the header
+    - Two roles and permissions for an admin and normal user  
 
 -[x] Search functionality for the project
     - Create an API endpoint that takes the author name and returns the first top 10 matched names from the Author columns in `quotaations` table. Minimum length for the input text is 3.  
@@ -124,7 +128,7 @@
 
 -[ ] Dockerized the whole sbt play project in the docker container and pass the environment variables to connect the databases and build the docker and publish to docker hub
 
--[ ] Upload images using play and MongoDB services
+-[ ] Upload images using play and MongoDB services(Start in a different module)
     - https://www.playframework.com/documentation/2.8.x/ScalaFileUpload
     - http://mongodb.github.io/mongo-java-driver/4.1/driver-scala/
     - https://dev.to/sonyarianto/how-to-spin-mongodb-server-with-docker-and-docker-compose-2lef
@@ -132,7 +136,7 @@
     - See the sample play project
     
 ### Consolidation 
--[ ] Fix the JWT authorization 
+-[x] Fix the JWT authorization 
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table
 -[ ] Getting `ERROR:  relation "play_evolutions" does not exist at character 72` while running docker container for postgres after applying play evolutions db migration. I can't see any error since the migration works fine and can see all the script running perfectly for now. Might have to check in more details regarding an error.  
 -[ ] Put for `/customQuote/{id}` is not working, have to update the swagger implementation by removing the in parameter for formData to in body parameter with case class for the response body. Might be the effect of updating the Swagger. If we need to make it appear like a form data then we need to find alternative solution or fix
