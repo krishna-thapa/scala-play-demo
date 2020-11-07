@@ -24,7 +24,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
   /**
     * Create a new user account in the table
     *
-    * @param details user sign up form details
+    * @param details user sign up searchForm details
     * @return New id of the record and exception if the password hashing goes wrong
     */
   def signUpUser(details: SignUpForm): Either[Throwable, OkResponse] = {
@@ -120,7 +120,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
   /**
     * Update the user info details: Only the logged in user can
     * @param id to select the account
-    * @param details Update details form
+    * @param details Update details searchForm
     * @return Either exception or success id of the updated record
     */
   def updateUserInfo(id: Int, details: SignUpForm): Either[Throwable, Try[Int]] = {

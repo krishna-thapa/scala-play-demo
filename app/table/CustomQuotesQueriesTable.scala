@@ -3,10 +3,10 @@ package table
 import java.sql.Date
 
 import models.CustomQuotesQuery
-import models.Genre.Genre
+import com.krishna.model.Genre.Genre
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
-import utils.Implicits.genreEnumMapper
+import com.krishna.util.Implicits.genreEnumMapper
 
 class CustomQuotesQueriesTable(tag: Tag)
     extends Table[CustomQuotesQuery](tag, "custom_quotations") {

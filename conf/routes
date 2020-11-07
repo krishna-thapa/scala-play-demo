@@ -3,7 +3,7 @@
 # ~~~~
 
 # CSV build endpoints for the table "quotations"
-->      /quote                      QuoteQueryBuild.Routes
+->      /quote                      Quote.Routes
 
 # CRUD operation endpoints for the custom table "custom_quotations"
 ->      /customQuote                CustomQuoteQueryBuild.Routes
@@ -12,7 +12,7 @@
 ->      /auth                       Auth.Routes
 
 # API endpoints for the search on the database using quatations table
-->      /search                     SearchQueryBuild.Routes
+->      /search                     Search.Routes
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index

@@ -46,7 +46,7 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The form was not in the expected format: $formWithErrors")
+          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
         },
         signInDetails => {
           // Need to check if the user has enter wrong password but has an account already
@@ -82,7 +82,7 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The form was not in the expected format: $formWithErrors")
+          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
         },
         signUpDetails => {
           // need to check if the account already exist
@@ -150,7 +150,7 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The form was not in the expected format: $formWithErrors")
+          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
         },
         userDetails => {
           authDAO.updateUserInfo(id, userDetails) match {

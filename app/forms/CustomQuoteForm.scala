@@ -1,7 +1,7 @@
 package forms
 
-import models.Genre.Genre
-import models.QuotesTable
+import com.krishna.model.QuotesTable
+import com.krishna.model.Genre.Genre
 
 final case class CustomQuoteForm(
     quote: String,

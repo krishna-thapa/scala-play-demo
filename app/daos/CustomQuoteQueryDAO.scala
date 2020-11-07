@@ -9,7 +9,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import table.CustomQuotesQueriesTable
-import utils.Implicits.genreEnumMapper
+import com.krishna.util.Implicits.genreEnumMapper
 
 import scala.util.Try
 

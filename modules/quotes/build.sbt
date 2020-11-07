@@ -1,4 +1,4 @@
-name := """search"""
+name := """quotes"""
 organization := "com.krishna"
 
 version := "1.0-SNAPSHOT"

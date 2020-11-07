@@ -12,7 +12,7 @@ object BcryptObject {
     The more time is necessary, the more difficult is brute-forcing.
     2. The salt is a random value, and should differ for each calculation, so the result should
     hardly ever be the same, even for equal passwords.
-    3. The salt is usually included in the resulting hash-string in readable form.
+    3. The salt is usually included in the resulting hash-string in readable searchForm.
     So with storing the hash-string you also store the salt.
    */
   def encryptPassword(password: String): Try[String] = {

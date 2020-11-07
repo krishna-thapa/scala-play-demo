@@ -1,13 +1,13 @@
 package forms
 
-import models.Genre.Genre
+import com.krishna.model.Genre.Genre
 import play.api.data.Forms._
 import play.api.data.{ Form, Forms }
 
 object RequestForm {
 
   /**
-    * The mapping for the QuotesQuery form.
+    * The mapping for the QuotesQuery searchForm.
     */
   val quotesQueryForm: Form[CustomQuoteForm] = Form {
     mapping(

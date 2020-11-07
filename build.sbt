@@ -13,25 +13,32 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
   .settings(
-    libraryDependencies ++= commonDependencies ++ Seq(
-      jdbc,
-      playJwt,
-      scalaBcrypt,
-      cacheApi,
-      playRedis,
-      postgres,
-      playSlickEvolutions,
-      playSlick,
-      //scalaTest,
-      swaggerUi,
-      //playScalaTest,
-      elastic4s,
-      elastic4sJson
-    ),
+    libraryDependencies ++=
+      commonDependencies ++
+        slickDatabaseDependencies ++ Seq(
+        //scalaTest,
+        swaggerUi
+        //playScalaTest
+      ),
     Test / fork := true
   )
-  .aggregate(auth, common)
-  .dependsOn(auth, common)
+  .aggregate(quotes, auth, search, common)
+  .dependsOn(quotes, auth, search, common)
+
+lazy val quotes = project
+  .in(file("modules/quotes"))
+  .enablePlugins(PlayScala, SwaggerPlugin)
+  .dependsOn(common)
+  .settings(
+    libraryDependencies ++=
+      commonDependencies ++
+        slickDatabaseDependencies ++
+        Seq(
+          jdbc,
+          cacheApi,
+          playRedis
+        )
+  )
 
 lazy val auth = project
   .in(file("modules/auth"))
@@ -45,6 +52,16 @@ lazy val auth = project
           playJwt,
           scalaBcrypt
         )
+  )
+
+lazy val search = project
+  .in(file("modules/search"))
+  .enablePlugins(PlayScala, SwaggerPlugin)
+  .dependsOn(common, auth, quotes)
+  .settings(
+    libraryDependencies ++=
+      commonDependencies ++
+        elastic4sDependencies
   )
 
 lazy val common = project
@@ -63,6 +80,7 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val slickDatabaseDependencies = Seq(
+  jdbc,
   postgres,
   playSlickEvolutions,
   playSlick
@@ -77,7 +95,15 @@ lazy val elastic4sDependencies = Seq(
  add domain package names for play-swagger to auto generate swagger
  definitions for domain classes mentioned in your routes
  */
-swaggerDomainNameSpaces := Seq("models", "model", "forms", "form", "search")
+swaggerDomainNameSpaces := Seq(
+  "models",
+  "model",
+  "forms",
+  "form",
+  "searchForm",
+  "com.krishna.response",
+  "com.krishna.model"
+)
 
 scalacOptions ++= Seq(
   "-feature",
