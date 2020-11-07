@@ -3,6 +3,8 @@ package utils
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, Date }
 
+import com.krishna.util.Logging
+
 import scala.util.{ Failure, Success, Try }
 
 object DateConversion extends Logging {

@@ -1,5 +1,6 @@
 package search
 
+import com.krishna.util.Logging
 import com.sksamuel.elastic4s.fields.TextField
 import com.sksamuel.elastic4s.http.JavaClient
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
@@ -7,7 +8,6 @@ import com.sksamuel.elastic4s.requests.searches.SearchResponse
 import com.sksamuel.elastic4s._
 import com.sksamuel.elastic4s.playjson._
 import play.api.libs.json.{ Json, OFormat }
-import utils.Logging
 
 // For testing purpose
 

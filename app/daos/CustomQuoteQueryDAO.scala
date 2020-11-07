@@ -1,5 +1,6 @@
 package daos
 
+import com.krishna.util.{ DbRunner, Logging }
 import forms.CustomQuoteForm
 import javax.inject.{ Inject, Singleton }
 import models.CustomQuotesQuery
@@ -9,7 +10,6 @@ import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import table.CustomQuotesQueriesTable
 import utils.Implicits.genreEnumMapper
-import utils.{ DbRunner, Logging }
 
 import scala.util.Try
 

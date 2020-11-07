@@ -1,11 +1,11 @@
 package controllers.customQuote
 
+import com.krishna.response.{ OkResponse, ResponseResult }
+import com.krishna.util.Logging
 import daos.CustomQuoteQueryDAO
 import forms.RequestForm
-import response.{ OkResponse, ResponseResult }
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
-import utils.Logging
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }

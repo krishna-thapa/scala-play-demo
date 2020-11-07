@@ -20,7 +20,7 @@
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
 GET      /:author                controllers.quote.QuoteController.getAuthorsAutocomplete(author: String)
 
@@ -41,11 +41,11 @@ GET      /:author                controllers.quote.QuoteController.getAuthorsAut
 #    404:
 #      description: Not found with input index in an ES.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
 GET      /create/:records                search.controller.SearchController.writeInEs(records: Int)
 
@@ -66,11 +66,11 @@ GET      /create/:records                search.controller.SearchController.writ
 #    404:
 #      description: Not found with input index in an ES.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
 GET      /delete/:indexName                search.controller.SearchController.deleteIndex(indexName: String)
 
@@ -92,10 +92,10 @@ GET      /delete/:indexName                search.controller.SearchController.de
 #    404:
 #      description: Not found with input index in an ES.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
 POST      /quote                     search.controller.SearchController.searchQuote

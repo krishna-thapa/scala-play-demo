@@ -63,7 +63,7 @@ POST        /               controllers.customQuote.CustomQuoteController.addCus
 #  responses:
 #    200:
 #      schema:
-#        $ref: '#/definitions/response.OkResponse'
+#        $ref: '#/definitions/com.krishna.response.OkResponse'
 ###
 DELETE      /:id            controllers.customQuote.CustomQuoteController.deleteCustomQuote(id: Int)
 

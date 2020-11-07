@@ -1,19 +1,20 @@
 import Dependencies.Libraries._
 
+name := """inspirational-quote-api"""
+description := "Back-end project for Inspirational quotes"
+version := "1.0-SNAPSHOT"
+
+organization in ThisBuild := "com.krishna"
+scalaVersion in ThisBuild := "2.13.1"
+
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
   .settings(
-    name := """inspirational-quote-api""",
-    organization := "com.krishna",
-    description := "Back-end project for Inspirational quotes",
-    version := "1.0-SNAPSHOT",
-    scalaVersion := "2.13.1",
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= commonDependencies ++ Seq(
       jdbc,
-      guice,
       playJwt,
       scalaBcrypt,
       cacheApi,
@@ -29,11 +30,54 @@ lazy val root = (project in file("."))
     ),
     Test / fork := true
   )
+  .aggregate(auth, common)
+  .dependsOn(auth, common)
+
+lazy val auth = project
+  .in(file("modules/auth"))
+  .enablePlugins(PlayScala, SwaggerPlugin)
+  .dependsOn(common)
+  .settings(
+    libraryDependencies ++=
+      commonDependencies ++
+        slickDatabaseDependencies ++
+        Seq(
+          playJwt,
+          scalaBcrypt
+        )
+  )
+
+lazy val common = project
+  .in(file("modules/common"))
+  .settings(
+    name := "common",
+    version := "1.0-SNAPSHOT",
+    libraryDependencies ++=
+      commonDependencies ++
+        elastic4sDependencies ++
+        slickDatabaseDependencies
+  )
+
+lazy val commonDependencies = Seq(
+  guice
+)
+
+lazy val slickDatabaseDependencies = Seq(
+  postgres,
+  playSlickEvolutions,
+  playSlick
+)
+
+lazy val elastic4sDependencies = Seq(
+  elastic4s,
+  elastic4sJson
+)
+
 /*
  add domain package names for play-swagger to auto generate swagger
  definitions for domain classes mentioned in your routes
  */
-swaggerDomainNameSpaces := Seq("models", "forms", "response", "auth", "search")
+swaggerDomainNameSpaces := Seq("models", "model", "forms", "form", "search")
 
 scalacOptions ++= Seq(
   "-feature",

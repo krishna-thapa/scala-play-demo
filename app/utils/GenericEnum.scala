@@ -1,5 +1,6 @@
 package utils
 
+import com.krishna.util.Logging
 import play.api.data.FormError
 import play.api.data.format.Formatter
 import play.api.libs.json._

@@ -1,5 +1,6 @@
 package daos
 
+import com.krishna.util.DbRunner
 import javax.inject.Inject
 import models.QuotesQuery
 import models.Genre.Genre
@@ -8,7 +9,6 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import table.QuoteQueriesTable
-import utils.DbRunner
 import utils.Implicits._
 
 /**

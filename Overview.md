@@ -137,6 +137,7 @@
     
 ### Consolidation 
 -[x] Fix the JWT authorization 
+-[ ] Should allow user to see only their own details in `/auth/user/{email}`
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table
 -[ ] Getting `ERROR:  relation "play_evolutions" does not exist at character 72` while running docker container for postgres after applying play evolutions db migration. I can't see any error since the migration works fine and can see all the script running perfectly for now. Might have to check in more details regarding an error.  
 -[ ] Put for `/customQuote/{id}` is not working, have to update the swagger implementation by removing the in parameter for formData to in body parameter with case class for the response body. Might be the effect of updating the Swagger. If we need to make it appear like a form data then we need to find alternative solution or fix

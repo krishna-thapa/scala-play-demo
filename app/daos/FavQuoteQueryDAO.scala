@@ -1,5 +1,6 @@
 package daos
 
+import com.krishna.util.{ DbRunner, Logging }
 import javax.inject.{ Inject, Singleton }
 import models.{ FavQuoteQuery, QuotesQuery }
 import play.api.db.slick.DatabaseConfigProvider
@@ -8,7 +9,6 @@ import slick.dbio.Effect
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import table.{ FavQuoteQueriesTable, QuoteQueriesTable }
-import utils.{ DbRunner, Logging }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try

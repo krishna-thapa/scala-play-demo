@@ -1,15 +1,15 @@
 package search.controller
 
+import com.krishna.response.ResponseResult
+import com.krishna.util.Logging
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import javax.inject.{ Inject, Singleton }
 import models.QuotesQuery
 import play.api.mvc._
-import response.ResponseResult
 import search.dao.MethodsInEsDAO
 import search.form.SearchForm
-import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
 

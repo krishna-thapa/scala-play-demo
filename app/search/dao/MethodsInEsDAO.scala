@@ -8,10 +8,10 @@ import daos.QuoteQueryDAO
 import javax.inject.Inject
 import models.QuotesQuery
 import _root_.search.util.InitEs
+import com.krishna.util.Logging
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
-import utils.Logging
 
 import scala.concurrent.{ ExecutionContext, Future }
 

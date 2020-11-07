@@ -1,16 +1,16 @@
 package controllers.quote
 
 import cache.CacheController
+import com.krishna.response.ResponseMsg.InvalidCsvId
+import com.krishna.response.ResponseResult
+import com.krishna.util.Logging
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
-import response.ResponseResult
 import javax.inject._
 import models.Genre.Genre
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
-import response.ResponseMsg.InvalidCsvId
 import utils.DateConversion._
-import utils.Logging
 
 import scala.concurrent.ExecutionContext
 import scala.util.matching.Regex
