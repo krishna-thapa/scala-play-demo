@@ -1,4 +1,4 @@
-package auth.bcrypt
+package bcrypt
 
 import com.github.t3hnar.bcrypt._
 

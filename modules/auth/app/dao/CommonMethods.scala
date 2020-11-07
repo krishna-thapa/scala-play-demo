@@ -1,14 +1,12 @@
-package auth.dao
+package dao
 
-import auth.model.UserInfo
-import auth.table.UserTable
+import com.krishna.response.ResponseError
+import com.krishna.util.{ DbRunner, Logging }
+import model.UserInfo
 import play.api.mvc.Result
-import response.ResponseError
 import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
-import utils.{ DbRunner, Logging }
-
-import scala.util.Try
+import table.UserTable
 
 trait CommonMethods extends DbRunner with ResponseError with Logging {
 

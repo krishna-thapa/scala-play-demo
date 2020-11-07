@@ -3,202 +3,200 @@
 #  description: >
 #   This can only be done by the user that have an existing account.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  parameters:
 #    - name: body
 #      in: body
 #      required: true
 #      description: Sign in form details
 #      schema:
-#        $ref: '#/definitions/auth.form.SignInForm'
+#        $ref: '#/definitions/form.SignInForm'
 #  responses:
 #    200:
 #      description: success
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized with wrong password but with valid email
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: User account is not found in the database
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
-POST        /signIn                     auth.controller.AuthController.signIn
+POST        /signIn                 controllers.auth.AuthController.signIn
 
 ###
 #  summary: Sign up API endpoint to creater a new account
 #  description: >
 #   This can be done by any new user.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  parameters:
 #    - name: body
 #      in: body
 #      required: true
 #      description: Sign up form details
 #      schema:
-#        $ref: '#/definitions/auth.form.SignUpForm'
+#        $ref: '#/definitions/form.SignUpForm'
 #  responses:
 #    200:
 #      description: success with id of newly created record
 #      schema:
-#        $ref: '#/definitions/response.OkResponse'
+#        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    406:
 #      description: Account already exist in the database
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
-POST        /signUp                     auth.controller.AuthController.signUp
+POST        /signUp                  controllers.auth.AuthController.signUp
 
 ###
 #  summary: List all the user accounts from database
 #  description: >
 #   This can only be done by Admin role.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  responses:
 #    200:
 #      description: All the existing users
 #      schema:
-#        $ref: '#/definitions/auth.model.UserList'
+#        $ref: '#/definitions/model.UserList'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
-GET        /users                      auth.controller.AuthController.getAllUser
+GET        /users                    controllers.auth.AuthController.getAllUser
 
 ###
 #  summary: Get the selected user details
 #  description: >
 #   This can only be done by logged in user or Admin role.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  responses:
 #    200:
 #      description: success with user detail info
 #      schema:
-#        $ref: '#/definitions/auth.model.UserList'
+#        $ref: '#/definitions/model.UserList'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
-GET        /user/:email                      auth.controller.AuthController.getUserInfo(email: String)
+GET        /user/:email                   controllers.auth.AuthController.getUserInfo(email: String)
 
 ###
 #  summary: Update the user details. Different email will replace the older email
 #  description: >
 #   This can only be done by logged in user or Admin role.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  parameters:
 #    - name: body
 #      in: body
 #      required: true
 #      description: Update user detail form
 #      schema:
-#        $ref: '#/definitions/auth.form.SignUpForm'
+#        $ref: '#/definitions/form.SignUpForm'
 #  responses:
 #    200:
 #      description: success with id of newly created record
 #      schema:
-#        $ref: '#/definitions/auth.model.UserList'
+#        $ref: '#/definitions/model.UserList'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
-POST        /user/:id                     auth.controller.AuthController.updateUserInfo(id:Int)
+POST        /user/:id                     controllers.auth.AuthController.updateUserInfo(id:Int)
 
 ###
 #  summary: Toggle the user account for admin role
 #  description: >
 #   This can only be done by Admin role.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  responses:
 #    200:
 #      description: success with id of toggled account
 #      schema:
-#        $ref: '#/definitions/response.OkResponse'
+#        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
-POST     /admin/:email                    auth.controller.AuthController.toggleAdminRole(email: String)
+POST     /admin/:email                    controllers.auth.AuthController.toggleAdminRole(email: String)
 
 ###
 #  summary: Delete the user from the database
 #  description: >
 #   This can only be done by Admin role.
 #  tags:
-#    - AuthQueryBuild
+#    - Auth
 #  responses:
 #    200:
 #      description: success with id of deleted account
 #      schema:
-#        $ref: '#/definitions/response.OkResponse'
+#        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
 #      schema:
-#        $ref: '#/definitions/response.ResponseErrorMsg'
+#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
-DELETE     /user/:email                   auth.controller.AuthController.removeUser(email: String)
-
-
+DELETE     /user/:email                   controllers.auth.AuthController.removeUser(email: String)

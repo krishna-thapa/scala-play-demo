@@ -1,18 +1,18 @@
-package auth.controller
+// Auth has to be appended on the controller so that routes file can read
+package controllers.auth
 
 import java.time.Clock
 
-import auth.dao.AuthDAO
-import auth.depInject.{ SecuredController, SecuredControllerComponents }
-import auth.form.AuthForms
-import auth.model.{ UserList, UserToken }
+import com.krishna.response.ResponseResult
+import com.krishna.util.Logging
+import dao.AuthDAO
+import depInject.{ SecuredController, SecuredControllerComponents }
+import form.AuthForms
 import javax.inject.{ Inject, Singleton }
-import pdi.jwt.JwtSession._
+import model.{ UserList, UserToken }
+import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
-import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.OFormat
-import response.ResponseResult
-import utils.Logging
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -42,30 +42,32 @@ class AuthController @Inject()(
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
     // Add request validation
-    val signInResult = AuthForms.signInForm.bindFromRequest.fold(
-      formWithErrors => {
-        badRequest(s"The form was not in the expected format: $formWithErrors")
-      },
-      signInDetails => {
-        // Need to check if the user has enter wrong password but has an account already
-        if (authDAO.isAccountExist(signInDetails.email)) {
-          authDAO.isValidLogin(signInDetails) match {
-            case Right(validUser) =>
-              log.info("Success on authentication!")
-              Ok.addingToJwtSession(
-                jwtSessionKey,
-                UserToken(
-                  validUser.email,
-                  s"${validUser.firstName.capitalize} ${validUser.lastName.capitalize}",
-                  validUser.isAdmin,
-                  validUser.createdDate
+    val signInResult = AuthForms.signInForm
+      .bindFromRequest()
+      .fold(
+        formWithErrors => {
+          badRequest(s"The form was not in the expected format: $formWithErrors")
+        },
+        signInDetails => {
+          // Need to check if the user has enter wrong password but has an account already
+          if (authDAO.isAccountExist(signInDetails.email)) {
+            authDAO.isValidLogin(signInDetails) match {
+              case Right(validUser) =>
+                log.info("Success on authentication!")
+                Ok.addingToJwtSession(
+                  jwtSessionKey,
+                  UserToken(
+                    validUser.email,
+                    s"${validUser.firstName.capitalize} ${validUser.lastName.capitalize}",
+                    validUser.isAdmin,
+                    validUser.createdDate
+                  )
                 )
-              )
-            case Left(exceptionResult) => exceptionResult
-          }
-        } else notFound(s"User account is not found for : ${signInDetails.email}")
-      }
-    )
+              case Left(exceptionResult) => exceptionResult
+            }
+          } else notFound(s"User account is not found for : ${signInDetails.email}")
+        }
+      )
     Future(signInResult)
   }
 
@@ -76,20 +78,22 @@ class AuthController @Inject()(
   def signUp: Action[AnyContent] = Action { implicit request =>
     log.info("Executing signUp Controller")
     // Add request validation
-    AuthForms.signUpForm.bindFromRequest.fold(
-      formWithErrors => {
-        badRequest(s"The form was not in the expected format: $formWithErrors")
-      },
-      signUpDetails => {
-        // need to check if the account already exist
-        if (!authDAO.isAccountExist(signUpDetails.email)) {
-          authDAO.signUpUser(signUpDetails) match {
-            case Right(value)    => responseOk(value)
-            case Left(exception) => bcryptValidationFailed(exception.getMessage)
-          }
-        } else notAcceptable(s"${signUpDetails.email}")
-      }
-    )
+    AuthForms.signUpForm
+      .bindFromRequest()
+      .fold(
+        formWithErrors => {
+          badRequest(s"The form was not in the expected format: $formWithErrors")
+        },
+        signUpDetails => {
+          // need to check if the account already exist
+          if (!authDAO.isAccountExist(signUpDetails.email)) {
+            authDAO.signUpUser(signUpDetails) match {
+              case Right(value)    => responseOk(value)
+              case Left(exception) => bcryptValidationFailed(exception.getMessage)
+            }
+          } else notAcceptable(s"${signUpDetails.email}")
+        }
+      )
   }
 
   /**
@@ -142,22 +146,24 @@ class AuthController @Inject()(
   def updateUserInfo(id: Int): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing updateUserInfo Controller")
     // Add request validation
-    AuthForms.signUpForm.bindFromRequest.fold(
-      formWithErrors => {
-        badRequest(s"The form was not in the expected format: $formWithErrors")
-      },
-      userDetails => {
-        authDAO.updateUserInfo(id, userDetails) match {
-          case Right(user) =>
-            user match {
-              case Success(_) =>
-                responseOk(UserList(authDAO.checkValidEmail(userDetails.email).head))
-              case Failure(exception) => badRequest(exception.getMessage)
-            }
-          case Left(exception) => bcryptValidationFailed(exception.getMessage)
+    AuthForms.signUpForm
+      .bindFromRequest()
+      .fold(
+        formWithErrors => {
+          badRequest(s"The form was not in the expected format: $formWithErrors")
+        },
+        userDetails => {
+          authDAO.updateUserInfo(id, userDetails) match {
+            case Right(user) =>
+              user match {
+                case Success(_) =>
+                  responseOk(UserList(authDAO.checkValidEmail(userDetails.email).head))
+                case Failure(exception) => badRequest(exception.getMessage)
+              }
+            case Left(exception) => bcryptValidationFailed(exception.getMessage)
+          }
         }
-      }
-    )
+      )
   }
 
   // sign out

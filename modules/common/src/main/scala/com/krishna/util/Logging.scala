@@ -1,4 +1,4 @@
-package utils
+package com.krishna.util
 
 import org.slf4j.{ Logger, LoggerFactory }
 

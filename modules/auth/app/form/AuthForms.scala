@@ -1,4 +1,4 @@
-package auth.form
+package form
 
 import play.api.data.Forms._
 import play.api.data.Form

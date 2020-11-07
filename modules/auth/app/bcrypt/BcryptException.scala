@@ -1,4 +1,4 @@
-package auth.bcrypt
+package bcrypt
 
 /*
   possibility that certain bcrypt operations can fail due to providing incorrect salt versions

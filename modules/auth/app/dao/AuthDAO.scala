@@ -1,15 +1,15 @@
-package auth.dao
+package dao
 
 import java.sql.Date
 
-import auth.bcrypt.BcryptException
-import auth.bcrypt.BcryptObject.{ encryptPassword, validatePassword }
-import auth.form.{ SignInForm, SignUpForm }
-import auth.model.{ UserInfo, UserList }
+import bcrypt.BcryptException
+import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
+import com.krishna.response.OkResponse
+import form.{ SignInForm, SignUpForm }
 import javax.inject.{ Inject, Singleton }
+import model.{ UserInfo, UserList }
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc.Result
-import response.OkResponse
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
