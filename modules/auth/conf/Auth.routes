@@ -89,7 +89,7 @@ GET        /users                    controllers.auth.AuthController.getAllUser
 ###
 #  summary: Get the selected user details
 #  description: >
-#   This can only be done by logged in user or Admin role.
+#   Logged in user role can view thier own personal info only whereas an admin can view anyone's record info details.
 #  tags:
 #    - Auth
 #  responses:

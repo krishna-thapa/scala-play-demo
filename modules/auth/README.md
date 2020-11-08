@@ -1,6 +1,6 @@
 ## Authorization and Authentication
 
-**TODO:** HAve to convert the auth package into separate scala module
+- [x] Have to convert the auth package into separate scala module
 
 [jwt-scala](https://github.com/pauldijou/jwt-scala) library is used for the use of jwt with [play session](https://www.playframework.com/documentation/2.8.x/ScalaSessionFlash). Jwt token is used for the authorization process whereas the user login details are stored in the postgres with the hashed password. 
 
@@ -23,7 +23,7 @@ Instead of using Play session, we can simply use JWT without persisting in any s
     - POST -> /auth/signUp: sign up for a new user with user details form
     - POST -> /auth/user/{id}: let the user update the details(only the user/admin can do)
     - GET -> /auth/users: get all the users that have an account in the database(only admin can do)
-    - GET -> /auth/user/{email}: get the selected user details (only the user/admin can do)
+    - GET -> /auth/user/{email}: get the selected user details (user can view only their own info/admin can view anyone's info)
     - POST -> /auth/admin/{email}: make the user as an admin or remove from an admin role(only admin can do)
     - DELETE -> /auth/user/{email}: Delete the user from the database (only the admin can do)
     - signOut: delete the session token for the signed user(**Have to be implemented in front-end side**)

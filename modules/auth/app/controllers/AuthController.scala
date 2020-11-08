@@ -14,6 +14,7 @@ import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
 import play.api.libs.json.OFormat
 import play.api.mvc._
+import util.DecodeHeader
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
@@ -128,14 +129,20 @@ class AuthController @Inject()(
   }
 
   /**
-    * Get the user info from selected email: only the logged in user can
+    * Get the user info from selected email: only the Admin or logged in user can
+    * Logged in user can only view own record info whereas an admin can view anyone's record
     * @param email to select the user's account
     * @return Record details or an exception
     */
   def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getUserInfo Controller")
-    val getUserInfoDetails = (email: String) => authDAO.userAccount(email)
-    runApiAction(email)(getUserInfoDetails)
+
+    // already know that header has token in 'Authorization'
+    val authToken: String  = request.headers.get("Authorization").get
+    val user: UserToken    = DecodeHeader(authToken)
+    val overrideEmail      = if (user.isAdmin) email else user.email
+    val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
+    runApiAction(overrideEmail)(getUserInfoDetails)
   }
 
   /**
