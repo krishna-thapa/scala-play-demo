@@ -4,8 +4,8 @@
 
 ### Prerequisite
 1. Download and install Java, Scala and sbt tool
-2. Download and install your choice of an IDEA(not needed for just to run the project)
-3. Download and install a docker and docker compose for your OS to run databases virtually needed for this project
+2. Download and install your choice of an IDEA(no need for just to run the project)
+3. Download and install a docker and docker compose for your OS to run databases virtually
 
 ### Steps to run the project locally
 1. Git clone or download the project from github
@@ -15,11 +15,60 @@
 5. Run the sbt command to run the project in localhost: `sbt run`
 6. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
 
+### Structure of the project
+Project is divided using the sbt sub-projects modules. These project has four sub-modules inside the modules folder. Each module beside the `common` is play application that has its own routes configuration file and own `build.sbt` file. Each play module has its own controller, service and test. All the common models and methods are defined in the `common` sbt project. All the configuration and dependency of the modules can be found in the root `build.sbt` file.
+
+* `auth`: will contain all the specific code for the authorization and authentication service using postgres database.
+* `quotes`: will contain all the specific code for the CRUD operation in quote service using postgres and Redis cache database.
+* `search`: will contain all the specific code for the search service using elastic search database.
+* `common`: will contain all the common code shared between the other subprojects.
+
+This is the basic structure of the whole project:
+```
+inspirational-quote-api
+ └ build.sbt
+ └ app
+    └ controllers
+      └ CustomQuote.scala
+    └ daos
+    └ forms
+    └ table
+    └ model
+    └ util
+ └ conf
+   └ application.conf
+   └ root routes
+   └ docker config 
+   └ play evolutions
+ └ project
+   └ build.properties
+   └ plugins.sbt
+   └ Dependencies.scala
+ └ modules
+   └ auth
+     └ build.sbt
+     └ app
+       └ controllers
+         └ AuthController.scala
+       └ model
+       └ util
+     └ conf
+       └ Auth.routes
+     └ project
+     └ test
+   └ search
+     └ ...
+   └ quotes
+     └ ...
+   └ common
+     └ ...
+```
+
 ## References links
 - Markdown Cheatsheet: https://github.com/tchapi/markdown-cheatsheet
 - Base for scala play project: https://github.com/playframework/play-samples/tree/2.8.x/play-scala-starter-example
 
-## Technologies/libraries used so far
+## Technologies/libraries used so far: Need to update
 - Back-end language
     - Scala as back-end programming language
     - SBT for built tool
@@ -137,9 +186,10 @@
     
 ### Consolidation 
 -[x] Fix the JWT authorization 
--[ ] Should allow user to see only their own details in `/auth/user/{email}`
+-[x] Should allow user to see only their own details in `/auth/user/{email}`
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table
 -[ ] Getting `ERROR:  relation "play_evolutions" does not exist at character 72` while running docker container for postgres after applying play evolutions db migration. I can't see any error since the migration works fine and can see all the script running perfectly for now. Might have to check in more details regarding an error.  
 -[ ] Put for `/customQuote/{id}` is not working, have to update the swagger implementation by removing the in parameter for formData to in body parameter with case class for the response body. Might be the effect of updating the Swagger. If we need to make it appear like a form data then we need to find alternative solution or fix
 -[ ] Change the created date to Instant type
 -[ ] Put validation in the create custom and update record
+-[ ] Implement dependency management for sbt using: `https://github.com/scala-steward`

@@ -17,10 +17,14 @@
 #        type: "array"
 #        items:
 #          type: "string"
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
 #    404:
 #      description: Not found. Database is empty.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
 GET      /:author                       controllers.search.SearchController.getAuthorsAutocomplete(author: String)
 
@@ -38,14 +42,16 @@ GET      /:author                       controllers.search.SearchController.getA
 #  responses:
 #    200:
 #      description: Success response after writing on ES index.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
 #    404:
 #      description: Not found with input index in an ES.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
 GET      /create/:records                controllers.search.SearchController.writeInEs(records: Int)
 
@@ -63,14 +69,16 @@ GET      /create/:records                controllers.search.SearchController.wri
 #  responses:
 #    200:
 #      description: Success response on deleting an es index.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
 #    404:
 #      description: Not found with input index in an ES.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
 GET      /delete/:indexName             controllers.search.SearchController.deleteIndex(indexName: String)
 
@@ -89,13 +97,15 @@ GET      /delete/:indexName             controllers.search.SearchController.dele
 #  responses:
 #    200:
 #      description: Success response on deleting an es index.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
 #    404:
 #      description: Not found with input index in an ES.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    502:
 #      description: Bad Gateway - Connection refused.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#  security:
+#    - TokenKey: []
 ###
 POST      /quote                        controllers.search.SearchController.searchQuote

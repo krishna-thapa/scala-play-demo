@@ -7,6 +7,7 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import dao.MethodsInEsDAO
+import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 import searchForm.SearchForm
@@ -14,9 +15,12 @@ import searchForm.SearchForm
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerComponents)(
+class SearchController @Inject()(
+    scc: SecuredControllerComponents,
+    methodsInEsDAO: MethodsInEsDAO
+)(
     implicit executionContext: ExecutionContext
-) extends AbstractController(cc)
+) extends SecuredController(scc)
     with ResponseResult
     with Logging {
 
@@ -27,7 +31,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     * @param records will be fetched from database and store under ES
     * @return success body or exception message
     */
-  def writeInEs(records: Int): Action[AnyContent] = Action.async { implicit request =>
+  def writeInEs(records: Int): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing writeInEs Controller")
 
     val listOfFutureResults: Seq[Future[Response[IndexResponse]]] =
@@ -53,7 +57,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     * @param indexName that will be deleted from ES
     * @return success body or exception message
     */
-  def deleteIndex(indexName: String): Action[AnyContent] = Action.async { implicit request =>
+  def deleteIndex(indexName: String): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info(s"Executing deleteIndex controller for: $indexName")
     log.warn("Hope you know what you are doing!")
 
@@ -73,7 +77,7 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     * List of the quotes that match the search text
     * @return Returns seq of matched quote
     */
-  def searchQuote: Action[AnyContent] = Action.async { implicit request =>
+  def searchQuote: Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing searchQuote controller")
     // Add request validation
     val searchResults = SearchForm.searchRequestForm
@@ -107,9 +111,10 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
   /**
     * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
     */
-  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getAuthorsAutocomplete")
-    responseSeqString(methodsInEsDAO.searchAuthorsSql(parameter))
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
+    implicit request =>
+      log.info("Executing getAuthorsAutocomplete")
+      responseSeqString(methodsInEsDAO.searchAuthorsSql(parameter))
   }
 
 }
