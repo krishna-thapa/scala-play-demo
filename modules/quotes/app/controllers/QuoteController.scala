@@ -110,13 +110,4 @@ class QuoteController @Inject()(
     // TODO build response when the genre is invalid type
     responseOptionResult(quotesDAO.getGenreQuote(genre))
   }
-
-  /**
-    * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
-    */
-  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getAuthorsAutocomplete")
-    responseSeqString(quotesDAO.searchAuthors(parameter))
-  }
-
 }

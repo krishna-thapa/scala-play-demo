@@ -22,7 +22,7 @@
 #      schema:
 #        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 ###
-GET      /:author                       controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
+GET      /:author                       controllers.search.SearchController.getAuthorsAutocomplete(author: String)
 
 ###
 #  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".

@@ -55,6 +55,10 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
       )
   }
 
+  def searchAuthorsSql(text: String): Seq[String] = {
+    quotesDAO.searchAuthors(text)
+  }
+
   // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
   val searchRequest: String => SearchRequest = (text: String) =>
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))

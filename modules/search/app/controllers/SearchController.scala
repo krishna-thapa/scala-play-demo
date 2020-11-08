@@ -104,4 +104,12 @@ class SearchController @Inject()(methodsInEsDAO: MethodsInEsDAO, cc: ControllerC
     searchResults
   }
 
+  /**
+    * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
+    */
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = Action { implicit request =>
+    log.info("Executing getAuthorsAutocomplete")
+    responseSeqString(methodsInEsDAO.searchAuthorsSql(parameter))
+  }
+
 }
