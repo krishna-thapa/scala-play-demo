@@ -136,11 +136,14 @@ inspirational-quote-api
     
 -[x] Authorization and Authentication (might create a different microservice)
     - Use of JWT to create a token and use for authorization
-    - Have to create a different database to store roles and user details
+    - Have to create a different database to store roles and user details in Postgres 
     - Password has to be hashed in the database 
     - Use of play session to store and validate jwt token in the backend
     - Token has to be stored in the client-server to pass them on each api calls in the header
     - Two roles and permissions for an admin and normal user  
+    - JWT token should be validated for 24 hours and should have signature using play secret key from application.conf
+    - Table for users will be initiated with default details for an admin
+    - **TODO**: Might need to add email verification or to help when the user forget their password 
 
 -[x] Search functionality for the project
     - Create an API endpoint that takes the author name and returns the first top 10 matched names from the Author columns in `quotaations` table. Minimum length for the input text is 3.  
@@ -185,8 +188,7 @@ inspirational-quote-api
     - See the sample play project
     
 ### Consolidation 
--[x] Fix the JWT authorization 
--[x] Should allow user to see only their own details in `/auth/user/{email}`
+-[x] Should allow logged in user to see only their own details in `/auth/user/{email}` and admin to look into anyone else details
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table
 -[ ] Getting `ERROR:  relation "play_evolutions" does not exist at character 72` while running docker container for postgres after applying play evolutions db migration. I can't see any error since the migration works fine and can see all the script running perfectly for now. Might have to check in more details regarding an error.  
 -[ ] Put for `/customQuote/{id}` is not working, have to update the swagger implementation by removing the in parameter for formData to in body parameter with case class for the response body. Might be the effect of updating the Swagger. If we need to make it appear like a form data then we need to find alternative solution or fix

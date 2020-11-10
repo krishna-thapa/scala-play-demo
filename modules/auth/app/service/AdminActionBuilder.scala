@@ -9,6 +9,7 @@ import pdi.jwt.JwtSession.RichRequestHeader
 import play.api.mvc._
 import pdi.jwt.JwtSession._
 import play.api.Configuration
+import util.JwtKey
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -16,7 +17,8 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
     implicit ec: ExecutionContext,
     conf: Configuration
 ) extends ActionBuilderImpl(parser)
-    with ResponseError {
+    with ResponseError
+    with JwtKey {
 
   implicit val clock: Clock = Clock.systemUTC
 
@@ -25,7 +27,7 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
       block: Request[A] => Future[Result]
   ): Future[Result] = {
     log.info("Executing the authService service for AdminActionBuilder")
-    request.jwtSession.getAs[UserToken]("user") match {
+    request.jwtSession.getAs[UserToken](jwtSessionKey) match {
       case Some(userToken) if userToken.isAdmin =>
         block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
       // If the logged in user doesn't have an admin role

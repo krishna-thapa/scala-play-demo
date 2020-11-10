@@ -14,7 +14,7 @@ import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
 import play.api.libs.json.OFormat
 import play.api.mvc._
-import util.DecodeHeader
+import util.{ DecodeHeader, JwtKey }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
@@ -26,11 +26,10 @@ class AuthController @Inject()(
 )(implicit executionContext: ExecutionContext, config: Configuration)
     extends SecuredController(scc)
     with Logging
-    with ResponseResult {
+    with ResponseResult
+    with JwtKey {
 
   implicit val clock: Clock = Clock.systemUTC
-
-  private lazy val jwtSessionKey: String = "user"
 
   // Regex to validate the email pattern
   def isEmailValid(email: String): Boolean =

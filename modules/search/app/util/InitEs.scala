@@ -1,12 +1,10 @@
 package util
 
+import com.krishna.conf.AppConfig
 import com.sksamuel.elastic4s.{ ElasticClient, ElasticProperties }
 import com.sksamuel.elastic4s.http.JavaClient
-import com.typesafe.config.{ Config, ConfigFactory }
 
-trait InitEs {
-
-  def config: Config = ConfigFactory.load("application")
+trait InitEs extends AppConfig {
 
   // Environment variables should be declared in the docker compose file while creating the docker
   // image of the whole sbt play project

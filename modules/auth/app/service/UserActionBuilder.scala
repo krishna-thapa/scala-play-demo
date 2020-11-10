@@ -8,6 +8,7 @@ import model.UserToken
 import pdi.jwt.JwtSession._
 import play.api.Configuration
 import play.api.mvc._
+import util.JwtKey
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -15,7 +16,8 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
     implicit ec: ExecutionContext,
     conf: Configuration
 ) extends ActionBuilderImpl(parser)
-    with ResponseError {
+    with ResponseError
+    with JwtKey {
 
   implicit val clock: Clock = Clock.systemUTC
 
@@ -24,7 +26,7 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
       block: Request[A] => Future[Result]
   ): Future[Result] = {
     log.info("Executing the authService service for UserActionBuilder")
-    request.jwtSession.getAs[UserToken]("user") match {
+    request.jwtSession.getAs[UserToken](jwtSessionKey) match {
       /*
       If want to make the admin role NOT to have permission that logged in user have
       Change to: case Some(userToken) if !userToken.isAdmin =>
