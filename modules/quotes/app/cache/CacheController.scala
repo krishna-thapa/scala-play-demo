@@ -26,7 +26,7 @@ class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   protected lazy val quoteOfTheDayCacheList: RedisList[String, SynchronousResult] =
     cache.list[String]("cache-quoteOfTheDay")
 
-  // TODO: make the max list size to 50
+  // TODO: make the max list size to 500
   protected lazy val maxListSize: Int = 5
 
   private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
@@ -66,14 +66,14 @@ class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   ): Either[ResponseMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method
-    if (cachedQuotes.toList.toList.contains(quote.csvid)) {
-      log.warn("Duplicate record has been called with id: " + quote.csvid)
+    if (cachedQuotes.toList.toList.contains(quote.csvId)) {
+      log.warn("Duplicate record has been called with id: " + quote.csvId)
       randomQuote
         .fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
           getUniqueQuoteFromDB(quote, cachedQuotes)
         })
     } else {
-      redisActions(quote.csvid, cachedQuotes)
+      redisActions(quote.csvId, cachedQuotes)
       Right(quote)
     }
   }
@@ -92,14 +92,14 @@ class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   /**
     * Unit return method that stores the ids in redis list
     * if the list exceeds max length, it deletes the first one and appends to last element
-    * @param csvid Unique id of the record
+    * @param csvId Unique id of the record
     */
   private def redisActions(
-      csvid: String,
+      csvId: String,
       cachedQuotes: RedisList[String, SynchronousResult]
   ): Unit = {
     if (cachedQuotes.size >= maxListSize) cachedQuotes.removeAt(0)
-    cachedQuotes.append(csvid)
+    cachedQuotes.append(csvId)
     log.info("Ids in the Redis storage: " + cachedQuotes.toList)
   }
 }

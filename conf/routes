@@ -2,7 +2,7 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# CSV build endpoints for the table "quotations"
+# CSV build endpoints for the table "quotes"
 ->      /quote                      Quote.Routes
 
 # CRUD operation endpoints for the custom table "custom_quotations"

@@ -12,8 +12,8 @@ final case class CustomQuotesQuery(
     quote: String,
     author: String,
     genre: Option[Genre] = None,
-    storeddate: Date,
-    ownquote: Boolean
+    storedDate: Date,
+    ownQuote: Boolean
 ) extends QuotesTable
 
 object CustomQuotesQuery {

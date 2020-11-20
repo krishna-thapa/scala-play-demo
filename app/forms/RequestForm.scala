@@ -14,7 +14,7 @@ object RequestForm {
       "quote"    -> nonEmptyText.verifying(_.nonEmpty),
       "author"   -> nonEmptyText,
       "genre"    -> optional(Forms.of[Genre]),
-      "ownquote" -> boolean
+      "ownQuote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }
 }

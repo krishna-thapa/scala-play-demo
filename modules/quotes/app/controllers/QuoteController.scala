@@ -1,3 +1,4 @@
+// Should be added controllers for the play routes
 package controllers.quotes
 
 import cache.CacheController
@@ -7,6 +8,7 @@ import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
+import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
@@ -17,24 +19,28 @@ import scala.util.matching.Regex
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
-  * application's quotes from 'quotations' table.
+  * application's quotes from 'quotes' table.
   */
 @Singleton
 class QuoteController @Inject()(
     cache: CacheApi,
     cacheController: CacheController,
-    cc: ControllerComponents,
+    scc: SecuredControllerComponents,
     quotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
-    extends AbstractController(cc)
+    extends SecuredController(scc)
     with ResponseResult
     with Logging {
 
+  // CsvId should start with "CSV" prefix
   protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
   /**
-    * A REST endpoint that gets a random quote as JSON from quotations table.
+    * A REST endpoint that gets a random quote as a JSON from quotes table.
+    * Should be unique to last 500 retrieved records from this end point
+    * Used Redis cache database to store last 500 csv id to get unique record
+    * Anyone can do perform this action
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
@@ -42,10 +48,11 @@ class QuoteController @Inject()(
   }
 
   /**
-    * A REST endpoint that gets a quote of the day as JSON from quotations table
+    * A REST endpoint that gets a quote of the day as JSON from quotes table
     *  @param date: Can take milliseconds date format as a path parameter to gets the
     *  previous 5 days quote of the day
     *  It stores the past 5 quote of the day in the Redis cache storage
+    *  Anyone can do perform this action
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
@@ -66,15 +73,17 @@ class QuoteController @Inject()(
   }
 
   /**quotations
-    * A REST endpoint that gets all the quotes as JSON from quotations table
+    * A REST endpoint that gets all the quotes as JSON from quotes table
+    * Only Admin can perform this action
     */
-  def getAllQuotes: Action[AnyContent] = Action { implicit request =>
+  def getAllQuotes: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllQuotes")
     responseSeqResult(quotesDAO.listAllQuotes())
   }
 
   /**
-    * A REST endpoint that gets random 10 quotes as JSON from quotations table
+    * A REST endpoint that gets random 10 quotes as JSON from quotes table
+    * Anyone can do perform this action
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
@@ -83,27 +92,30 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that creates or altered the fav tag in the fav_quotes table.
+    * Only the logged user can perform this action
     */
-  def favQuote(csvid: String): Action[AnyContent] = Action {
+  def favQuote(csvId: String): Action[AnyContent] = UserAction {
     implicit request: Request[AnyContent] =>
       log.info("Executing favQuote")
-      if (csvIdPattern.matches(csvid)) {
-        responseTryResult(favQuotesDAO.modifyFavQuote(csvid))
+      if (csvIdPattern.matches(csvId)) {
+        responseTryResult(favQuotesDAO.modifyFavQuote(csvId))
       } else {
-        badRequest(InvalidCsvId(csvid).msg)
+        badRequest(InvalidCsvId(csvId).msg)
       }
   }
 
   /**
     * A REST endpoint that gets all favorite quotes as JSON from fav_quotes table.
+    * Only the logged user can perform this action
     */
-  def getFavQuotes: Action[AnyContent] = Action { implicit request =>
+  def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getFavQuotes")
     responseSeqResult(favQuotesDAO.listAllQuotes())
   }
 
   /**
-    * A REST endpoint that gets a random quote as per selected genre from the table from quotations table.
+    * A REST endpoint that gets a random quote as per selected genre from the table from quotes table.
+    * Anyone can do perform this action
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")

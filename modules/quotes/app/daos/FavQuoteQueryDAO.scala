@@ -21,15 +21,13 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
-  type T = QuotesQuery
-
   /**
     * @return Quotes that are marked as favorite
     */
   def listAllQuotes(): Seq[QuotesQuery] = {
     val query = QuoteQueriesTable.quoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter(_.favTag))
-      .on(_.csvid === _.csvid)
+      .on(_.csvId === _.csvId)
 
     runDbAction(query.result).map(_._1)
   }
@@ -38,45 +36,45 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   //def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)
 
   /**
-    * @param csvid id from csv custom table
+    * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table
     */
-  def modifyFavQuote(csvid: String): Try[FavQuoteQuery] = {
+  def modifyFavQuote(csvId: String): Try[FavQuoteQuery] = {
     // check if the record exists with that csv id in the fav_quotes table
     val action =
-      FavQuoteQueriesTable.favQuoteQueries.filter(_.csvid === csvid).result.headOption.flatMap {
+      FavQuoteQueriesTable.favQuoteQueries.filter(_.csvId === csvId).result.headOption.flatMap {
         case Some(favQuote) =>
           log.info(s"Quote is already in the table with id: ${favQuote.id}")
-          alterFavTag(favQuote.csvid, favQuote.favTag)
+          alterFavTag(favQuote.csvId, favQuote.favTag)
           // get the updated record once the fav tag is altered
-          FavQuoteQueriesTable.favQuoteQueries.filter(_.csvid === csvid).result.head
+          FavQuoteQueriesTable.favQuoteQueries.filter(_.csvId === csvId).result.head
         case None =>
           log.info("Inserting new record in the fav quotes table")
-          createFavQuote(csvid)
+          createFavQuote(csvId)
       }
     runDbActionCatchError(action)
   }
 
   /**
-    * @param csvid id from csv custom table
+    * @param csvId id from csv custom table
     * @param tag boolean tag to specify favorite quote
     * @return record with altered fav tag
     */
-  def alterFavTag(csvid: String, tag: Boolean): Int = {
-    log.info(s"Changing the fav tag status of: $csvid to ${!tag}")
+  def alterFavTag(csvId: String, tag: Boolean): Int = {
+    log.info(s"Changing the fav tag status of: $csvId to ${!tag}")
     runDbAction(
       FavQuoteQueriesTable.favQuoteQueries
-        .filter(_.csvid === csvid)
+        .filter(_.csvId === csvId)
         .map(quote => quote.favTag)
         .update(!tag)
     )
   }
 
   /**
-    * @param csvid id from csv custom table
+    * @param csvId id from csv custom table
     * @return create a new record in the fav_quotes table with fav tag as true
     */
-  def createFavQuote(csvid: String): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {
+  def createFavQuote(csvId: String): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {
     val insertFavQuote = FavQuoteQueriesTable.favQuoteQueries returning
       FavQuoteQueriesTable.favQuoteQueries.map(_.id) into (
         (
@@ -86,7 +84,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     )
     insertFavQuote += FavQuoteQuery(
       0,
-      csvid = csvid,
+      csvId = csvId,
       favTag = true
     )
   }

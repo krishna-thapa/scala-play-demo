@@ -15,10 +15,10 @@ class CustomQuotesQueriesTable(tag: Tag)
   def quote: Rep[String]        = column[String]("quote")
   def author: Rep[String]       = column[String]("author")
   def genre: Rep[Option[Genre]] = column[Option[Genre]]("genre")
-  def storeddate: Rep[Date]     = column[Date]("storeddate")
-  def ownquote: Rep[Boolean]    = column[Boolean]("ownquote")
+  def storedDate: Rep[Date]     = column[Date]("stored_date")
+  def ownQuote: Rep[Boolean]    = column[Boolean]("own_quote")
   def * : ProvenShape[CustomQuotesQuery] =
-    (id, quote, author, genre, storeddate, ownquote) <>
+    (id, quote, author, genre, storedDate, ownQuote) <>
       ((CustomQuotesQuery.apply _).tupled, CustomQuotesQuery.unapply)
 }
 

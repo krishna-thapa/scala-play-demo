@@ -30,7 +30,7 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionC
     quotes.map { quote =>
       client.execute {
         // providing index with csvId to avoid duplicates records with same csvId
-        val csvId = quote.csvid
+        val csvId = quote.csvId
         // if createOnly set to true then trying to update a document will fail
         // have set as false (default) so that duplicate records can override the existing records
         indexInto(indexName).id(csvId).doc(quote).refresh(RefreshPolicy.Immediate)

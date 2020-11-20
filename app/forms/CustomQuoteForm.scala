@@ -7,5 +7,5 @@ final case class CustomQuoteForm(
     quote: String,
     author: String,
     genre: Option[Genre] = None,
-    ownquote: Boolean
+    ownQuote: Boolean
 ) extends QuotesTable

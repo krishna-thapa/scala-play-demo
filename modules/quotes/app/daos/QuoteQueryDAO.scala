@@ -20,8 +20,6 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
-  type T = QuotesQuery
-
   /**
     * @return List of all stored quotes
     */

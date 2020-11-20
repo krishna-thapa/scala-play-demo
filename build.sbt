@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
 lazy val quotes = project
   .in(file("modules/quotes"))
   .enablePlugins(PlayScala, SwaggerPlugin)
-  .dependsOn(common)
+  .dependsOn(common, auth)
   .settings(
     libraryDependencies ++=
       commonDependencies ++

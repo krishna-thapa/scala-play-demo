@@ -5,14 +5,14 @@ CREATE TABLE custom_quotations (
     quote varchar(1000) NOT NULL,
     author varchar(255) NOT NULL,
     genre varchar(100),
-    storeddate date NOT NULL,
-    ownquote boolean default true
+    stored_date date NOT NULL,
+    own_quote boolean default true
 );
 
 CREATE TABLE fav_quotations (
     id serial PRIMARY KEY,
-    csvid text NOT NULL,
-    favtag boolean default true
+    csv_id text NOT NULL,
+    fav_tag boolean default true
 );
 
 --- !Downs

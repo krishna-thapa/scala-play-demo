@@ -5,7 +5,7 @@ import play.api.libs.json._
 
 final case class QuotesQuery(
     id: Int,
-    csvid: String,
+    csvId: String,
     quote: String,
     author: String,
     genre: Option[Genre] = None

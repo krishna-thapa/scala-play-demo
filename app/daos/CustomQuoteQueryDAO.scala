@@ -85,7 +85,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
       customQuoteForm.author,
       customQuoteForm.genre,
       currentDate,
-      customQuoteForm.ownquote
+      customQuoteForm.ownQuote
     )
     runDbAction(action)
   }
@@ -99,12 +99,12 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     runDbActionCatchError(
       customQuotes
         .filter(_.id === id)
-        .map(quote => (quote.quote, quote.author, quote.genre, quote.ownquote))
+        .map(quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
         .update(
           customQuoteForm.quote,
           customQuoteForm.author,
           customQuoteForm.genre,
-          customQuoteForm.ownquote
+          customQuoteForm.ownQuote
         )
     )
   }
