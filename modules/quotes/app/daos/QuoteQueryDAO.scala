@@ -55,6 +55,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   }
 
   /**
+    * First get the distinct on authors and then use like command to filter out
     * @param parameter input author string to get the autocomplete
     * @return List of top 10 authors that matches on search string
     */
@@ -63,10 +64,10 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     val inputParam: String = parameter.replaceAll("^\\s+", "").toLowerCase
     runDbAction(
       QuoteQueriesTable.quoteQueries
+        .distinctOn(_.author)
         .filter(_.author.toLowerCase like s"%$inputParam%")
         .result
     ).map(_.author)
-      .distinct
       .sortBy(!_.startsWith(inputParam.take(1).capitalize)) //Sorted by the first letter of parameter
       .take(10)
   }

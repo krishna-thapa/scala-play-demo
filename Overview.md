@@ -146,7 +146,7 @@ inspirational-quote-api
     - **TODO**: Might need to add email verification or to help when the user forget their password 
 
 -[x] Search functionality for the project
-    - Create an API endpoint that takes the author name and returns the first top 10 matched names from the Author columns in `quotaations` table. Minimum length for the input text is 3.  
+    - Create an API endpoint that takes the author name and returns the first top 10 matched names from the Author columns in `quotations` table. Minimum length for the input text is 3.  
     - Author search in the `quotations` table using Postgres like command. Returns first 10 distinct matched result. 
     - Can be searched using lastname or any matched 3 letters in the name itself
     - **TODO**: Have to update the method so that first get the distinct authors from the table and apply the like command on top 10 data and sort the result 
