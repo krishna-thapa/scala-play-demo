@@ -136,9 +136,7 @@ class AuthController @Inject()(
   def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    // already know that header has token in 'Authorization'
-    val authToken: String  = request.headers.get("Authorization").get
-    val user: UserToken    = DecodeHeader(authToken)
+    val user: UserToken    = DecodeHeader(request.headers)
     val overrideEmail      = if (user.isAdmin) email else user.email
     val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
     runApiAction(overrideEmail)(getUserInfoDetails)

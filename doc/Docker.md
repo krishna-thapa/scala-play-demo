@@ -62,9 +62,18 @@ docker ps
 docker exec -it <container-id> redis-cli
 ```
 
-- To see all the stored keys in the Redis server:
+- Basic commands:
 ```
-KEYS *
+// Get all the lists
+KEYS * 
+
+// Delete the list
+DEL cache-random-quote
+DEL cache-quoteOfTheDay
+
+// Get all the stored values inside the list
+LRANGE cache-random-quote 0 -1
+LRANGE cache-quoteOfTheDay 0 -1
 ```
 
 ## Install Postgres Server in Docker

@@ -10,9 +10,11 @@ import com.krishna.util.Logging
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
+import model.UserToken
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
+import util.DecodeHeader
 
 import scala.concurrent.ExecutionContext
 import scala.util.matching.Regex
@@ -72,6 +74,8 @@ class QuoteController @Inject()(
     }
   }
 
+  def getLastFiveQuotes: Action[AnyContent] = ???
+
   /**quotations
     * A REST endpoint that gets all the quotes as JSON from quotes table
     * Only Admin can perform this action
@@ -91,20 +95,23 @@ class QuoteController @Inject()(
   }
 
   /**
+    * TODO add user id while saving the fav quote
     * A REST endpoint that creates or altered the fav tag in the fav_quotes table.
     * Only the logged user can perform this action
     */
-  def favQuote(csvId: String): Action[AnyContent] = UserAction {
-    implicit request: Request[AnyContent] =>
-      log.info("Executing favQuote")
-      if (csvIdPattern.matches(csvId)) {
-        responseTryResult(favQuotesDAO.modifyFavQuote(csvId))
-      } else {
-        badRequest(InvalidCsvId(csvId).msg)
-      }
+  def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
+    val user: UserToken = DecodeHeader(request.headers)
+    log.info(s"Executing favQuote bu user: ${user.email}")
+
+    if (csvIdPattern.matches(csvId)) {
+      responseTryResult(favQuotesDAO.modifyFavQuote(csvId))
+    } else {
+      badRequest(InvalidCsvId(csvId).msg)
+    }
   }
 
   /**
+    * TODO only the logged user should retrieve own fav quotes
     * A REST endpoint that gets all favorite quotes as JSON from fav_quotes table.
     * Only the logged user can perform this action
     */
@@ -115,11 +122,11 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that gets a random quote as per selected genre from the table from quotes table.
+    * Returns 400 response code when the invalid genre is used
     * Anyone can do perform this action
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
-    // TODO build response when the genre is invalid type
     responseOptionResult(quotesDAO.getGenreQuote(genre))
   }
 }

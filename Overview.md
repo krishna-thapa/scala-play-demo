@@ -187,6 +187,8 @@ inspirational-quote-api
     - https://medium.com/@ievstrygul/wiring-scala-app-docker-container-with-mongodb-84b29c50ac5
     - See the sample play project
     
+-[ ] Redis get connection lost after some time if the app is not active
+
 ### Consolidation 
 -[x] Should allow logged in user to see only their own details in `/auth/user/{email}` and admin to look into anyone else details
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table

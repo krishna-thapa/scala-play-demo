@@ -3,10 +3,14 @@ package util
 import com.krishna.conf.AppConfig
 import model.UserToken
 import pdi.jwt.{ JwtAlgorithm, JwtJson }
+import play.api.mvc.Headers
 
 object DecodeHeader extends AppConfig with JwtKey {
 
-  def apply(token: String): UserToken = {
+  def apply(headers: Headers): UserToken = {
+
+    // already know that header has token in 'Authorization'
+    val token: String = headers.get("Authorization").get
 
     val secretKey: String = config.getString("play.http.secret.key")
 
