@@ -4,7 +4,7 @@ import java.time.Clock
 
 import com.krishna.response.ResponseError
 import javax.inject.Inject
-import model.UserToken
+import model.UserDetail
 import pdi.jwt.JwtSession.RichRequestHeader
 import play.api.mvc._
 import pdi.jwt.JwtSession._
@@ -27,12 +27,12 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
       block: Request[A] => Future[Result]
   ): Future[Result] = {
     log.info("Executing the authService service for AdminActionBuilder")
-    request.jwtSession.getAs[UserToken](jwtSessionKey) match {
-      case Some(userToken) if userToken.isAdmin =>
-        block(new AuthenticatedRequest[A](userToken, request)).map(_.refreshJwtSession(request))
+    request.jwtSession.getAs[UserDetail](jwtSessionKey) match {
+      case Some(userDetail) if userDetail.isAdmin =>
+        block(new AuthenticatedRequest[A](userDetail, request)).map(_.refreshJwtSession(request))
       // If the logged in user doesn't have an admin role
-      case Some(userToken) =>
-        Future(forbidden(s"${userToken.email}").refreshJwtSession(request))
+      case Some(userDetail) =>
+        Future(forbidden(s"${userDetail.email}").refreshJwtSession(request))
       case _ =>
         Future(unauthorized(s"Do not have access!"))
     }

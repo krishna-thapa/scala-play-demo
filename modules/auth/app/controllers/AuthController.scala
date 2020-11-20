@@ -9,7 +9,7 @@ import dao.AuthDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import form.AuthForms
 import javax.inject.{ Inject, Singleton }
-import model.{ UserList, UserToken }
+import model.UserDetail
 import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
 import play.api.libs.json.OFormat
@@ -56,12 +56,7 @@ class AuthController @Inject()(
                 log.info("Success on authentication!")
                 Ok.addingToJwtSession(
                   jwtSessionKey,
-                  UserToken(
-                    validUser.email,
-                    s"${validUser.firstName.capitalize} ${validUser.lastName.capitalize}",
-                    validUser.isAdmin,
-                    validUser.createdDate
-                  )
+                  UserDetail(validUser)
                 )
               case Left(exceptionResult) => exceptionResult
             }
@@ -136,7 +131,7 @@ class AuthController @Inject()(
   def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    val user: UserToken    = DecodeHeader(request.headers)
+    val user: UserDetail   = DecodeHeader(request.headers)
     val overrideEmail      = if (user.isAdmin) email else user.email
     val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
     runApiAction(overrideEmail)(getUserInfoDetails)
@@ -161,7 +156,7 @@ class AuthController @Inject()(
             case Right(user) =>
               user match {
                 case Success(_) =>
-                  responseOk(UserList(authDAO.checkValidEmail(userDetails.email).head))
+                  responseOk(UserDetail(authDAO.checkValidEmail(userDetails.email).head))
                 case Failure(exception) => badRequest(exception.getMessage)
               }
             case Left(exception) => bcryptValidationFailed(exception.getMessage)

@@ -10,7 +10,7 @@ import com.krishna.util.Logging
 import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
-import model.UserToken
+import model.UserDetail
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -100,7 +100,7 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
-    val user: UserToken = DecodeHeader(request.headers)
+    val user: UserDetail = DecodeHeader(request.headers)
     log.info(s"Executing favQuote bu user: ${user.email}")
 
     if (csvIdPattern.matches(csvId)) {

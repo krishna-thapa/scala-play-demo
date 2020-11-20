@@ -72,7 +72,7 @@ POST        /signUp                  controllers.auth.AuthController.signUp
 #    200:
 #      description: All the existing users
 #      schema:
-#        $ref: '#/definitions/model.UserList'
+#        $ref: '#/definitions/model.UserDetail'
 #    401:
 #      description: Unauthorized
 #      schema:
@@ -96,7 +96,7 @@ GET        /users                    controllers.auth.AuthController.getAllUser
 #    200:
 #      description: success with user detail info
 #      schema:
-#        $ref: '#/definitions/model.UserList'
+#        $ref: '#/definitions/model.UserDetail'
 #    400:
 #      description: Bad request (have to be in correct email format)
 #      schema:
@@ -131,7 +131,7 @@ GET        /user/:email                   controllers.auth.AuthController.getUse
 #    200:
 #      description: success with id of newly created record
 #      schema:
-#        $ref: '#/definitions/model.UserList'
+#        $ref: '#/definitions/model.UserDetail'
 #    401:
 #      description: Unauthorized
 #      schema:

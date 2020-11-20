@@ -4,7 +4,7 @@ import java.sql.Date
 
 import play.api.libs.json.{ Json, OFormat }
 
-case class UserList(
+case class UserDetail(
     id: Int,
     name: String,
     email: String,
@@ -12,11 +12,11 @@ case class UserList(
     isAdmin: Boolean
 )
 
-object UserList {
-  implicit lazy val userListFormat: OFormat[UserList] = Json.format[UserList]
+object UserDetail {
+  implicit lazy val userListFormat: OFormat[UserDetail] = Json.format[UserDetail]
 
-  def apply(userInfo: UserInfo): UserList =
-    new UserList(
+  def apply(userInfo: UserInfo): UserDetail =
+    new UserDetail(
       userInfo.id,
       s"${userInfo.firstName} ${userInfo.lastName}",
       userInfo.email,

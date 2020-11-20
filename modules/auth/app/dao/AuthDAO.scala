@@ -7,7 +7,7 @@ import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
 import javax.inject.{ Inject, Singleton }
-import model.{ UserInfo, UserList }
+import model.{ UserInfo, UserDetail }
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc.Result
 import slick.basic.DatabaseConfig
@@ -76,9 +76,9 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     * List all the users from the database: Only Admin can perform this action
     * @return list of existing users
     */
-  def listAllUser(): Seq[UserList] = {
+  def listAllUser(): Seq[UserDetail] = {
     val result = runDbAction(userInfo.sortBy(_.email).result)
-    result.map(UserList(_))
+    result.map(UserDetail(_))
   }
 
   /**
@@ -86,10 +86,10 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     * @param email to select the account
     * @return Either exception or success record id
     */
-  def toggleAdmin(email: String): Either[Result, UserList] = {
+  def toggleAdmin(email: String): Either[Result, UserDetail] = {
     val toggleRole = (user: UserInfo) => {
       alterAdminRole(user.id, user.isAdmin) // Side-effect method
-      UserList(checkValidEmail(email).head)
+      UserDetail(checkValidEmail(email).head)
     }
     findValidEmail(email)(toggleRole)
   }
@@ -112,8 +112,8 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     * @param email to select the account
     * @return Either exception or success record details of the user
     */
-  def userAccount(email: String): Either[Result, UserList] = {
-    val getUser = (user: UserInfo) => UserList(user)
+  def userAccount(email: String): Either[Result, UserDetail] = {
+    val getUser = (user: UserInfo) => UserDetail(user)
     findValidEmail(email)(getUser)
   }
 
