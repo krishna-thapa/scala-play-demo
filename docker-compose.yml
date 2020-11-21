@@ -8,17 +8,22 @@ services:
       network.host: 0.0.0.0
       path.repo: /tmp/elastic4s
     ports:
-      # use obscure ports for the tests to reduce the risk of interfering with existing elastic installations/containers
       - 9200:9200
     volumes:
       - "./conf/docker/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "esdata1:/usr/share/elasticsearch/data:rw"
+    restart: unless-stopped
   redis:
     image: redis:latest
     ports:
       - 6379:6379
     volumes:
       - "./conf/docker/redis.conf:/redis.conf"
-    command: [ "redis-server", "/redis.conf" ]
+      - "redis-data:/data:rw"
+    command: >
+      bash -c "redis-server --appendonly yes
+      && redis-server /redis.conf"
+    restart: always
   postgres:
     image: postgres
     container_name: pg-docker
@@ -34,3 +39,7 @@ services:
       - "./conf/docker/postgres.conf:/etc/postgresql/postgresql.conf"
       - "/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata"
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
+volumes:
+  esdata1:
+    driver: local
+  redis-data:
