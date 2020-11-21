@@ -70,7 +70,7 @@ GET      /allQuotes            controllers.quotes.QuoteController.getAllQuotes
 #  tags:
 #    - Quote
 #  parameters:
-#    - name: "csvid"
+#    - name: "csvId"
 #      in: "path"
 #      description: "Required"
 #      required: true

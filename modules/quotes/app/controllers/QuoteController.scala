@@ -95,29 +95,28 @@ class QuoteController @Inject()(
   }
 
   /**
-    * TODO add user id while saving the fav quote
     * A REST endpoint that creates or altered the fav tag in the fav_quotes table.
-    * Only the logged user can perform this action
+    * Only the logged user can perform this action and should be stored to user's id only
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
     val user: UserDetail = DecodeHeader(request.headers)
-    log.info(s"Executing favQuote bu user: ${user.email}")
+    log.info(s"Executing favQuote by user: ${user.email}")
 
     if (csvIdPattern.matches(csvId)) {
-      responseTryResult(favQuotesDAO.modifyFavQuote(csvId))
+      responseTryResult(favQuotesDAO.modifyFavQuote(user.id, csvId))
     } else {
       badRequest(InvalidCsvId(csvId).msg)
     }
   }
 
   /**
-    * TODO only the logged user should retrieve own fav quotes
     * A REST endpoint that gets all favorite quotes as JSON from fav_quotes table.
-    * Only the logged user can perform this action
+    * Only the logged user can perform this action and should retrieve own fav quotes only
     */
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
-    log.info("Executing getFavQuotes")
-    responseSeqResult(favQuotesDAO.listAllQuotes())
+    val user: UserDetail = DecodeHeader(request.headers)
+    log.info(s"Executing getFavQuotes by user: ${user.email}")
+    responseSeqResult(favQuotesDAO.listAllQuotes(user.id))
   }
 
   /**

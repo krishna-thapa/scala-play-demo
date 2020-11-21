@@ -7,7 +7,7 @@ abstract class CommonMethods[T] {
 
   //type T  //https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics
 
-  def listAllQuotes(): Seq[T]
+  def listAllQuotes(): Seq[T] = Seq.empty
 
   def listSelectedQuote(id: Int): Option[T] = None
 

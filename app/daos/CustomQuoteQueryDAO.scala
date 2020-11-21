@@ -39,7 +39,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * List all the records from the table
     * @return sequence of the CustomQuotesQuery records
     */
-  def listAllQuotes(): Seq[CustomQuotesQuery] =
+  override def listAllQuotes(): Seq[CustomQuotesQuery] =
     runDbAction(customQuotes.sortBy(_.id).result)
 
   /**

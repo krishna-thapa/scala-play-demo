@@ -23,7 +23,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   /**
     * @return List of all stored quotes
     */
-  def listAllQuotes(): Seq[QuotesQuery] =
+  override def listAllQuotes(): Seq[QuotesQuery] =
     runDbAction(QuoteQueriesTable.quoteQueries.result)
 
   /**

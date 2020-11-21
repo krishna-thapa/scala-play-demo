@@ -4,6 +4,7 @@ import play.api.libs.json.{ Json, OFormat }
 
 final case class FavQuoteQuery(
     id: Int,
+    userId: Int,
     csvId: String,
     favTag: Boolean
 )
