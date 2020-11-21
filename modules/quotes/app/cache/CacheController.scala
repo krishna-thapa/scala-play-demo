@@ -51,7 +51,6 @@ class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
             expiration = 5.days                                     // Key is only store for 5 days
           )
         }
-
         uniqueQuote
       })
     } else {

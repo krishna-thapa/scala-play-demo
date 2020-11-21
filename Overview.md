@@ -188,6 +188,8 @@ inspirational-quote-api
     - See the sample play project
     
 -[ ] Redis get connection lost after some time if the app is not active
+    - Make Redis cache as persistence so that it won't lost the data once it get hard restart
+    - https://github.com/docker-library/redis/issues/111
 
 ### Consolidation 
 -[x] Should allow logged in user to see only their own details in `/auth/user/{email}` and admin to look into anyone else details

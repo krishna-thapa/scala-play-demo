@@ -3,7 +3,8 @@ package controllers.quotes
 
 import cache.CacheController
 import com.krishna.model.Genre.Genre
-import com.krishna.response.ResponseMsg.InvalidCsvId
+import com.krishna.model.{ AllQuotesOfDay, QuotesQuery }
+import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidCsvId }
 import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
@@ -11,7 +12,8 @@ import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
 import model.UserDetail
-import play.api.cache.redis.CacheApi
+import play.api.cache.redis.{ CacheApi, SynchronousResult }
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json.Json
 import play.api.mvc._
 import util.DecodeHeader
@@ -74,9 +76,30 @@ class QuoteController @Inject()(
     }
   }
 
-  def getLastFiveQuotes: Action[AnyContent] = ???
+  /**
+    * Get all the cached quotes from last 5 days
+    * All of the quotes csv id are stored in the Redis storage
+    * @return last 5 quote of the day
+    */
+  def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
+    log.info("Executing getLastFiveQuotes")
 
-  /**quotations
+    // Get all the cached keys(max 5) and will be in date format
+    val allCachedKeys: SynchronousResult[Seq[String]] = cache.matching("20*")
+    if (allCachedKeys.nonEmpty) {
+      val result: Seq[AllQuotesOfDay] = for {
+        key <- allCachedKeys
+        quote <- cache
+          .get[String](key) // Get the stored value for that key from Redis cached storage
+      } yield AllQuotesOfDay(key, quote)
+
+      responseSeqResult(result)
+    } else {
+      notFound(EmptyDbMsg.msg)
+    }
+  }
+
+  /**
     * A REST endpoint that gets all the quotes as JSON from quotes table
     * Only Admin can perform this action
     */
@@ -87,7 +110,7 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that gets random 10 quotes as JSON from quotes table
-    * Anyone can do perform this action
+    * Anyone can perform this action
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")

@@ -34,6 +34,21 @@ GET      /random               controllers.quotes.QuoteController.getRandomQuote
 GET      /quoteOfTheDay         controllers.quotes.QuoteController.getQuoteOfTheDay(date: Option[String])
 
 ###
+#  summary: Get last 5 quote of the day
+#  description: "Only retreive last 5 quote of the day including today's quote"
+#  tags:
+#    - Quote
+#  responses:
+#    200:
+#      description: Success response of the quote of the day.
+#      schema:
+#        $ref: '#/definitions/com.krishna.model.QuotesQuery'
+#    404:
+#      description: Not found. Database is empty.
+###
+GET      /quotesOfTheDay         controllers.quotes.QuoteController.getCachedQuotes
+
+###
 #  summary: Get a random 10 quotes from a quotes table
 #  tags:
 #    - Quote
