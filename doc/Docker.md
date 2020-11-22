@@ -3,37 +3,55 @@ Docker is an open-source containerization platform that allows you to quickly bu
 
 Docker is an integral part of modern software development and DevOps continuous integration and deployment pipelines.
 
-## How to Install Docker on Ubuntu 20.04
+### Install Docker on Ubuntu 20.04
 Link [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-20-04/)
 
-## Install Docker compose on Ubuntu 20.04
+### Install Docker compose on Ubuntu 20.04
 Link [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04)
 
-## docker-compose cheatsheet
+### docker-compose cheatsheet
 Link [here](https://devhints.io/docker-compose)
 
 ```
 docker-compose start
 docker-compose stop
 
-----------
 docker-compose pause
 docker-compose unpause
 
-----------
 docker-compose ps
 docker-compose up
 
-
-To stop the cluster: 
+// To stop the cluster: 
 docker-compose down
 
-To destroy the cluster and the data volumes:
+// To destroy the cluster and the data volumes
+// (Be careful as it will delete the volumn):
 docker-compose down -v
 ```
 
+## Install Postgres Server in Docker
+
+- [Docker compose up with Postgres tips](https://hashinteractive.com/blog/docker-compose-up-with-postgres-quick-tips/)
+- [Use volumes in Docker](https://docs.docker.com/storage/volumes/)
+
+### Connect to the Postgres database running in docker
+- First start the docker container with postgres image up and running
+`docker-compose up`
+- Connect to the postgres through terminal
+`psql -h localhost -p 5432 -U  admin postgres`
+- Password for admin role is *admin*
+- Connect to the right database
+`\c inspiration_db`
+- See all the tables 
+`\c dt`
+
+
 ## Install ElasticSearch Server in Docker
 Link [here](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/docker.html#docker-prod-cluster-composefile)
+
+Data volumes will persist, so it’s possible to start the cluster again with the same data using `docker-compose up`. To destroy the cluster and the data volumes, just type `docker-compose down -v`.
+
 
 ### Elasticsearch in Docker
 The images use centos:7 as the base image.
@@ -51,8 +69,17 @@ To see the ES match API, [refer here](https://www.elastic.co/guide/en/elasticsea
 ## Install Redis Server in Docker
 [Configure and Run a Docker Container for Redis and Use it for Python](https://medium.com/better-programming/dockerizing-and-pythonizing-redis-41b1340979de)
 
+[How To Configure Redis + Redis Commander + Docker](https://hackernoon.com/how-to-configurate-redis-redis-commander-docker-616136f2)
+
+- create volume `redis-data`: This is where all redis data will be stored, even if container is restarted, data will be there.
+- command: ["redis-server", "--appendonly", "yes"] - I start redis in persistent storage mode
+- REDIS_HOSTS=local:redis:6379 - tells redis commander how to connect to redis
+
 ### Connect to Redis cli running in docker
 - Get the Container id of Redis container running in docker
+
+**TODO: Need to protect redis commander interface with login/password using redis-commander. See above link**
+
 ```
 docker ps
 ```
@@ -75,17 +102,3 @@ DEL cache-quoteOfTheDay
 LRANGE cache-random-quote 0 -1
 LRANGE cache-quoteOfTheDay 0 -1
 ```
-
-## Install Postgres Server in Docker
-[DOCKER COMPOSE UP WITH POSTGRES QUICK TIPS](https://hashinteractive.com/blog/docker-compose-up-with-postgres-quick-tips/)
-
-### Connect to the Postgres database running in docker
-- First start the docker container with postgres image up and running
-`docker-compose up`
-- Connect to the postgres through terminal
-`psql -h localhost -p 5432 -U  admin postgres`
-- Password for admin role is *admin*
-- Connect to the right database
-`\c inspiration_db`
-- See all the tables 
-`\c dt`

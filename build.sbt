@@ -34,7 +34,6 @@ lazy val quotes = project
       commonDependencies ++
         slickDatabaseDependencies ++
         Seq(
-          jdbc,
           cacheApi,
           playRedis
         )

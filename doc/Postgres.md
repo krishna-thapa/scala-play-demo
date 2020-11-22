@@ -64,4 +64,3 @@ COPY quotations(quote,author,genre) FROM '/var/lib/postgresql/data/pgdata/Quotes
 
 ### Know errors:
 - Might need to change the local path in mac OS for storing the csv file to `-./pgdata/:/var/lib/postgresql/data/pgdata` see the comments on this s[tackoverflow for details](https://stackoverflow.com/questions/46849539/how-can-i-set-path-to-load-data-from-csv-file-into-postgresql-database-in-docker)
-- Docker-Compose postgres upgrade initdb: error: directory “/var/lib/postgresql/data” exists but is not empty: Have to add `PGDATA` to the environment section of the compose file. [For details](https://github.com/docker-library/postgres/issues/263)

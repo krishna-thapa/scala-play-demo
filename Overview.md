@@ -190,6 +190,14 @@ inspirational-quote-api
 -[ ] Redis get connection lost after some time if the app is not active
     - Make Redis cache as persistence so that it won't lost the data once it get hard restart
     - https://github.com/docker-library/redis/issues/111
+    
+-[ ] Scheduling asynchronous tasks
+    - Quote of the day has to be called every night to get the new random quote and store in Redis cache for 5 days
+    - Might have to use Akka actors
+    - Use Scala play [Scheduling asynchronous tasks](https://www.playframework.com/documentation/2.8.x/ScheduledTasks)
+    - https://stackoverflow.com/questions/32178713/how-to-write-cron-job-in-play-framework-2-3
+    - https://discuss.lightbend.com/t/how-to-create-a-cron-job-in-play-framework/4812
+    - http://www.icharm.me/use-akka-quartz-scheduler-for-cron-schedule-in-play-framework-2-7.html
 
 ### Consolidation 
 -[x] Should allow logged in user to see only their own details in `/auth/user/{email}` and admin to look into anyone else details
