@@ -199,6 +199,13 @@ inspirational-quote-api
     - https://discuss.lightbend.com/t/how-to-create-a-cron-job-in-play-framework/4812
     - http://www.icharm.me/use-akka-quartz-scheduler-for-cron-schedule-in-play-framework-2-7.html
 
+-[ ] Add Akka stream in elastic search service for adding batch while importing data from Postgres to Es
+    - https://github.com/sksamuel/elastic4s/blob/master/docs/streams.md
+    - https://www.reonomy.com/blog/post/reactive-streams-end-to-end-with-slick-akka-streams-and-elastic4s
+    - https://qiita.com/kamijin_fanta/items/8d8eacfe23138eea0a26
+    - https://github.com/sksamuel/elastic4s/blob/master/elastic4s-streams-akka/src/main/scala/com/sksamuel/elastic4s/akka/streams/ElasticSink.scala
+    - https://stackoverflow.com/questions/45623990/elastic4s-akka-stream-sink-with-httpclient
+
 ### Consolidation 
 -[x] Should allow logged in user to see only their own details in `/auth/user/{email}` and admin to look into anyone else details
 -[ ] Only the ids that are present in the quotations tables should be allowed to store in the fav_quotations tables, right now any csvid can be stored in the table

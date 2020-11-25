@@ -64,10 +64,3 @@ curl -X DELETE http://localhost:9200/sink2
 
 ## TODO:
 - Write some test cases: https://github.com/sksamuel/elastic4s#example-application
-
-
-- https://github.com/sksamuel/elastic4s/blob/master/docs/streams.md
-- https://www.reonomy.com/blog/post/reactive-streams-end-to-end-with-slick-akka-streams-and-elastic4s
-- https://qiita.com/kamijin_fanta/items/8d8eacfe23138eea0a26
-- https://github.com/sksamuel/elastic4s/blob/master/elastic4s-streams-akka/src/main/scala/com/sksamuel/elastic4s/akka/streams/ElasticSink.scala
-- https://stackoverflow.com/questions/45623990/elastic4s-akka-stream-sink-with-httpclient

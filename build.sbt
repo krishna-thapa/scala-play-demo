@@ -35,7 +35,8 @@ lazy val quotes = project
         slickDatabaseDependencies ++
         Seq(
           cacheApi,
-          playRedis
+          playRedis,
+          "com.enragedginger" %% "akka-quartz-scheduler" % "1.8.5-akka-2.6.x"
         )
   )
 

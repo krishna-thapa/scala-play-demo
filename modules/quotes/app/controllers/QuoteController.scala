@@ -1,7 +1,7 @@
 // Should be added controllers for the play routes
 package controllers.quotes
 
-import cache.CacheController
+import cache.{ CacheController, CacheService }
 import com.krishna.model.Genre.Genre
 import com.krishna.model.{ AllQuotesOfDay, QuotesQuery }
 import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidCsvId }
@@ -29,6 +29,7 @@ import scala.util.matching.Regex
 class QuoteController @Inject()(
     cache: CacheApi,
     cacheController: CacheController,
+    cacheService: CacheService,
     scc: SecuredControllerComponents,
     quotesDAO: QuoteQueryDAO,
     favQuotesDAO: FavQuoteQueryDAO
@@ -66,14 +67,8 @@ class QuoteController @Inject()(
     log.info("Content Date from the API call: " + contentDate)
 
     // Get the quote from the content date key from global cache storage in Redis
-    cache.get[String](contentDate) match {
-      case Some(quote: String) =>
-        log.info("Content date found in the cache storage")
-        Ok(Json.parse(quote))
-      case None =>
-        log.warn("Content date is not found in the cache storage")
-        responseEitherResult(cacheController.cacheQuoteOfTheDay(contentDate))
-    }
+    responseEitherResult(cacheService.cacheQuoteOfTheDay(contentDate))
+
   }
 
   /**
