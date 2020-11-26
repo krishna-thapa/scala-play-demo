@@ -9,7 +9,7 @@ import com.krishna.util.Logging
 import javax.inject.Inject
 
 object QuoteOfTheDayActor {
-  def props: Props = Props[QuoteOfTheDayActor]
+  def props: Props = Props[QuoteOfTheDayActor]()
 
   case class GetQuoteOfTheDay(date: Date)
 }

@@ -12,7 +12,7 @@ import play.api.libs.json.Json
 
 import scala.concurrent.duration.DurationInt
 
-class CacheController @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
+class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     extends Logging
     with ResponseError {
 

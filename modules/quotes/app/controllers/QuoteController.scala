@@ -1,10 +1,9 @@
 // Should be added controllers for the play routes
 package controllers.quotes
 
-import cache.{ CacheController, CacheService }
+import cache.CacheService
 import com.krishna.model.Genre.Genre
-import com.krishna.model.{ AllQuotesOfDay, QuotesQuery }
-import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidCsvId }
+import com.krishna.response.ResponseMsg.InvalidCsvId
 import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
@@ -12,9 +11,7 @@ import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
 import model.UserDetail
-import play.api.cache.redis.{ CacheApi, SynchronousResult }
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.Json
 import play.api.mvc._
 import util.DecodeHeader
 
@@ -27,8 +24,6 @@ import scala.util.matching.Regex
   */
 @Singleton
 class QuoteController @Inject()(
-    cache: CacheApi,
-    cacheController: CacheController,
     cacheService: CacheService,
     scc: SecuredControllerComponents,
     quotesDAO: QuoteQueryDAO,
@@ -49,11 +44,12 @@ class QuoteController @Inject()(
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseEitherResult(cacheController.cacheRandomQuote())
+    responseEitherResult(cacheService.getCacheRandomQuote)
   }
 
   /**
-    * A REST endpoint that gets a quote of the day as JSON from quotes table
+    *  A REST endpoint that gets a quote of the day as JSON from quotes table
+    *  Is triggered after midnight on every day using cron job
     *  @param date: Can take milliseconds date format as a path parameter to gets the
     *  previous 5 days quote of the day
     *  It stores the past 5 quote of the day in the Redis cache storage
@@ -66,7 +62,6 @@ class QuoteController @Inject()(
       date.fold[String](getCurrentDate)((strDate: String) => convertToDate(strDate))
     log.info("Content Date from the API call: " + contentDate)
 
-    // Get the quote from the content date key from global cache storage in Redis
     responseEitherResult(cacheService.cacheQuoteOfTheDay(contentDate))
 
   }
@@ -78,20 +73,7 @@ class QuoteController @Inject()(
     */
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getLastFiveQuotes")
-
-    // Get all the cached keys(max 5) and will be in date format
-    val allCachedKeys: SynchronousResult[Seq[String]] = cache.matching("20*")
-    if (allCachedKeys.nonEmpty) {
-      val result: Seq[AllQuotesOfDay] = for {
-        key <- allCachedKeys
-        quote <- cache
-          .get[String](key) // Get the stored value for that key from Redis cached storage
-      } yield AllQuotesOfDay(key, quote)
-
-      responseSeqResult(result)
-    } else {
-      notFound(EmptyDbMsg.msg)
-    }
+    responseSeqResult(cacheService.getAllCachedQuotes)
   }
 
   /**

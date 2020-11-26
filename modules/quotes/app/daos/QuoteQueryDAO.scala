@@ -12,7 +12,7 @@ import slick.jdbc.PostgresProfile.api._
 import tables.QuoteQueriesTable
 
 /**
-  * A repository for Quotes stored in quotations table.
+  * A repository for Quotes stored in quotes table.
   */
 class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     extends CommonMethods[QuotesQuery]
