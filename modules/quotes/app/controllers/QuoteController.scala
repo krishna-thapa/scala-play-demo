@@ -53,7 +53,7 @@ class QuoteController @Inject()(
     *  @param date: Can take milliseconds date format as a path parameter to gets the
     *  previous 5 days quote of the day
     *  It stores the past 5 quote of the day in the Redis cache storage
-    *  Anyone can do perform this action
+    *  Anyone can perform this action
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
@@ -63,7 +63,6 @@ class QuoteController @Inject()(
     log.info("Content Date from the API call: " + contentDate)
 
     responseEitherResult(cacheService.cacheQuoteOfTheDay(contentDate))
-
   }
 
   /**

@@ -20,7 +20,7 @@ class CacheService @Inject()(
         log.info("Content date found in the cache storage")
         Right(Json.parse(quote).as[QuotesQuery])
       case None =>
-        log.warn("Content date is not found in the cache storage")
+        log.info("Content date is not found in the cache storage")
         cacheDao.cacheQuoteOfTheDay(contentDate)
     }
   }
@@ -30,7 +30,6 @@ class CacheService @Inject()(
   }
 
   def getAllCachedQuotes: Seq[AllQuotesOfDay] = {
-
     // Get all the cached keys(max 5) and will be in date format
     val allCachedKeys: SynchronousResult[Seq[String]] = cache.matching("20*")
     for {

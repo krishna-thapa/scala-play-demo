@@ -29,6 +29,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   // TODO: make the max list size to 500
   protected lazy val maxListSize: Int = 5
 
+  // Gets a single random quote from the `quotes` table
   private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
 
   /**
@@ -59,6 +60,14 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     }
   }
 
+  /**
+    * Recursive method that checks if the quote is present in cache list
+    * If it is then retrieve the new quote and call the same method, if not then
+    * it updates the redis cache list and return the quote
+    * @param quote random quote to check with cache list
+    * @param cachedQuotes redis cache list that has all the past called quote csv ids
+    * @return random quote that has not been called before
+    */
   def getUniqueQuoteFromDB(
       quote: QuotesQuery,
       cachedQuotes: RedisList[String, SynchronousResult]

@@ -29,6 +29,6 @@ class ApplicationStart @Inject()(
   val receiver: ActorRef =
     system.actorOf(Props.create(classOf[GuiceActorProducer], injector, classOf[QuoteOfTheDayActor]))
 
-  scheduler.schedule("every5seconds", receiver, QuoteOfTheDayActor.GetQuoteOfTheDay(now), None)
+  //scheduler.schedule("every5seconds", receiver, QuoteOfTheDayActor.GetQuoteOfTheDay(now), None)
 
 }

@@ -14,6 +14,7 @@ import scheduler.ApplicationStart
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
-    //bind(classOf[ApplicationStart]).asEagerSingleton()
+    bind(classOf[ApplicationStart]).asEagerSingleton()
+    //bind[Config].toInstance(ConfigFactory.load())
   }
 }

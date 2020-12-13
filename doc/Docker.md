@@ -72,7 +72,7 @@ To see the ES match API, [refer here](https://www.elastic.co/guide/en/elasticsea
 [How To Configure Redis + Redis Commander + Docker](https://hackernoon.com/how-to-configurate-redis-redis-commander-docker-616136f2)
 
 - create volume `redis-data`: This is where all redis data will be stored, even if container is restarted, data will be there.
-- command: ["redis-server", "--appendonly", "yes"] - I start redis in persistent storage mode
+- command: ["redis-server", "--appendonly", "yes"] - Start redis in persistent storage mode
 - REDIS_HOSTS=local:redis:6379 - tells redis commander how to connect to redis
 
 ### Connect to Redis cli running in docker
