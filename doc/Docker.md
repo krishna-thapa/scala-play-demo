@@ -44,7 +44,7 @@ docker-compose down -v
 - Connect to the right database
 `\c inspiration_db`
 - See all the tables 
-`\c dt`
+`\dt`
 
 
 ## Install ElasticSearch Server in Docker

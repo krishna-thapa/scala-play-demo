@@ -2,7 +2,7 @@ package daos
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
-import com.krishna.services.CommonMethods
+import com.krishna.services.RepositoryMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,20 +11,24 @@ import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import tables.QuoteQueriesTable
 
+import javax.inject.Inject
+
 /**
   * A repository for Quotes stored in quotes table.
   */
-class QuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
-    extends CommonMethods[QuotesQuery]
+class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+    extends RepositoryMethods[QuotesQuery, QuoteQueriesTable]
     with DbRunner {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
+  override def tables: TableQuery[QuoteQueriesTable] = QuoteQueriesTable.quoteQueries
+
   /**
-    * @return List of all stored quotes
+    * @return List of all stored quotes from database
     */
-  def listAllQuotes(): Seq[QuotesQuery] =
-    runDbAction(QuoteQueriesTable.quoteQueries.sortBy(_.id).result)
+  def listAllQuotes: Seq[QuotesQuery] =
+    runDbAction(getAllQuotes)
 
   /**
     * @param records number of records to return
@@ -32,7 +36,7 @@ class QuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
     */
   def listRandomQuote(records: Int): Seq[QuotesQuery] =
     runDbAction(
-      QuoteQueriesTable.quoteQueries
+      tables
         .sortBy(_ => randomFunction)
         .take(records)
         .result
@@ -42,9 +46,9 @@ class QuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
     * @param genre to filter records with that genre
     * @return Random quote that matches input genre
     */
-  def getGenreQuote(genre: Genre): Option[QuotesQuery] = {
+  def listGenreQuote(genre: Genre): Option[QuotesQuery] = {
     runDbAction(
-      QuoteQueriesTable.quoteQueries
+      tables
         .filter(_.genre === genre)
         .sortBy(_ => randomFunction)
         .result

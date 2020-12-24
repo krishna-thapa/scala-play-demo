@@ -5,7 +5,7 @@ import com.krishna.model.FavQuoteQuery
 import com.krishna.services.FavQuoteServices
 import com.krishna.util.{ DbRunner, Logging }
 
-import javax.inject.Singleton
+import javax.inject.{ Inject, Singleton }
 import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
 import slick.dbio.Effect
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
+class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     extends FavQuoteServices
     with DbRunner
     with Logging {

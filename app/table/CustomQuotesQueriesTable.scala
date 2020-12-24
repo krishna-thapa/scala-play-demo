@@ -1,24 +1,24 @@
 package table
 
 import java.sql.Date
-
 import models.CustomQuotesQuery
 import com.krishna.model.Genre.Genre
+import com.krishna.table.TableId
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 import com.krishna.util.Implicits.genreEnumMapper
 
 class CustomQuotesQueriesTable(tag: Tag)
-    extends Table[CustomQuotesQuery](tag, "custom_quotations") {
+    extends Table[CustomQuotesQuery](tag, "custom_quotations")
+    with TableId[CustomQuotesQuery] {
 
-  def id: Rep[Int]              = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def quote: Rep[String]        = column[String]("quote")
   def author: Rep[String]       = column[String]("author")
   def genre: Rep[Option[Genre]] = column[Option[Genre]]("genre")
   def storedDate: Rep[Date]     = column[Date]("stored_date")
   def ownQuote: Rep[Boolean]    = column[Boolean]("own_quote")
   def * : ProvenShape[CustomQuotesQuery] =
-    (id, quote, author, genre, storedDate, ownQuote) <>
+    (id, csvId, quote, author, genre, storedDate, ownQuote) <>
       ((CustomQuotesQuery.apply _).tupled, CustomQuotesQuery.unapply)
 }
 

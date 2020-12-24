@@ -83,7 +83,7 @@ class QuoteController @Inject()(
     */
   def getAllQuotes: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllQuotes")
-    responseSeqResult(quotesDAO.listAllQuotes())
+    responseSeqResult(quotesDAO.listAllQuotes)
   }
 
   /**
@@ -127,6 +127,6 @@ class QuoteController @Inject()(
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
-    responseOptionResult(quotesDAO.getGenreQuote(genre))
+    responseOptionResult(quotesDAO.listGenreQuote(genre))
   }
 }

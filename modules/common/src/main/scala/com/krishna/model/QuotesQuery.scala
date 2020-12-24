@@ -4,7 +4,7 @@ import com.krishna.model.Genre.Genre
 import com.krishna.model.base.{ QuoteResource, QuotesTable }
 import play.api.libs.json._
 
-final case class QuotesQuery(
+case class QuotesQuery(
     id: Int,
     csvId: String,
     quote: String,

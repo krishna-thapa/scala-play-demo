@@ -1,6 +1,6 @@
 package daos
 
-import com.krishna.services.CommonMethods
+import com.krishna.services.RepositoryMethods
 import com.krishna.util.{ DbRunner, Logging }
 import forms.CustomQuoteForm
 
@@ -26,31 +26,29 @@ import scala.util.Try
 
 @Singleton
 class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends CommonMethods[CustomQuotesQuery]
+    extends RepositoryMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
     with DbRunner
     with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
-  val customQuotes: TableQuery[CustomQuotesQueriesTable] =
+  override def tables: TableQuery[CustomQuotesQueriesTable] =
     CustomQuotesQueriesTable.customQuoteQueries
-
-  //type T = CustomQuotesQuery
 
   /**
     * List all the records from the table
     * @return sequence of the CustomQuotesQuery records
     */
-  override def listAllQuotes(): Seq[CustomQuotesQuery] =
-    runDbAction(customQuotes.sortBy(_.id).result)
+  def listAllQuotes: Seq[CustomQuotesQuery] =
+    runDbAction(getAllQuotes)
 
   /**
     * List the JSON format of the selected record from the table
     * @param id quote id
     * @return Option of the CustomQuotesQuery record
     */
-  override def listSelectedQuote(id: Int): Option[CustomQuotesQuery] = {
-    runDbAction(customQuotes.filter(_.id === id).result.headOption)
+  def listSelectedQuote(id: Int): Option[CustomQuotesQuery] = {
+    runDbAction(getSelectedQuote(id))
   }
 
   /**
@@ -58,9 +56,9 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * aware that "random" function is database specific
     * @return Option of CustomQuotesQuery
     */
-  override def listRandomQuote(records: Int): Seq[CustomQuotesQuery] = {
+  def listRandomQuote(records: Int): Seq[CustomQuotesQuery] = {
     runDbAction(
-      customQuotes
+      tables
         .sortBy(_ => randomFunction)
         .take(records)
         .result
@@ -74,15 +72,16 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   def createQuote(customQuoteForm: CustomQuoteForm): CustomQuotesQuery = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
-    val insertQuery = customQuotes returning
-      customQuotes.map(_.id) into (
+    val insertQuery = tables returning
+      tables.map(_.id) into (
         (
             fields,
             id
-        ) => fields.copy(id = id)
+        ) => fields.copy(id = id, csvId = s"CCSV$id")
     )
     val action = insertQuery += CustomQuotesQuery(
       0,
+      "",
       customQuoteForm.quote,
       customQuoteForm.author,
       customQuoteForm.genre,
@@ -99,7 +98,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   def updateQuote(id: Int, customQuoteForm: CustomQuoteForm): Try[Int] = {
     runDbActionCatchError(
-      customQuotes
+      tables
         .filter(_.id === id)
         .map(quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
         .update(
@@ -116,7 +115,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param id of the selected row from the CustomQuotesQuery table
     */
   def deleteQuote(id: Int): Int = {
-    runDbAction(customQuotes.filter(_.id === id).delete)
+    runDbAction(deleteCustomQuote(id))
   }
 
 }
