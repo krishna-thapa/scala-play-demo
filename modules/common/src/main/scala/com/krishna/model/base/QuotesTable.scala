@@ -1,4 +1,4 @@
-package com.krishna.model
+package com.krishna.model.base
 
 import com.krishna.model.Genre.Genre
 
