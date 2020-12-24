@@ -1,9 +1,8 @@
 package models
 
 import java.sql.Date
-
-import com.krishna.model.QuotesTable
 import com.krishna.model.Genre.Genre
+import com.krishna.model.base.QuotesTable
 import play.api.libs.json._
 
 // https://nrinaudo.github.io/scala-best-practices/tricky_behaviours/final_case_classes.html

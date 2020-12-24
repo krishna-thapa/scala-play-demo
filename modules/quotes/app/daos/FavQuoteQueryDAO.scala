@@ -1,8 +1,11 @@
 package daos
 
-import com.krishna.model.{ FavQuoteQuery, QuotesQuery }
+import com.krishna.model.base.QuoteResource
+import com.krishna.model.FavQuoteQuery
+import com.krishna.services.FavQuoteServices
 import com.krishna.util.{ DbRunner, Logging }
-import javax.inject.{ Inject, Singleton }
+
+import javax.inject.Singleton
 import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
 import slick.dbio.Effect
@@ -15,25 +18,29 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends CommonMethods[QuotesQuery]
+class FavQuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
+    extends FavQuoteServices
     with DbRunner
     with Logging {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
+  /*
+    NOTE: Use of Upper bounds using super trait of QuoteResource: Just to use the scala generic bounds
+    In this case, each abstract methods have their own Type so not really need of upper bounds
+   */
   /**
     * @param userId primary id from user_details_table
     * @return Quotes that are marked as favorite for the specific user id
     */
-  def listAllQuotes(userId: Int): Seq[QuotesQuery] = {
+  def listFavQuotes[T <: QuoteResource](userId: Int): Seq[T] = {
     val query = QuoteQueriesTable.quoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter { favQuote =>
         favQuote.userId === userId && favQuote.favTag
       })
       .on(_.csvId === _.csvId)
 
-    runDbAction(query.result).map(_._1)
+    runDbAction(query.result).map(_._1.asInstanceOf[T])
   }
 
   // list all records from the fav_quotes table
@@ -44,7 +51,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table
     */
-  def modifyFavQuote(userId: Int, csvId: String): Try[FavQuoteQuery] = {
+  def modifyFavQuote[T <: QuoteResource](userId: Int, csvId: String): Try[T] = {
     // check if the record exists with that csv id in the fav_quotes table for that user id
     val favRecord: FixedSqlStreamingAction[Seq[FavQuoteQuery], FavQuoteQuery, Effect.Read] =
       FavQuoteQueriesTable.favQuoteQueries.filter { quote =>
@@ -63,7 +70,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
             log.info("Inserting new record in the fav quotes table")
             createFavQuote(userId, csvId)
         }
-    runDbActionCatchError(action)
+    runDbActionCatchError(action).map(_.asInstanceOf[T])
   }
 
   /**
@@ -71,7 +78,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param tag boolean tag to specify favorite quote
     * @return record with altered fav tag
     */
-  def alterFavTag(id: Int, tag: Boolean): Int = {
+  private def alterFavTag(id: Int, tag: Boolean): Int = {
     log.info(s"Changing the fav tag status of: $id to ${!tag}")
     runDbAction(
       FavQuoteQueriesTable.favQuoteQueries
@@ -86,7 +93,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param csvId id from csv custom table
     * @return create a new record in the fav_quotes table with fav tag as true
     */
-  def createFavQuote(
+  private def createFavQuote(
       userId: Int,
       csvId: String
   ): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {

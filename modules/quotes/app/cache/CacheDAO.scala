@@ -1,11 +1,13 @@
 package cache
 
+import com.krishna.conf.AppConfig
 import com.krishna.model.QuotesQuery
 import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidDate }
 import com.krishna.response.{ ResponseError, ResponseMsg }
 import com.krishna.util.DateConversion.getCurrentDate
 import com.krishna.util.Logging
 import daos.QuoteQueryDAO
+
 import javax.inject._
 import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
 import play.api.libs.json.Json
@@ -14,7 +16,8 @@ import scala.concurrent.duration.DurationInt
 
 class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     extends Logging
-    with ResponseError {
+    with ResponseError
+    with AppConfig {
 
   /*
     A cache API that uses synchronous calls rather than async calls.
@@ -27,7 +30,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     cache.list[String]("cache-quoteOfTheDay")
 
   // TODO: make the max list size to 500
-  protected lazy val maxListSize: Int = 5
+  protected lazy val maxListSize: Int = config.getInt("play.cache.storeQuotesSize")
 
   // Gets a single random quote from the `quotes` table
   private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
@@ -61,6 +64,17 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   }
 
   /**
+    * Cache storage for the random quote API
+    * First 500 response should be unique quote
+    * @return the quote in the JSON format
+    */
+  def cacheRandomQuote(): Either[ResponseMsg, QuotesQuery] = {
+    randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+      getUniqueQuoteFromDB(quote, randomQuoteCacheList)
+    })
+  }
+
+  /**
     * Recursive method that checks if the quote is present in cache list
     * If it is then retrieve the new quote and call the same method, if not then
     * it updates the redis cache list and return the quote
@@ -74,6 +88,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   ): Either[ResponseMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method
+    // Use of List instead of Set since redis-play has no many wrapper methods for Set
     if (cachedQuotes.toList.toList.contains(quote.csvId)) {
       log.warn("Duplicate record has been called with id: " + quote.csvId)
       randomQuote
@@ -87,18 +102,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   }
 
   /**
-    * Cache storage for the random quote API
-    * First 500 response should be unique quote
-    * @return the quote in the JSON format
-    */
-  def cacheRandomQuote(): Either[ResponseMsg, QuotesQuery] = {
-    randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
-      getUniqueQuoteFromDB(quote, randomQuoteCacheList)
-    })
-  }
-
-  /**
-    * Unit return method that stores the ids in redis list
+    * Unit method that stores the ids in redis list
     * if the list exceeds max length, it deletes the first one and appends to last element
     * @param csvId Unique id of the record
     */
@@ -106,7 +110,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
       csvId: String,
       cachedQuotes: RedisList[String, SynchronousResult]
   ): Unit = {
-    if (cachedQuotes.size >= maxListSize) cachedQuotes.removeAt(0)
+    if (cachedQuotes.size >= maxListSize) cachedQuotes.headPop
     cachedQuotes.append(csvId)
     log.info("Ids in the Redis storage: " + cachedQuotes.toList)
   }

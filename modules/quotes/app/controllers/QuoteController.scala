@@ -7,12 +7,14 @@ import com.krishna.response.ResponseMsg.InvalidCsvId
 import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
-import daos.{ FavQuoteQueryDAO, QuoteQueryDAO }
+import daos.QuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
+
 import javax.inject._
 import model.UserDetail
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.mvc._
+import service.FavQuoteQueryService
 import util.DecodeHeader
 
 import scala.concurrent.ExecutionContext
@@ -27,7 +29,7 @@ class QuoteController @Inject()(
     cacheService: CacheService,
     scc: SecuredControllerComponents,
     quotesDAO: QuoteQueryDAO,
-    favQuotesDAO: FavQuoteQueryDAO
+    favQuoteService: FavQuoteQueryService
 )(implicit executionContext: ExecutionContext)
     extends SecuredController(scc)
     with ResponseResult
@@ -39,7 +41,7 @@ class QuoteController @Inject()(
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
     * Should be unique to last 500 retrieved records from this end point
-    * Used Redis cache database to store last 500 csv id to get unique record
+    * Uses Redis cache database to store last 500 csv id to get unique record
     * Anyone can do perform this action
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
@@ -102,7 +104,7 @@ class QuoteController @Inject()(
     log.info(s"Executing favQuote by user: ${user.email}")
 
     if (csvIdPattern.matches(csvId)) {
-      responseTryResult(favQuotesDAO.modifyFavQuote(user.id, csvId))
+      responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
     } else {
       badRequest(InvalidCsvId(csvId).msg)
     }
@@ -115,7 +117,7 @@ class QuoteController @Inject()(
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
     val user: UserDetail = DecodeHeader(request.headers)
     log.info(s"Executing getFavQuotes by user: ${user.email}")
-    responseSeqResult(favQuotesDAO.listAllQuotes(user.id))
+    responseSeqResult(favQuoteService.listAllQuotes(user.id))
   }
 
   /**

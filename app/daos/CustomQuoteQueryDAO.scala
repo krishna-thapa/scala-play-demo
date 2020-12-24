@@ -1,7 +1,9 @@
 package daos
 
+import com.krishna.services.CommonMethods
 import com.krishna.util.{ DbRunner, Logging }
 import forms.CustomQuoteForm
+
 import javax.inject.{ Inject, Singleton }
 import models.CustomQuotesQuery
 import play.api.db.slick.DatabaseConfigProvider

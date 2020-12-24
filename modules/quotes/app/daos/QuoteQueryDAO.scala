@@ -2,9 +2,9 @@ package daos
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
+import com.krishna.services.CommonMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
-import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
@@ -14,7 +14,7 @@ import tables.QuoteQueriesTable
 /**
   * A repository for Quotes stored in quotes table.
   */
-class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class QuoteQueryDAO(dbConfigProvider: DatabaseConfigProvider)
     extends CommonMethods[QuotesQuery]
     with DbRunner {
 
@@ -23,14 +23,14 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   /**
     * @return List of all stored quotes
     */
-  override def listAllQuotes(): Seq[QuotesQuery] =
-    runDbAction(QuoteQueriesTable.quoteQueries.result)
+  def listAllQuotes(): Seq[QuotesQuery] =
+    runDbAction(QuoteQueriesTable.quoteQueries.sortBy(_.id).result)
 
   /**
     * @param records number of records to return
     * @return Random quote from the database table
     */
-  override def listRandomQuote(records: Int): Seq[QuotesQuery] =
+  def listRandomQuote(records: Int): Seq[QuotesQuery] =
     runDbAction(
       QuoteQueriesTable.quoteQueries
         .sortBy(_ => randomFunction)
