@@ -1,22 +1,18 @@
-package cache
+package daos
 
 import com.krishna.conf.AppConfig
 import com.krishna.model.QuotesQuery
 import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidDate }
 import com.krishna.response.{ ResponseError, ResponseMsg }
 import com.krishna.util.DateConversion.getCurrentDate
-import com.krishna.util.Logging
-import daos.QuoteQueryDAO
-
-import javax.inject._
 import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
 import play.api.libs.json.Json
 
+import javax.inject._
 import scala.concurrent.duration.DurationInt
 
 class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
-    extends Logging
-    with ResponseError
+    extends ResponseError
     with AppConfig {
 
   /*
@@ -88,7 +84,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   ): Either[ResponseMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method
-    // Use of List instead of Set since redis-play has no many wrapper methods for Set
+    // Use of List instead of Set since redis-play has no many wrapper methods for Set and no sorted Set
     if (cachedQuotes.toList.toList.contains(quote.csvId)) {
       log.warn("Duplicate record has been called with id: " + quote.csvId)
       randomQuote

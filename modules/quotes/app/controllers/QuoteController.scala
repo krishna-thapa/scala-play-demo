@@ -1,7 +1,6 @@
 // Should be added controllers for the play routes
 package controllers.quotes
 
-import cache.CacheService
 import com.krishna.model.Genre.Genre
 import com.krishna.response.ResponseMsg.InvalidCsvId
 import com.krishna.response.ResponseResult
@@ -14,7 +13,7 @@ import javax.inject._
 import model.UserDetail
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.mvc._
-import service.FavQuoteQueryService
+import service.{ CacheService, FavQuoteQueryService }
 import util.DecodeHeader
 
 import scala.concurrent.ExecutionContext
@@ -43,6 +42,8 @@ class QuoteController @Inject()(
     * Should be unique to last 500 retrieved records from this end point
     * Uses Redis cache database to store last 500 csv id to get unique record
     * Anyone can do perform this action
+    *
+    * By default Play Framework is asynchronous from the bottom up
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")

@@ -2,10 +2,9 @@ package com.krishna.util
 
 import slick.basic.DatabaseConfig
 import slick.dbio.Effect.All
-import slick.dbio.{ DBIOAction, NoStream }
 import slick.jdbc.JdbcProfile
+import slick.dbio.{ DBIOAction, NoStream }
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ Rep, SimpleFunction }
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ Await, Future }
@@ -14,8 +13,6 @@ import scala.util.{ Failure, Success, Try }
 trait DbRunner extends Logging {
 
   val dbConfig: DatabaseConfig[JdbcProfile]
-
-  def randomFunction: Rep[Double] = SimpleFunction.nullary[Double]("random")
 
   // return result from future
   implicit class FutureResult[T](future: Future[T]) {

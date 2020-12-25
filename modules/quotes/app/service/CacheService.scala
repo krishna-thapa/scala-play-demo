@@ -1,11 +1,13 @@
-package cache
+package service
 
 import com.krishna.model.{ AllQuotesOfDay, QuotesQuery }
 import com.krishna.response.ResponseMsg
 import com.krishna.util.Logging
-import javax.inject.Inject
+import daos.CacheDAO
 import play.api.cache.redis.{ CacheApi, SynchronousResult }
 import play.api.libs.json.Json
+
+import javax.inject.Inject
 
 class CacheService @Inject()(
     cache: CacheApi,

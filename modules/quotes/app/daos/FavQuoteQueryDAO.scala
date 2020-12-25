@@ -1,9 +1,9 @@
 package daos
 
-import com.krishna.model.base.IdResource
+import com.krishna.model.base.WithCSCVIdResource
 import com.krishna.model.FavQuoteQuery
 import com.krishna.services.FavQuoteServices
-import com.krishna.util.{ DbRunner, Logging }
+import com.krishna.util.DbRunner
 
 import javax.inject.{ Inject, Singleton }
 import play.api.db.slick.DatabaseConfigProvider
@@ -20,8 +20,7 @@ import scala.util.Try
 @Singleton
 class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     extends FavQuoteServices
-    with DbRunner
-    with Logging {
+    with DbRunner {
 
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
@@ -33,7 +32,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param userId primary id from user_details_table
     * @return Quotes that are marked as favorite for the specific user id
     */
-  def listFavQuotes[T <: IdResource](userId: Int): Seq[T] = {
+  def listFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
     val query = QuoteQueriesTable.quoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter { favQuote =>
         favQuote.userId === userId && favQuote.favTag
@@ -51,7 +50,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table
     */
-  def modifyFavQuote[T <: IdResource](userId: Int, csvId: String): Try[T] = {
+  def modifyFavQuote[T <: WithCSCVIdResource](userId: Int, csvId: String): Try[T] = {
     // check if the record exists with that csv id in the fav_quotes table for that user id
     val favRecord: FixedSqlStreamingAction[Seq[FavQuoteQuery], FavQuoteQuery, Effect.Read] =
       FavQuoteQueriesTable.favQuoteQueries.filter { quote =>

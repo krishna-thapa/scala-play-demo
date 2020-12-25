@@ -1,6 +1,6 @@
 package com.krishna.response
 
-import com.krishna.model.base.IdResource
+import com.krishna.model.base.{ IdResource, WithCSCVIdResource }
 import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidDate }
 import com.sksamuel.elastic4s.Response
 import play.api.libs.json.{ Json, OFormat }
@@ -43,7 +43,7 @@ trait ResponseResult extends ResponseError {
     }
   }
 
-  def responseEitherResult[T <: IdResource](
+  def responseEitherResult[T <: WithCSCVIdResource](
       record: Either[ResponseMsg, T]
   )(implicit conv: OFormat[T]): Result = {
     record match {

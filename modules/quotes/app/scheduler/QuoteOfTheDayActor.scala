@@ -1,11 +1,11 @@
 package scheduler
 
 import java.util.Date
-
 import akka.actor.{ Actor, Props }
-import cache.CacheService
 import com.krishna.util.DateConversion.{ dateFormatter, now }
 import com.krishna.util.Logging
+import service.CacheService
+
 import javax.inject.Inject
 
 object QuoteOfTheDayActor {

@@ -34,13 +34,9 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param records number of records to return
     * @return Random quote from the database table
     */
-  def listRandomQuote(records: Int): Seq[QuotesQuery] =
-    runDbAction(
-      tables
-        .sortBy(_ => randomFunction)
-        .take(records)
-        .result
-    )
+  def listRandomQuote(records: Int): Seq[QuotesQuery] = {
+    runDbAction(getRandomRecords(records))
+  }
 
   /**
     * @param genre to filter records with that genre

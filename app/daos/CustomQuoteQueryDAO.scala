@@ -57,12 +57,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return Option of CustomQuotesQuery
     */
   def listRandomQuote(records: Int): Seq[CustomQuotesQuery] = {
-    runDbAction(
-      tables
-        .sortBy(_ => randomFunction)
-        .take(records)
-        .result
-    )
+    runDbAction(getRandomRecords(records))
   }
 
   /**
