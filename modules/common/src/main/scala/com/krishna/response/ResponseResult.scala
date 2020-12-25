@@ -1,5 +1,6 @@
 package com.krishna.response
 
+import com.krishna.model.base.IdResource
 import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidDate }
 import com.sksamuel.elastic4s.Response
 import play.api.libs.json.{ Json, OFormat }
@@ -14,7 +15,7 @@ trait ResponseResult extends ResponseError {
     Ok(Json.toJson(result))
   }
 
-  def responseSeqResult[T](records: Seq[T])(implicit conv: OFormat[T]): Result = {
+  def responseSeqResult[T <: IdResource](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
     else notFound(EmptyDbMsg.msg)
   }
@@ -25,7 +26,9 @@ trait ResponseResult extends ResponseError {
     else notFound(EmptyDbMsg.msg)
   }
 
-  def responseOptionResult[T](record: Option[T])(implicit conv: OFormat[T]): Result = {
+  def responseOptionResult[T <: IdResource](
+      record: Option[T]
+  )(implicit conv: OFormat[T]): Result = {
     record match {
       case Some(quote) => Ok(Json.toJson(quote))
       case None =>
@@ -33,14 +36,16 @@ trait ResponseResult extends ResponseError {
     }
   }
 
-  def responseTryResult[T](record: Try[T])(implicit conv: OFormat[T]): Result = {
+  def responseTryResult[T <: IdResource](record: Try[T])(implicit conv: OFormat[T]): Result = {
     record match {
       case Success(quote)     => Ok(Json.toJson(quote))
       case Failure(exception) => internalServerError(exception.getMessage)
     }
   }
 
-  def responseEitherResult[T](record: Either[ResponseMsg, T])(implicit conv: OFormat[T]): Result = {
+  def responseEitherResult[T <: IdResource](
+      record: Either[ResponseMsg, T]
+  )(implicit conv: OFormat[T]): Result = {
     record match {
       case Left(errorMsg) =>
         errorMsg match {

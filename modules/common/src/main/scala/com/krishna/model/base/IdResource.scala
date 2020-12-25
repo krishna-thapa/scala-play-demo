@@ -1,6 +1,5 @@
 package com.krishna.model.base
 
-trait QuoteResource {
+trait IdResource {
   def id: Int
-  def csvId: String
 }

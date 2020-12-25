@@ -33,8 +33,8 @@ class CacheService @Inject()(
     // Get all the cached keys(max 5) and will be in date format
     val allCachedKeys: SynchronousResult[Seq[String]] = cache.matching("20*")
     for {
-      key   <- allCachedKeys
-      quote <- cache.get[String](key) // Get the stored value for that key from Redis cached storage
-    } yield AllQuotesOfDay(key, quote)
+      (key, index) <- allCachedKeys.zipWithIndex
+      quote        <- cache.get[String](key) // Get the stored value for that key from Redis cached storage
+    } yield AllQuotesOfDay(key, quote, index)
   }
 }

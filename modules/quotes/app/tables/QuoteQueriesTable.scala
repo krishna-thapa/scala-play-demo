@@ -2,14 +2,14 @@ package tables
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.{ FavQuoteQuery, QuotesQuery }
-import com.krishna.table.TableId
+import com.krishna.table.TableWithCSVId
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, Tag }
 import com.krishna.util.Implicits._
 
 class QuoteQueriesTable(tag: Tag)
     extends Table[QuotesQuery](tag, "quotes")
-    with TableId[QuotesQuery] {
+    with TableWithCSVId[QuotesQuery] {
 
   def quote: Rep[String]        = column[String]("quote")
   def author: Rep[String]       = column[String]("author")

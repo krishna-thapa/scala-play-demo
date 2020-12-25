@@ -77,11 +77,10 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
         (
             fields,
             id
-        ) => fields.copy(id = id, csvId = s"CCSV$id")
+        ) => fields.copy(id = id)
     )
     val action = insertQuery += CustomQuotesQuery(
       0,
-      "",
       customQuoteForm.quote,
       customQuoteForm.author,
       customQuoteForm.genre,

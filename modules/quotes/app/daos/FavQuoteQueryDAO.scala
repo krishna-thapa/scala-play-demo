@@ -1,6 +1,6 @@
 package daos
 
-import com.krishna.model.base.QuoteResource
+import com.krishna.model.base.IdResource
 import com.krishna.model.FavQuoteQuery
 import com.krishna.services.FavQuoteServices
 import com.krishna.util.{ DbRunner, Logging }
@@ -26,14 +26,14 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
   /*
-    NOTE: Use of Upper bounds using super trait of QuoteResource: Just to use the scala generic bounds
+    NOTE: Use of Upper bounds using super trait of IdResource: Just to use the scala generic bounds
     In this case, each abstract methods have their own Type so not really need of upper bounds
    */
   /**
     * @param userId primary id from user_details_table
     * @return Quotes that are marked as favorite for the specific user id
     */
-  def listFavQuotes[T <: QuoteResource](userId: Int): Seq[T] = {
+  def listFavQuotes[T <: IdResource](userId: Int): Seq[T] = {
     val query = QuoteQueriesTable.quoteQueries
       .join(FavQuoteQueriesTable.favQuoteQueries.filter { favQuote =>
         favQuote.userId === userId && favQuote.favTag
@@ -51,7 +51,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table
     */
-  def modifyFavQuote[T <: QuoteResource](userId: Int, csvId: String): Try[T] = {
+  def modifyFavQuote[T <: IdResource](userId: Int, csvId: String): Try[T] = {
     // check if the record exists with that csv id in the fav_quotes table for that user id
     val favRecord: FixedSqlStreamingAction[Seq[FavQuoteQuery], FavQuoteQuery, Effect.Read] =
       FavQuoteQueriesTable.favQuoteQueries.filter { quote =>

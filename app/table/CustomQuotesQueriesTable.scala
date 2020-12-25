@@ -18,7 +18,7 @@ class CustomQuotesQueriesTable(tag: Tag)
   def storedDate: Rep[Date]     = column[Date]("stored_date")
   def ownQuote: Rep[Boolean]    = column[Boolean]("own_quote")
   def * : ProvenShape[CustomQuotesQuery] =
-    (id, csvId, quote, author, genre, storedDate, ownQuote) <>
+    (id, quote, author, genre, storedDate, ownQuote) <>
       ((CustomQuotesQuery.apply _).tupled, CustomQuotesQuery.unapply)
 }
 

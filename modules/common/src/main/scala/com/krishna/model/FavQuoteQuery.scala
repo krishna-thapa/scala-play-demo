@@ -1,6 +1,6 @@
 package com.krishna.model
 
-import com.krishna.model.base.QuoteResource
+import com.krishna.model.base.WithCSCVIdResource
 import play.api.libs.json.{ Json, OFormat }
 
 final case class FavQuoteQuery(
@@ -8,7 +8,7 @@ final case class FavQuoteQuery(
     csvId: String,
     userId: Int,
     favTag: Boolean
-) extends QuoteResource
+) extends WithCSCVIdResource
 
 // not needed
 object FavQuoteQuery {

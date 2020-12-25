@@ -2,7 +2,6 @@
 
 CREATE TABLE custom_quotations (
     id serial PRIMARY KEY,
-    csv_id text NOT NULL,
     quote varchar(1000) NOT NULL,
     author varchar(255) NOT NULL,
     genre varchar(100),

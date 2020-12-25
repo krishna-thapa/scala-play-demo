@@ -1,7 +1,8 @@
 package model
 
-import java.sql.Date
+import com.krishna.model.base.IdResource
 
+import java.sql.Date
 import play.api.libs.json.{ Json, OFormat }
 
 case class UserDetail(
@@ -10,7 +11,7 @@ case class UserDetail(
     email: String,
     joinedDate: Date,
     isAdmin: Boolean
-)
+) extends IdResource
 
 object UserDetail {
   implicit lazy val userListFormat: OFormat[UserDetail] = Json.format[UserDetail]
