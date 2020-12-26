@@ -77,6 +77,7 @@ Have implemented [play cache](https://www.playframework.com/documentation/2.8.x/
 ## Further improvements on
 - Look into how it can be stored and how to check the contains in efficient manner 
 - Time limit and speed and where to store the codes
+- Run evolution sql scripts for test container (find out how the copy can be differed with test and actual project) 
 
 ## Actor inject dependency
 - https://abhsrivastava.github.io/2017/11/03/Actors-With-Guice/

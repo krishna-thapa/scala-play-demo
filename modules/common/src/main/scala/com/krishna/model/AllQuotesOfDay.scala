@@ -15,7 +15,7 @@ object AllQuotesOfDay {
 
   def apply(contentDate: String, quote: String, index: Int): AllQuotesOfDay = {
     new AllQuotesOfDay(
-      index,
+      index + 1,
       contentDate,
       Json.parse(quote).as[QuotesQuery]
     )

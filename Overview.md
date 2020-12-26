@@ -30,7 +30,7 @@ inspirational-quote-api
  └ app
     └ controllers
       └ CustomQuote.scala
-    └ daos
+    └ scala.daos
     └ forms
     └ table
     └ model

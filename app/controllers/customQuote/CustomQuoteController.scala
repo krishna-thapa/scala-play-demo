@@ -2,7 +2,7 @@ package controllers.customQuote
 
 import com.krishna.response.{ OkResponse, ResponseResult }
 import com.krishna.util.Logging
-import daos.CustomQuoteQueryDAO
+import scala.daos.CustomQuoteQueryDAO
 import forms.RequestForm
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._

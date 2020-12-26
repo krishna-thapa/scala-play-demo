@@ -1,4 +1,4 @@
-package daos
+package scala.daos
 
 import com.krishna.services.RepositoryMethods
 import com.krishna.util.{ DbRunner, Logging }
@@ -6,12 +6,11 @@ import forms.CustomQuoteForm
 
 import javax.inject.{ Inject, Singleton }
 import models.CustomQuotesQuery
-import play.api.db.slick.DatabaseConfigProvider
-import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
+import slick.jdbc.JdbcBackend
 import slick.jdbc.PostgresProfile.api._
 import table.CustomQuotesQueriesTable
 import com.krishna.util.Implicits.genreEnumMapper
+import slick.jdbc
 
 import scala.util.Try
 
@@ -25,12 +24,12 @@ import scala.util.Try
   */
 
 @Singleton
-class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class CustomQuoteQueryDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef)
     extends RepositoryMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
     with DbRunner
     with Logging {
 
-  override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
 
   override def tables: TableQuery[CustomQuotesQueriesTable] =
     CustomQuotesQueriesTable.customQuoteQueries

@@ -1,8 +1,7 @@
 package com.krishna.util
 
-import slick.basic.DatabaseConfig
 import slick.dbio.Effect.All
-import slick.jdbc.JdbcProfile
+import slick.jdbc.JdbcBackend
 import slick.dbio.{ DBIOAction, NoStream }
 import slick.jdbc.PostgresProfile.api._
 
@@ -12,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
 
 trait DbRunner extends Logging {
 
-  val dbConfig: DatabaseConfig[JdbcProfile]
+  val dbConfig: JdbcBackend.DatabaseDef
 
   // return result from future
   implicit class FutureResult[T](future: Future[T]) {
@@ -22,7 +21,7 @@ trait DbRunner extends Logging {
 
   /* Run and get the result from the future*/
   def runDbAction[T](action: DBIOAction[T, NoStream, All], timeout: Option[Int] = None): T = {
-    dbConfig.db.run(action.transactionally).andGetResult(timeout)
+    dbConfig.run(action.transactionally).andGetResult(timeout)
   }
 
   /* Run and get the result from the future or catch any error*/

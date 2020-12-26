@@ -1,4 +1,4 @@
-package daos
+package scala.daos
 
 import com.krishna.model.base.WithCSCVIdResource
 import com.krishna.model.FavQuoteQuery
@@ -6,10 +6,9 @@ import com.krishna.services.FavQuoteServices
 import com.krishna.util.DbRunner
 
 import javax.inject.{ Inject, Singleton }
-import play.api.db.slick.DatabaseConfigProvider
-import slick.basic.DatabaseConfig
 import slick.dbio.Effect
-import slick.jdbc.JdbcProfile
+import slick.jdbc
+import slick.jdbc.JdbcBackend
 import slick.jdbc.PostgresProfile.api._
 import slick.sql.FixedSqlStreamingAction
 import tables.{ FavQuoteQueriesTable, QuoteQueriesTable }
@@ -18,11 +17,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class FavQuoteQueryDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef)
     extends FavQuoteServices
     with DbRunner {
 
-  override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
 
   /*
     NOTE: Use of Upper bounds using super trait of IdResource: Just to use the scala generic bounds

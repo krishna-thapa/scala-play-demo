@@ -1,25 +1,24 @@
 package dao
 
 import java.sql.Date
-
 import bcrypt.BcryptException
 import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
+
 import javax.inject.{ Inject, Singleton }
-import model.{ UserInfo, UserDetail }
-import play.api.db.slick.DatabaseConfigProvider
+import model.{ UserDetail, UserInfo }
 import play.api.mvc.Result
-import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
+import slick.jdbc
+import slick.jdbc.JdbcBackend
 import slick.jdbc.PostgresProfile.api._
 
 import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
+class AuthDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef) extends CommonMethods {
 
-  override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
 
   /**
     * Create a new user account in the table

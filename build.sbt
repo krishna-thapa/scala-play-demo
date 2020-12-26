@@ -33,10 +33,12 @@ lazy val quotes = project
     libraryDependencies ++=
       commonDependencies ++
         slickDatabaseDependencies ++
+        testContainerDependencies ++
         Seq(
           cacheApi,
           playRedis,
-          "com.enragedginger" %% "akka-quartz-scheduler" % "1.8.5-akka-2.6.x"
+          quartzScheduler,
+          scalaTest
         )
   )
 
@@ -84,6 +86,11 @@ lazy val slickDatabaseDependencies = Seq(
   postgres,
   playSlickEvolutions,
   playSlick
+)
+
+lazy val testContainerDependencies = Seq(
+  testContainers,
+  postgresContainer
 )
 
 lazy val elastic4sDependencies = Seq(

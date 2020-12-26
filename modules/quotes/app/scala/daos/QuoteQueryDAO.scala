@@ -1,13 +1,12 @@
-package daos
+package scala.daos
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
 import com.krishna.services.RepositoryMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
-import play.api.db.slick.DatabaseConfigProvider
-import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
+import slick.jdbc
+import slick.jdbc.JdbcBackend
 import slick.jdbc.PostgresProfile.api._
 import tables.QuoteQueriesTable
 
@@ -16,11 +15,11 @@ import javax.inject.Inject
 /**
   * A repository for Quotes stored in quotes table.
   */
-class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class QuoteQueryDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef)
     extends RepositoryMethods[QuotesQuery, QuoteQueriesTable]
     with DbRunner {
 
-  override val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
 
   override def tables: TableQuery[QuoteQueriesTable] = QuoteQueriesTable.quoteQueries
 
