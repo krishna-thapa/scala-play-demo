@@ -38,7 +38,8 @@ lazy val quotes = project
           cacheApi,
           playRedis,
           quartzScheduler,
-          scalaTest
+          scalaTest,
+          playScalaTest
         )
   )
 
@@ -82,7 +83,7 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val slickDatabaseDependencies = Seq(
-  jdbc,
+  //jdbc,
   postgres,
   playSlickEvolutions,
   playSlick

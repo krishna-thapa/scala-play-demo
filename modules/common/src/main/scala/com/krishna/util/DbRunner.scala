@@ -11,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
 
 trait DbRunner extends Logging {
 
-  val dbConfig: JdbcBackend.DatabaseDef
+  val dbConfig: JdbcBackend#DatabaseDef
 
   // return result from future
   implicit class FutureResult[T](future: Future[T]) {

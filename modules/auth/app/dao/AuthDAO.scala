@@ -8,17 +8,17 @@ import form.{ SignInForm, SignUpForm }
 
 import javax.inject.{ Inject, Singleton }
 import model.{ UserDetail, UserInfo }
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc.Result
-import slick.jdbc
-import slick.jdbc.JdbcBackend
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
 
 import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class AuthDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef) extends CommonMethods {
+class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
 
-  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
+  override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
   /**
     * Create a new user account in the table
