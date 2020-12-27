@@ -5,21 +5,22 @@ import com.krishna.model.QuotesQuery
 import com.krishna.services.RepositoryMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
-import slick.jdbc
-import slick.jdbc.JdbcBackend
+import play.api.db.slick.DatabaseConfigProvider
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
 import tables.QuoteQueriesTable
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 
 /**
   * A repository for Quotes stored in quotes table.
   */
-class QuoteQueryDAO @Inject()(dbConfigProvider: JdbcBackend.DatabaseDef)
-    extends RepositoryMethods[QuotesQuery, QuoteQueriesTable]
-    with DbRunner {
+@Singleton
+class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+    extends DbRunner
+    with RepositoryMethods[QuotesQuery, QuoteQueriesTable] {
 
-  override val dbConfig: jdbc.JdbcBackend.DatabaseDef = dbConfigProvider
+  override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
   override def tables: TableQuery[QuoteQueriesTable] = QuoteQueriesTable.quoteQueries
 
