@@ -214,3 +214,15 @@ inspirational-quote-api
 -[ ] Change the created date to Instant type
 -[ ] Put validation in the create custom and update record
 -[ ] Implement dependency management for sbt using: `https://github.com/scala-steward`
+
+
+## Known compiler warning and issues:
+1. Compiler warning in Guice dependency injection while running test suits from Intellij:
+```
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/home/krishna/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/inject/guice/4.2.3/guice-4.2.3.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+```
+**FIX**: It has been [updated in the new version of Guice library](https://github.com/google/guice/issues/1133) but Play still haven't updated in their dependency management for guice. Just have to wait until Play updates the version of Guice. 

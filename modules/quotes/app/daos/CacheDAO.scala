@@ -1,4 +1,4 @@
-package scala.daos
+package daos
 
 import com.krishna.conf.AppConfig
 import com.krishna.model.QuotesQuery

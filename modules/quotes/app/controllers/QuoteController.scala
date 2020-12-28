@@ -6,7 +6,7 @@ import com.krishna.response.ResponseMsg.InvalidCsvId
 import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
-import scala.daos.QuoteQueryDAO
+import daos.QuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 
 import javax.inject._

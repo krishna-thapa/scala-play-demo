@@ -1,4 +1,4 @@
-package scala.daos
+package daos
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
@@ -6,8 +6,8 @@ import com.krishna.services.RepositoryMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
 import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import tables.QuoteQueriesTable
 
 import javax.inject.{ Inject, Singleton }

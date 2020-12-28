@@ -1,18 +1,17 @@
-package scala.daos
+package daos
 
-import com.krishna.model.base.WithCSCVIdResource
 import com.krishna.model.FavQuoteQuery
+import com.krishna.model.base.WithCSCVIdResource
 import com.krishna.services.FavQuoteServices
 import com.krishna.util.DbRunner
 import play.api.db.slick.DatabaseConfigProvider
-
-import javax.inject.{ Inject, Singleton }
 import slick.dbio.Effect
-import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.sql.FixedSqlStreamingAction
 import tables.{ FavQuoteQueriesTable, QuoteQueriesTable }
 
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 

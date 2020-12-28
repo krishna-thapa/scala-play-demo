@@ -1,71 +1,18 @@
 package daos
 
-import com.dimafeng.testcontainers.PostgreSQLContainer
-import com.dimafeng.testcontainers.scalatest.TestContainerForAll
 import com.krishna.model.{ Genre, QuotesQuery }
-import helper.PlayPostgreSQLTest
+import helper.testContainers.PostgresInstance
 import org.scalatest.compatible.Assertion
 import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{ Application, Mode }
-import play.api.db.DBApi
-import play.api.db.evolutions.Evolutions
-import play.api.inject.guice.GuiceApplicationBuilder
-import slick.jdbc.JdbcBackend
+import play.api.Application
 
-import scala.daos.QuoteQueryDAO
-import scala.util.{ Failure, Success }
-
-class QuoteQueryDAOSpec
-    extends PlayPostgreSQLTest
-    with Matchers
-    with TestContainerForAll
-    with GuiceOneAppPerSuite {
-
-  // Define a Postgres Container for test docker
-  override val containerDef: PostgreSQLContainer.Def = PostgreSQLContainer.Def()
-
-  // Start the connection
-  val container: PostgreSQLContainer             = startContainers()
-  override val dbConfig: JdbcBackend.DatabaseDef = getDb(container)
+class QuoteQueryDAOSpec extends PostgresInstance with Matchers {
 
   // Load the test sql queries in the test Postgres docker container
-  val loadQueries: Unit = loadSqlQueries match {
-    case Success(_)         => log.info("Success on loading sql queries in test container")
-    case Failure(exception) => log.error("Failed on loading sql queries: " + exception.getMessage)
-  }
+  loadQueries("quoteTestSqlQueries")
 
   // Initialize the QuoteQueryDao class
-
-  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(
-      "slick.dbs.default.profile"     -> "slick.jdbc.PostgresProfile$",
-      "slick.dbs.default.db.driver"   -> "org.postgresql.Driver",
-      "slick.dbs.default.db.url"      -> container.jdbcUrl,
-      "slick.dbs.default.db.user"     -> container.username,
-      "slick.dbs.default.db.password" -> container.password
-    )
-    .build()
-
-//  lazy val appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
-//  lazy val injector                            = appBuilder.injector()
-//  lazy val databaseApi                         = injector.instanceOf[DBApi] //here is the important line
-//
-//  Evolutions.applyEvolutions(databaseApi.database("test"))
-
-  //val quoteQueryDao: QuoteQueryDAO = appBuilder.injector.instanceOf[QuoteQueryDAO]
-
   val quoteQueryDao: QuoteQueryDAO = Application.instanceCache[QuoteQueryDAO].apply(app)
-
-  //val dbConfigProvider: DatabaseConfigProvider
-  //lazy val appBuilder: GuiceApplicationBuilder    = new GuiceApplicationBuilder().in(Mode.Test)
-  //lazy val injector: Injector                     = appBuilder.injector()
-  //lazy val dbConfProvider: DatabaseConfigProvider = injector.instanceOf[DatabaseConfigProvider]
-
-  //val quoteQueryDao: QuoteQueryDAO = app.injector.instanceOf[QuoteQueryDAO]
-  //val foo: DatabaseConfigProvider  = mock[DatabaseConfigProvider]
-  //val quoteQueryDao: QuoteQueryDAO = new QuoteQueryDAO(dbConfProvider)
-  //val quoteQueryDao = new QuoteQueryDAO(dbConfig.createSession())
 
   behavior of "QuoteQueryDAO"
   it should "list down all the quotes from database" in {
