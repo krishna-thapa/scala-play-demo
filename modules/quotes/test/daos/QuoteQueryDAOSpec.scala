@@ -9,7 +9,7 @@ import play.api.Application
 class QuoteQueryDAOSpec extends PostgresInstance with Matchers {
 
   // Load the test sql queries in the test Postgres docker container
-  loadQueries("quoteTestSqlQueries")
+  loadQueries("quoteTestQueries")
 
   // Initialize the QuoteQueryDao class
   val quoteQueryDao: QuoteQueryDAO = Application.instanceCache[QuoteQueryDAO].apply(app)

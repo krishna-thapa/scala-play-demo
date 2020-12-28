@@ -22,6 +22,9 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
+  val quotesTable    = QuoteQueriesTable.quoteQueries
+  val favQuotesTable = FavQuoteQueriesTable.favQuoteQueries
+
   /*
     NOTE: Use of Upper bounds using super trait of IdResource: Just to use the scala generic bounds
     In this case, each abstract methods have their own Type so not really need of upper bounds
@@ -31,8 +34,8 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return Quotes that are marked as favorite for the specific user id
     */
   def listFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
-    val query = QuoteQueriesTable.quoteQueries
-      .join(FavQuoteQueriesTable.favQuoteQueries.filter { favQuote =>
+    val query = quotesTable
+      .join(favQuotesTable.filter { favQuote =>
         favQuote.userId === userId && favQuote.favTag
       })
       .on(_.csvId === _.csvId)
@@ -51,7 +54,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   def modifyFavQuote[T <: WithCSCVIdResource](userId: Int, csvId: String): Try[T] = {
     // check if the record exists with that csv id in the fav_quotes table for that user id
     val favRecord: FixedSqlStreamingAction[Seq[FavQuoteQuery], FavQuoteQuery, Effect.Read] =
-      FavQuoteQueriesTable.favQuoteQueries.filter { quote =>
+      favQuotesTable.filter { quote =>
         quote.userId === userId && quote.csvId === csvId
       }.result
 
@@ -78,7 +81,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   private def alterFavTag(id: Int, tag: Boolean): Int = {
     log.info(s"Changing the fav tag status of: $id to ${!tag}")
     runDbAction(
-      FavQuoteQueriesTable.favQuoteQueries
+      favQuotesTable
         .filter(_.id === id)
         .map(quote => quote.favTag)
         .update(!tag)
@@ -95,7 +98,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
       csvId: String
   ): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {
     val insertFavQuote = FavQuoteQueriesTable.favQuoteQueries returning
-      FavQuoteQueriesTable.favQuoteQueries.map(_.id) into (
+      favQuotesTable.map(_.id) into (
         (
             fields,
             id
