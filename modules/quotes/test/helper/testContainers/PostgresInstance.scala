@@ -19,14 +19,14 @@ trait PostgresInstance
   override val containerDef: PostgreSQLContainer.Def = PostgreSQLContainer.Def()
 
   // Start the connection
-  val container: PostgreSQLContainer = startContainers()
+  val containerPostgres: PostgreSQLContainer = startContainers()
 
   // Initialize the Database connection using PostgreSQLContainer
   override val dbConfig: JdbcBackend.DatabaseDef = {
     Database.forURL(
-      url = container.jdbcUrl,
-      user = container.username,
-      password = container.password,
+      url = containerPostgres.jdbcUrl,
+      user = containerPostgres.username,
+      password = containerPostgres.password,
       driver = "org.postgresql.Driver"
     )
   }
@@ -36,9 +36,9 @@ trait PostgresInstance
     .configure(
       "slick.dbs.default.profile"          -> "slick.jdbc.PostgresProfile$",
       "slick.dbs.default.db.driver"        -> "org.postgresql.Driver",
-      "slick.dbs.default.db.url"           -> container.jdbcUrl,
-      "slick.dbs.default.db.user"          -> container.username,
-      "slick.dbs.default.db.password"      -> container.password,
+      "slick.dbs.default.db.url"           -> containerPostgres.jdbcUrl,
+      "slick.dbs.default.db.user"          -> containerPostgres.username,
+      "slick.dbs.default.db.password"      -> containerPostgres.password,
       "play.evolutions.db.default.enabled" -> "false" // Important to disable evolution while running test
     )
     .build()

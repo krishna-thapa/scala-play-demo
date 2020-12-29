@@ -40,6 +40,8 @@ lazy val quotes = project
           quartzScheduler,
           scalaTest,
           playScalaTest
+          //"org.mockito" %% "mockito-scala-scalatest" % "1.13.0" % "test"
+          //"com.typesafe.akka" %% "akka-testkit" % "2.6.10" % Test
         )
   )
 
