@@ -1,5 +1,3 @@
---- !Ups
-
 CREATE TABLE custom_quotations (
     id serial PRIMARY KEY,
     user_id INTEGER NOT NULL,
@@ -9,7 +7,3 @@ CREATE TABLE custom_quotations (
     stored_date date NOT NULL,
     own_quote boolean default true
 );
-
---- !Downs
-
-DROP TABLE if exists custom_quotations CASCADE;

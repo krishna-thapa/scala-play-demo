@@ -1,15 +1,15 @@
 package tables
 
 import com.krishna.model.FavQuoteQuery
-import com.krishna.table.TableWithCSVId
+import com.krishna.table.{ TableWithCSVId, TableWithUserId }
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 
 class FavQuoteQueriesTable(tag: Tag)
     extends Table[FavQuoteQuery](tag, "fav_quotations")
-    with TableWithCSVId[FavQuoteQuery] {
+    with TableWithCSVId[FavQuoteQuery]
+    with TableWithUserId[FavQuoteQuery] {
 
-  def userId: Rep[Int]     = column[Int]("user_id")
   def favTag: Rep[Boolean] = column[Boolean]("fav_tag")
 
   def * : ProvenShape[FavQuoteQuery] =

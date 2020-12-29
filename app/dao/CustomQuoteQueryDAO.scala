@@ -1,17 +1,16 @@
-package scala.daos
+package dao
 
-import com.krishna.services.RepositoryMethods
+import com.krishna.services.RepositoryUserMethods
+import com.krishna.util.Implicits.genreEnumMapper
 import com.krishna.util.{ DbRunner, Logging }
 import forms.CustomQuoteForm
+import models.CustomQuotesQuery
+import play.api.db.slick.DatabaseConfigProvider
+import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
+import table.CustomQuotesQueriesTable
 
 import javax.inject.{ Inject, Singleton }
-import models.CustomQuotesQuery
-import slick.jdbc.{ JdbcBackend, JdbcProfile }
-import slick.jdbc.PostgresProfile.api._
-import table.CustomQuotesQueriesTable
-import com.krishna.util.Implicits.genreEnumMapper
-import play.api.db.slick.DatabaseConfigProvider
-
 import scala.util.Try
 
 /**
@@ -25,7 +24,7 @@ import scala.util.Try
 
 @Singleton
 class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends RepositoryMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
+    extends RepositoryUserMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
     with DbRunner
     with Logging {
 
@@ -36,10 +35,11 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   /**
     * List all the records from the table
+    * @param userId: Logged in user id
     * @return sequence of the CustomQuotesQuery records
     */
-  def listAllQuotes: Seq[CustomQuotesQuery] =
-    runDbAction(getAllQuotes)
+  def listAllQuotes(userId: Int): Seq[CustomQuotesQuery] =
+    runDbAction(getAllQuotesForUser(userId))
 
   /**
     * List the JSON format of the selected record from the table

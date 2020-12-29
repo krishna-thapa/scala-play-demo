@@ -16,7 +16,7 @@ class FavQuoteQueryDAOSpec extends PostgresInstance with Matchers {
   // Load the fav_quotations test sql queries in the test Postgres docker container
   loadQueries("favQuoteTestQueries")
 
-  // Initialize the QuoteQueryDao class
+  // Initialize the FavQuoteQueryDAO class
   val favQuoteQueryDAO: FavQuoteQueryDAO = Application.instanceCache[FavQuoteQueryDAO].apply(app)
 
   behavior of "FavQuoteQueryDAO"

@@ -2,7 +2,7 @@ package daos
 
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
-import com.krishna.services.RepositoryMethods
+import com.krishna.services.RepositoryQuoteMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,7 +18,7 @@ import javax.inject.{ Inject, Singleton }
 @Singleton
 class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     extends DbRunner
-    with RepositoryMethods[QuotesQuery, QuoteQueriesTable] {
+    with RepositoryQuoteMethods[QuotesQuery, QuoteQueriesTable] {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 

@@ -15,15 +15,15 @@ lazy val root = (project in file("."))
   .settings(
     libraryDependencies ++=
       commonDependencies ++
+        testContainerDependencies ++
         slickDatabaseDependencies ++ Seq(
-        //scalaTest,
         swaggerUi
-        //playScalaTest
       ),
     Test / fork := true
   )
   .aggregate(quotes, auth, search, common)
-  .dependsOn(quotes, auth, search, common)
+  // https://stackoverflow.com/questions/8193904/sbt-test-dependencies-in-multiprojects-make-the-test-code-available-to-dependen
+  .dependsOn(quotes % "compile->compile;test->test", auth, search, common)
 
 lazy val quotes = project
   .in(file("modules/quotes"))
@@ -37,9 +37,7 @@ lazy val quotes = project
         Seq(
           cacheApi,
           playRedis,
-          quartzScheduler,
-          scalaTest,
-          playScalaTest
+          quartzScheduler
         )
   )
 
@@ -91,7 +89,9 @@ lazy val slickDatabaseDependencies = Seq(
 
 lazy val testContainerDependencies = Seq(
   testContainers,
-  postgresContainer
+  postgresContainer,
+  scalaTest,
+  playScalaTest
 )
 
 lazy val elastic4sDependencies = Seq(

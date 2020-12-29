@@ -2,29 +2,34 @@ package controllers.customQuote
 
 import com.krishna.response.{ OkResponse, ResponseResult }
 import com.krishna.util.Logging
-import scala.daos.CustomQuoteQueryDAO
+import dao.CustomQuoteQueryDAO
+import depInject.{ SecuredController, SecuredControllerComponents }
 import forms.RequestForm
+import model.UserDetail
+
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
+import util.DecodeHeader
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }
 
 @Singleton
 class CustomQuoteController @Inject()(
-    cc: ControllerComponents,
+    ss: SecuredControllerComponents,
     customerQuotesDAO: CustomQuoteQueryDAO
 )(implicit executionContext: ExecutionContext)
-    extends AbstractController(cc)
+    extends SecuredController(ss)
     with ResponseResult
     with Logging {
 
   /**
-    * A REST endpoint that gets all the custom quotes.
+    * A REST endpoint that gets all the custom quotes for the logged in user.
     */
-  def getCustomQuotes: Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getCustomQuotes")
-    responseSeqResult(customerQuotesDAO.listAllQuotes)
+  def getCustomQuotes: Action[AnyContent] = UserAction { implicit request =>
+    val user: UserDetail = DecodeHeader(request.headers)
+    log.info(s"Executing getCustomQuotes by user: ${user.email}")
+    responseSeqResult(customerQuotesDAO.listAllQuotes(user.id))
   }
 
   /**
