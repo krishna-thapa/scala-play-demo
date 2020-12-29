@@ -23,6 +23,8 @@ GET         /all            controllers.customQuote.CustomQuoteController.getCus
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
+#  security:
+#    - TokenKey: []
 ###
 GET         /random         controllers.customQuote.CustomQuoteController.getRandomCustomQuote
 
@@ -34,6 +36,8 @@ GET         /random         controllers.customQuote.CustomQuoteController.getRan
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
+#  security:
+#    - TokenKey: []
 ###
 GET         /:id            controllers.customQuote.CustomQuoteController.getSelectedQuote(id: Int)
 
@@ -68,6 +72,8 @@ POST        /               controllers.customQuote.CustomQuoteController.addCus
 #    200:
 #      schema:
 #        $ref: '#/definitions/com.krishna.response.OkResponse'
+#  security:
+#    - TokenKey: []
 ###
 DELETE      /:id            controllers.customQuote.CustomQuoteController.deleteCustomQuote(id: Int)
 
@@ -77,32 +83,12 @@ DELETE      /:id            controllers.customQuote.CustomQuoteController.delete
 #  tags:
 #    - CustomQuoteQueryBuild
 #  parameters:
-#    - name: "id"
-#      in: "path"
-#      description: "ID of quote that needs to be updated"
+#    - name: body
+#      in: body
 #      required: true
-#      type: "integer"
-#      format: "int64"
-#    - name: "quote"
-#      in: "formData"
-#      description: "Custom quote"
-#      required: true
-#      type: "string"
-#    - name: "author"
-#      in: "formData"
-#      description: "Author of the quote"
-#      required: true
-#      type: "string"
-#    - name: "genre"
-#      in: "formData"
-#      description: "Genre of the quote"
-#      required: true
-#      type: "string"
-#    - name: "ownquote"
-#      in: "formData"
-#      description: "Is it custom made quote"
-#      required: true
-#      type: "boolean"
+#      description: Update a existing record
+#      schema:
+#        $ref: '#/definitions/forms.CustomQuoteForm'
 #  responses:
 #    200:
 #      description: success
@@ -110,9 +96,9 @@ DELETE      /:id            controllers.customQuote.CustomQuoteController.delete
 #        $ref: '#/definitions/models.CustomQuotesQuery'
 #    400:
 #      description: "Invalid ID supplied"
-#    404:
-#      description: "Pet not found"
-#    405:
-#      description: "Validation exception"
+#    500:
+#      description: "Internal server error"
+#  security:
+#    - TokenKey: []
 ###
 PUT         /:id            controllers.customQuote.CustomQuoteController.updateCustomQuote(id: Int)

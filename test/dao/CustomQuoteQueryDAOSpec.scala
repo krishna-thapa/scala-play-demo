@@ -8,6 +8,8 @@ import models.CustomQuotesQuery
 import org.scalatest.matchers.should.Matchers
 import play.api.Application
 
+import scala.util.Try
+
 class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
 
   // Load the custom_quotations test sql queries in the test Postgres docker container
@@ -86,5 +88,21 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
 
     val afterDelete: Seq[CustomQuotesQuery] = customQuoteQueryDAO.listAllQuotes(3)
     afterDelete.length shouldBe 0
+  }
+
+  "updateQuote" should "update the existing record for logged iun user" in {
+    val updateRecord: Try[Int] =
+      customQuoteQueryDAO.updateQuote(
+        2,
+        2,
+        customQuoteForm.copy(quote = "Updated quote", author = Some("Updated author"))
+      )
+    updateRecord.isSuccess shouldBe true
+    updateRecord.get shouldBe 1
+
+    val result: Option[CustomQuotesQuery] = customQuoteQueryDAO.listSelectedQuote(2, 2)
+    result.isDefined shouldBe true
+    result.get.quote shouldBe "Updated quote"
+    result.get.author.get shouldBe "Updated author"
   }
 }

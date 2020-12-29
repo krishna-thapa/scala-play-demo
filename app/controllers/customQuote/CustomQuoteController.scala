@@ -88,7 +88,6 @@ class CustomQuoteController @Inject()(
 
   /**
     * A REST endpoint that updated selected quote to Custom quotes table.
-    * TODO: NOT WORKING
     */
   def updateCustomQuote(id: Int): Action[AnyContent] = UserAction {
     implicit request: Request[AnyContent] =>
@@ -100,7 +99,10 @@ class CustomQuoteController @Inject()(
         },
         customQuote => {
           customerQuotesDAO.updateQuote(id, user.id, customQuote) match {
-            case Success(id)        => responseOk(OkResponse(s"Successfully updated entry row $id"))
+            case Success(recordsUpdated) if recordsUpdated == 1 =>
+              responseOk(OkResponse(s"Successfully updated record with id: $id"))
+            case Success(recordsUpdated) if recordsUpdated != 1 =>
+              notFound(s"Record not found with id: $id")
             case Failure(exception) => internalServerError(exception.getMessage)
           }
         }
