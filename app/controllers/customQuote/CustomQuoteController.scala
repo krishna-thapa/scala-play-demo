@@ -23,11 +23,14 @@ class CustomQuoteController @Inject()(
     with ResponseResult
     with Logging {
 
+  private lazy val getLoggedUser: Request[AnyContent] => UserDetail =
+    (request: Request[AnyContent]) => DecodeHeader(request.headers)
+
   /**
     * A REST endpoint that gets all the custom quotes for the logged in user.
     */
   def getCustomQuotes: Action[AnyContent] = UserAction { implicit request =>
-    val user: UserDetail = DecodeHeader(request.headers)
+    val user: UserDetail = getLoggedUser(request)
     log.info(s"Executing getCustomQuotes by user: ${user.email}")
     responseSeqResult(customerQuotesDAO.listAllQuotes(user.id))
   }
@@ -35,45 +38,50 @@ class CustomQuoteController @Inject()(
   /**
     * A REST endpoint that gets a random quote as JSON from Custom quotes table.
     */
-  def getRandomCustomQuote: Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getRandomCustomQuote")
-    responseSeqResult(customerQuotesDAO.listRandomQuote(1))
+  def getRandomCustomQuote: Action[AnyContent] = UserAction { implicit request =>
+    val user: UserDetail = getLoggedUser(request)
+    log.info(s"Executing getRandomCustomQuote by user: ${user.email}")
+    responseSeqResult(customerQuotesDAO.listRandomQuote(1, user.id))
   }
 
   /**
     * A REST endpoint that gets a selected quote as JSON from Custom quotes table.
     */
-  def getSelectedQuote(id: Int): Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getSelectedQuote")
-    responseOptionResult(customerQuotesDAO.listSelectedQuote(id))
+  def getSelectedQuote(id: Int): Action[AnyContent] = UserAction { implicit request =>
+    val user: UserDetail = getLoggedUser(request)
+    log.info(s"Executing getSelectedQuote by user: ${user.email}")
+    responseOptionResult(customerQuotesDAO.listSelectedQuote(id, user.id))
   }
 
   /**
     * A REST endpoint that deletes selected quote as JSON from Custom quotes table.
     */
-  def deleteCustomQuote(id: Int): Action[AnyContent] = Action {
+  def deleteCustomQuote(id: Int): Action[AnyContent] = UserAction {
     implicit request: Request[AnyContent] =>
-      if (customerQuotesDAO.deleteQuote(id) > 0) {
+      val user: UserDetail = getLoggedUser(request)
+      log.info(s"Executing deleteCustomQuote by user: ${user.email}")
+
+      if (customerQuotesDAO.deleteQuote(id, user.id) > 0) {
         log.warn(s"Successfully delete entry $id")
         responseOk(OkResponse(s"Successfully delete entry $id"))
       } else {
-        val error = s"Error on request with id: $id"
-        badRequest(error)
+        badRequest(s"Error on request with id: $id")
       }
   }
 
   /**
     * A REST endpoint that add a new quote as JSON to Custom quotes table.
+    * It takes the userinfo to add userid and user name in custom quotes tagble
     */
-  def addCustomQuote(): Action[AnyContent] = Action { implicit request =>
-    log.info("Executing addCustomQuote")
-    // Add request validation
+  def addCustomQuote(): Action[AnyContent] = UserAction { implicit request =>
+    val user: UserDetail = getLoggedUser(request)
+    log.info(s"Executing addCustomQuote by user: ${user.email}")
     RequestForm.quotesQueryForm.bindFromRequest.fold(
       formWithErrors => {
-        badRequest("error" + formWithErrors)
+        badRequest("error" + formWithErrors.errors)
       },
       customQuote => {
-        responseOk(customerQuotesDAO.createQuote(customQuote))
+        responseOk(customerQuotesDAO.createQuote(customQuote, user))
       }
     )
   }
@@ -82,15 +90,16 @@ class CustomQuoteController @Inject()(
     * A REST endpoint that updated selected quote to Custom quotes table.
     * TODO: NOT WORKING
     */
-  def updateCustomQuote(id: Int): Action[AnyContent] = Action {
+  def updateCustomQuote(id: Int): Action[AnyContent] = UserAction {
     implicit request: Request[AnyContent] =>
-      log.info("Executing updateCustomQuote")
+      val user: UserDetail = getLoggedUser(request)
+      log.info(s"Executing updateCustomQuote by user: ${user.email}")
       RequestForm.quotesQueryForm.bindFromRequest.fold(
         formWithErrors => {
-          badRequest("error" + formWithErrors)
+          badRequest("error" + formWithErrors.errors)
         },
         customQuote => {
-          customerQuotesDAO.updateQuote(id, customQuote) match {
+          customerQuotesDAO.updateQuote(id, user.id, customQuote) match {
             case Success(id)        => responseOk(OkResponse(s"Successfully updated entry row $id"))
             case Failure(exception) => internalServerError(exception.getMessage)
           }

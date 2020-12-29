@@ -4,6 +4,7 @@ import com.krishna.services.RepositoryUserMethods
 import com.krishna.util.Implicits.genreEnumMapper
 import com.krishna.util.{ DbRunner, Logging }
 import forms.CustomQuoteForm
+import model.UserDetail
 import models.CustomQuotesQuery
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.PostgresProfile.api._
@@ -42,29 +43,31 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     runDbAction(getAllQuotesForUser(userId))
 
   /**
-    * List the JSON format of the selected record from the table
+    * List the JSON format of the selected record from the table for logged in user
     * @param id quote id
+    * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listSelectedQuote(id: Int): Option[CustomQuotesQuery] = {
-    runDbAction(getSelectedQuote(id))
+  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = {
+    runDbAction(getSelectedQuote(id, userId))
   }
 
   /**
-    * Defined custom function for slick 3
-    * aware that "random" function is database specific
+    * Return a random custom inserted query for a logged in user specific
+    * @param records number of random records to return
+    * @param userId logged in user id
     * @return Option of CustomQuotesQuery
     */
-  def listRandomQuote(records: Int): Seq[CustomQuotesQuery] = {
-    runDbAction(getRandomRecords(records))
+  def listRandomQuote(records: Int, userId: Int): Seq[CustomQuotesQuery] = {
+    runDbAction(getRandomRecords(records, userId))
   }
 
   /**
     * Create a customQuotes in the table.
-    * This is an asynchronous operation, it will return a future of the created customQuotes,
-    * which can be used to obtain the id for that person.
+    * @param customQuoteForm Custom quote info
+    * @param user logged in user details
     */
-  def createQuote(customQuoteForm: CustomQuoteForm): CustomQuotesQuery = {
+  def createQuote(customQuoteForm: CustomQuoteForm, user: UserDetail): CustomQuotesQuery = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
     val insertQuery = tables returning
       tables.map(_.id) into (
@@ -73,11 +76,15 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
             id
         ) => fields.copy(id = id)
     )
+    // If the ownQuote flag is false, use provided author name, else use user full name
+    val author: String =
+      if (customQuoteForm.ownQuote) user.name else customQuoteForm.author.getOrElse(user.name)
+
     val action = insertQuery += CustomQuotesQuery(
       0,
-      1,
+      user.id,
       customQuoteForm.quote,
-      customQuoteForm.author,
+      Some(author),
       customQuoteForm.genre,
       currentDate,
       customQuoteForm.ownQuote
@@ -87,13 +94,14 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   /**
     * @param id quote record id
+    * @param userId logged in user id
     * @param customQuoteForm updated custom quote object
     * @return number of updated records, just 1 here
     */
-  def updateQuote(id: Int, customQuoteForm: CustomQuoteForm): Try[Int] = {
+  def updateQuote(id: Int, userId: Int, customQuoteForm: CustomQuoteForm): Try[Int] = {
     runDbActionCatchError(
       tables
-        .filter(_.id === id)
+        .filter(record => record.id === id && record.userId === userId)
         .map(quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
         .update(
           customQuoteForm.quote,
@@ -105,11 +113,12 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   }
 
   /**
-    * Delete the record from the table
+    * Delete the record from the table for logged in user
     * @param id of the selected row from the CustomQuotesQuery table
+    * @param userId logged user id
     */
-  def deleteQuote(id: Int): Int = {
-    runDbAction(deleteCustomQuote(id))
+  def deleteQuote(id: Int, userId: Int): Int = {
+    runDbAction(deleteCustomQuote(id, userId))
   }
 
 }

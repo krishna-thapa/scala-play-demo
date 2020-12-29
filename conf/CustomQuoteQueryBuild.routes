@@ -10,6 +10,8 @@
 #    200:
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
+#  security:
+#    - TokenKey: []
 ###
 GET         /all            controllers.customQuote.CustomQuoteController.getCustomQuotes
 
@@ -52,6 +54,8 @@ GET         /:id            controllers.customQuote.CustomQuoteController.getSel
 #      description: success
 #      schema:
 #        $ref: '#/definitions/models.CustomQuotesQuery'
+#  security:
+#    - TokenKey: []
 ###
 POST        /               controllers.customQuote.CustomQuoteController.addCustomQuote
 
