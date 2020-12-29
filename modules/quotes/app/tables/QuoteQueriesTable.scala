@@ -11,9 +11,9 @@ class QuoteQueriesTable(tag: Tag)
     extends Table[QuotesQuery](tag, "quotes")
     with TableWithCSVId[QuotesQuery] {
 
-  def quote: Rep[String]        = column[String]("quote")
-  def author: Rep[String]       = column[String]("author")
-  def genre: Rep[Option[Genre]] = column[Option[Genre]]("genre")
+  def quote: Rep[String]          = column[String]("quote")
+  def author: Rep[Option[String]] = column[Option[String]]("author")
+  def genre: Rep[Option[Genre]]   = column[Option[Genre]]("genre")
 
   def * : ProvenShape[QuotesQuery] =
     (id, csvId, quote, author, genre) <> ((QuotesQuery.apply _).tupled, QuotesQuery.unapply)

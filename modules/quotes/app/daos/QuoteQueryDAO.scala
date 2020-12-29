@@ -62,10 +62,11 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     val inputParam: String = parameter.replaceAll("^\\s+", "").toLowerCase
     runDbAction(
       QuoteQueriesTable.quoteQueries
-        .distinctOn(_.author)
-        .filter(_.author.toLowerCase like s"%$inputParam%")
+        .groupBy(_.author)
+        .map { case (author, _) => author }
+        .filter(_.toLowerCase like s"%$inputParam%")
         .result
-    ).map(_.author)
+    ).flatten
       .sortBy(!_.startsWith(inputParam.take(1).capitalize)) //Sorted by the first letter of parameter
       .take(10)
   }

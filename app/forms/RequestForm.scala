@@ -12,7 +12,7 @@ object RequestForm {
   val quotesQueryForm: Form[CustomQuoteForm] = Form {
     mapping(
       "quote"    -> nonEmptyText.verifying(_.nonEmpty),
-      "author"   -> nonEmptyText,
+      "author"   -> optional(text),
       "genre"    -> optional(Forms.of[Genre]),
       "ownQuote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)

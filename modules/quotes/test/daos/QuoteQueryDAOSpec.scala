@@ -17,7 +17,7 @@ class QuoteQueryDAOSpec extends PostgresInstance with Matchers {
   behavior of "QuoteQueryDAO"
   it should "list down all the quotes from database" in {
     val result: Seq[QuotesQuery] = quoteQueryDao.listAllQuotes
-    result.length shouldBe 3
+    result.length shouldBe 5
     result.head.csvId should startWith("CSV")
   }
 

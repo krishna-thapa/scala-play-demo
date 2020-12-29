@@ -12,13 +12,14 @@ class CustomQuotesQueriesTable(tag: Tag)
     extends Table[CustomQuotesQuery](tag, "custom_quotations")
     with TableId[CustomQuotesQuery] {
 
-  def quote: Rep[String]        = column[String]("quote")
-  def author: Rep[String]       = column[String]("author")
-  def genre: Rep[Option[Genre]] = column[Option[Genre]]("genre")
-  def storedDate: Rep[Date]     = column[Date]("stored_date")
-  def ownQuote: Rep[Boolean]    = column[Boolean]("own_quote")
+  def userId: Rep[Int]            = column[Int]("user_id")
+  def quote: Rep[String]          = column[String]("quote")
+  def author: Rep[Option[String]] = column[Option[String]]("author")
+  def genre: Rep[Option[Genre]]   = column[Option[Genre]]("genre")
+  def storedDate: Rep[Date]       = column[Date]("stored_date")
+  def ownQuote: Rep[Boolean]      = column[Boolean]("own_quote")
   def * : ProvenShape[CustomQuotesQuery] =
-    (id, quote, author, genre, storedDate, ownQuote) <>
+    (id, userId, quote, author, genre, storedDate, ownQuote) <>
       ((CustomQuotesQuery.apply _).tupled, CustomQuotesQuery.unapply)
 }
 

@@ -5,7 +5,7 @@ import com.krishna.model.base.QuotesTable
 
 final case class CustomQuoteForm(
     quote: String,
-    author: String,
+    author: Option[String],
     genre: Option[Genre] = None,
     ownQuote: Boolean
 ) extends QuotesTable

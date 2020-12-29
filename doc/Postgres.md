@@ -55,6 +55,7 @@ CREATE DATABASE inspiration_db;
 - In the docker-compose yml file, under the volumes:
 `/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata`
 - Need to mount the path of the csv file in the db container if you are running the command in that container.
+- Have to login as root: `sudo su`
 - First create (if not already created) a folder in your local machine with the path 
 `/var/lib/postgresql/data/` and copy csv file under that folder 
 - When the docker is compose, it will mount the path in the db docker container under the path: `/var/lib/postgresql/data/pgdata`, from where we can read the csv file and copy to the database that has been initaliozed under the play migration evolutions sql script: 

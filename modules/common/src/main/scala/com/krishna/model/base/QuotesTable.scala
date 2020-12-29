@@ -7,7 +7,7 @@ trait QuotesTable {
 
   def quote: String
 
-  def author: String
+  def author: Option[String]
 
   def genre: Option[Genre]
 

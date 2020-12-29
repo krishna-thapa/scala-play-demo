@@ -8,7 +8,7 @@ case class QuotesQuery(
     id: Int,
     csvId: String,
     quote: String,
-    author: String,
+    author: Option[String],
     genre: Option[Genre] = None
 ) extends WithCSCVIdResource
     with QuotesTable

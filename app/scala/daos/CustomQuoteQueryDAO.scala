@@ -75,6 +75,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     )
     val action = insertQuery += CustomQuotesQuery(
       0,
+      1,
       customQuoteForm.quote,
       customQuoteForm.author,
       customQuoteForm.genre,
