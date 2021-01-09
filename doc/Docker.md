@@ -31,7 +31,6 @@ docker-compose down -v
 ```
 
 ## Install Postgres Server in Docker
-
 - [Docker compose up with Postgres tips](https://hashinteractive.com/blog/docker-compose-up-with-postgres-quick-tips/)
 - [Use volumes in Docker](https://docs.docker.com/storage/volumes/)
 

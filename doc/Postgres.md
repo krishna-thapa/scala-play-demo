@@ -1,6 +1,6 @@
-## Notes in Postgres
+# Notes in Postgres
 
-### Installation notes in Ubuntu:
+## Installation notes in Ubuntu:
 
 [Steps to follow](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart)
 
@@ -26,16 +26,12 @@ ALTER USER admin WITH SUPERUSER;
 5. enable service postgresql(auto-start)
 `systemctl enable postgresql`
 
-### Connect to the postgres server locally:
+### Connect to the postgres server locally and create a database:
 ```
 sudo su - postgres
 psql
-\c inspiration_db 
-```
-
-### Create a database:
-```
 CREATE DATABASE inspiration_db;
+\c inspiration_db 
 ```
 
 ### Connect to the postgres server running in docker container:
@@ -58,10 +54,11 @@ CREATE DATABASE inspiration_db;
 - Have to login as root: `sudo su`
 - First create (if not already created) a folder in your local machine with the path 
 `/var/lib/postgresql/data/` and copy csv file under that folder 
-- When the docker is compose, it will mount the path in the db docker container under the path: `/var/lib/postgresql/data/pgdata`, from where we can read the csv file and copy to the database that has been initaliozed under the play migration evolutions sql script: 
+- When the docker is compose, it will mount the path in the db docker container under the path: `/var/lib/postgresql/data/pgdata`, from where we can read the csv file and copy to the database that has been initialized under the play migration evolutions sql script: 
 ```
 COPY quotations(quote,author,genre) FROM '/var/lib/postgresql/data/pgdata/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
 ```
 
 ### Know errors:
 - Might need to change the local path in mac OS for storing the csv file to `-./pgdata/:/var/lib/postgresql/data/pgdata` see the comments on this s[tackoverflow for details](https://stackoverflow.com/questions/46849539/how-can-i-set-path-to-load-data-from-csv-file-into-postgresql-database-in-docker)
+- Solution for above: pgdata directory will be present under this project level along with app and conf folder. 

@@ -21,7 +21,7 @@ play.modules.enabled += play.api.cache.redis.RedisCacheModule
 ```
 
 ## Install Redis and start the server
-- [Install Redis on Mac](https://blog.usejournal.com/how-to-install-redis-on-catalina-mac-os-5dc173b08bf6)
+- [Install Redis on Mac](https://gist.github.com/tomysmile/1b8a321e7c58499ef9f9441b2faa0aa8)
 - [Install Redis on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-18-04)
 - [Introduction to Redis](https://auth0.com/blog/introduction-to-redis-install-cli-commands-and-data-types/)
 - [Redis commands](https://redis.io/commands)
