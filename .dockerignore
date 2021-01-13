@@ -1,0 +1,26 @@
+# To prevent storing target and othr directories
+logs
+target
+.idea
+.idea_modules
+.classpath
+.settings
+
+# To prevent storing all the CSV and JSON files
+data
+
+# To prevent storing pgdata from postgres container
+/pgdata/
+
+# To prevent storing docs and readme files
+doc
+Overview.md
+README.md
+
+# To prevent storing git files
+.gitignore
+.git
+
+# To prevent storing dev/temporary container data
+tmp
+.DS_Store
