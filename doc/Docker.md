@@ -117,7 +117,18 @@ LRANGE cache-quoteOfTheDay 0 -1
 4. To make sure all the docker containers are connected, have to update the host names of each database in the main play project. So instead of using localhost, have to implement the docker service name. In this project, these names are should be updated in the application.conf file under the conf folder.
 5. All the unnecessary files and storage data are removed while building an image using `.dockerignore`.
 6. All the environment variables used in the docker-compose file can be moved to the Dockerfile
-7. COPY method to upload the CSV file data to the Postgres table     
+7. COPY method to upload the CSV file data to the Postgres table    
+
+### Options regarding uploading CSV file
+1. We can upload the CSV file directly to the image while building using the docker build command. It can only be copied before the image is build. Which means that we don't have to upload the CSV file to the host machine and while the image is run, it can copy the CSV file from the local container folder to the postgres table. Drawback would be the size of the image would be large and can slow when uploading and processing.
+2. We can simply copy the CSV files to the host machine where the docker container is running. It will be a different compare to linux and mac os. Basically we need to mount the docker's volume to the host directory where we can copy the CSV file, and the docker will read and mount in its local volume. Then it can be read and uploaded to the postgres table.  
+   
+### Pass an environment variables in docker
+1. Can pass an environment variable from a host to the container 
+2. Can pass an environment variable from a container to the host   
+3. Can pass an environment variable from one container to the another
+
+In this project, I am creating a .env file that will hold all the defined environment variables. These variables should be declared in the root level where the docker-compose file is present. These variables should be initialized in the server or in cloud server. The docker-compose file will read the variables and each variable that is declared in the docker service and read the variable without passing through Dockerfile. 
 
 ### Docker commands
 ```

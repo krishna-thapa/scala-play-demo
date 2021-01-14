@@ -4,6 +4,7 @@ import java.util.{ Calendar, Date }
 
 import akka.actor.{ ActorRef, ActorSystem, Props }
 import com.google.inject.Inject
+import com.krishna.util.Logging
 import com.typesafe.akka.`extension`.quartz.QuartzSchedulerExtension
 import play.api.inject.ApplicationLifecycle
 import play.inject.Injector
@@ -14,9 +15,7 @@ class ApplicationStart @Inject()(
     lifecycle: ApplicationLifecycle,
     system: ActorSystem,
     injector: Injector
-) {
-  val name = "ApplicationStart"
-
+) extends Logging {
   // Shut-down hook
   lifecycle.addStopHook { () =>
     Future.successful()
@@ -24,7 +23,10 @@ class ApplicationStart @Inject()(
 
   val now: Date = Calendar.getInstance().getTime
 
-  // Start scheduling
+  val projectEnv: String = sys.env.getOrElse("PROJECT_ENV", "local")
+  log.info(s"Project is started in $projectEnv at $now")
+
+  // TODO: Start scheduling
   val scheduler: QuartzSchedulerExtension = QuartzSchedulerExtension(system)
   val receiver: ActorRef =
     system.actorOf(Props.create(classOf[GuiceActorProducer], injector, classOf[QuoteOfTheDayActor]))
