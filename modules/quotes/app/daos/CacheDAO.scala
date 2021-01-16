@@ -2,8 +2,8 @@ package daos
 
 import com.krishna.conf.AppConfig
 import com.krishna.model.QuotesQuery
-import com.krishna.response.ResponseMsg.{ EmptyDbMsg, InvalidDate }
-import com.krishna.response.{ ResponseError, ResponseMsg }
+import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidDate }
+import com.krishna.response.{ ResponseError, ErrorMsg }
 import com.krishna.util.DateConversion.getCurrentDate
 import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
 import play.api.libs.json.Json
@@ -33,10 +33,10 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     * @param contentDate: To check the date as a key in the Redis
     * @return Response Quote in the JSON
     */
-  def cacheQuoteOfTheDay(contentDate: String): Either[ResponseMsg, QuotesQuery] = {
+  def cacheQuoteOfTheDay(contentDate: String): Either[ErrorMsg, QuotesQuery] = {
     if (contentDate.contentEquals(getCurrentDate)) {
-      randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
-        val uniqueQuote: Either[ResponseMsg, QuotesQuery] =
+      randomQuote.fold[Either[ErrorMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+        val uniqueQuote: Either[ErrorMsg, QuotesQuery] =
           getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
 
         // Side effect to store the cache storage
@@ -68,14 +68,14 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   def getUniqueQuoteFromDB(
       quote: QuotesQuery,
       cachedQuotes: RedisList[String, SynchronousResult]
-  ): Either[ResponseMsg, QuotesQuery] = {
+  ): Either[ErrorMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method
     // Use of List instead of Set since redis-play has no many wrapper methods for Set and no sorted Set
     if (cachedQuotes.toList.toList.contains(quote.csvId)) {
       log.warn("Duplicate record has been called with id: " + quote.csvId)
       randomQuote
-        .fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
+        .fold[Either[ErrorMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
           getUniqueQuoteFromDB(quote, cachedQuotes)
         })
     } else {

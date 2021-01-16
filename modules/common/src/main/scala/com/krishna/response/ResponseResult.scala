@@ -1,7 +1,7 @@
 package com.krishna.response
 
 import com.krishna.model.base.IdResource
-import com.krishna.response.ResponseMsg._
+import com.krishna.response.ErrorMsg._
 import com.sksamuel.elastic4s.Response
 import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
@@ -44,7 +44,7 @@ trait ResponseResult extends ResponseError {
   }
 
   def responseEitherResult[T <: IdResource](
-      record: Either[ResponseMsg, T]
+      record: Either[ErrorMsg, T]
   )(implicit conv: OFormat[T]): Result = {
     record match {
       case Left(errorMsg) =>
@@ -53,12 +53,14 @@ trait ResponseResult extends ResponseError {
     }
   }
 
-  def responseErrorResult(errorMsg: ResponseMsg): Result = {
+  def responseErrorResult(errorMsg: ErrorMsg): Result = {
     errorMsg match {
-      case EmptyDbMsg                 => notFound(EmptyDbMsg.msg)
-      case invalidDate: InvalidDate   => badRequest(invalidDate.msg)
-      case invalidCsvId: InvalidCsvId => badRequest(invalidCsvId.msg)
-      case _                          => badRequest("Something went wrong")
+      case EmptyDbMsg                             => notFound(EmptyDbMsg.msg)
+      case invalidDate: InvalidDate               => badRequest(invalidDate.msg)
+      case invalidCsvId: InvalidCsvId             => badRequest(invalidCsvId.msg)
+      case NoAuthorizationField                   => badGateway(NoAuthorizationField.msg)
+      case tokenDecodeFailure: TokenDecodeFailure => badGateway(tokenDecodeFailure.msg)
+      case _                                      => badRequest("Something went wrong")
     }
   }
 

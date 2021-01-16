@@ -2,13 +2,12 @@
 package controllers.quotes
 
 import com.krishna.model.Genre.Genre
-import com.krishna.response.ResponseMsg.InvalidCsvId
-import com.krishna.response.ResponseResult
+import com.krishna.response.ErrorMsg.InvalidCsvId
+import com.krishna.response.{ ErrorMsg, ResponseResult }
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
 import daos.QuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
-
 import javax.inject._
 import model.UserDetail
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -35,13 +34,14 @@ class QuoteController @Inject()(
     with Logging {
 
   // CsvId should start with "CSV" prefix
-  protected lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
+  private val csvIdPattern: Regex = "CSV[0-9]+$".r
 
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
-    * Anyone can call this API endpoint
     *
-    * By default Play Framework is asynchronous from the bottom up
+    * Anyone can call this API endpoint.
+    *
+    * This API endpoint is not used in mobile app
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
@@ -49,12 +49,16 @@ class QuoteController @Inject()(
   }
 
   /**
-    *  A REST endpoint that gets a quote of the day as JSON from quotes table
-    *  Is triggered after midnight on every day using cron job
+    *  A REST endpoint that gets a quote of the day as JSON from quotes table.
+    *  It should be trigger after midnight on every day using cron job.
+    *  It should stores the past 5 quotes of the day in the Redis cache storage.
+    *
+    *  Anyone can call this API endpoint.
+    *
+    *  This API endpoint is not used in mobile app
+    *
     *  @param date: Can take milliseconds date format as a path parameter to gets the
     *  previous 5 days quote of the day
-    *  It stores the past 5 quote of the day in the Redis cache storage
-    *  Anyone can perform this action
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
@@ -81,7 +85,8 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that gets all the quotes as JSON from quotes table.
-    * Only Admin can perform this action
+    *
+    * Only Admin can perform this action.
     */
   def getAllQuotes: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllQuotes")
@@ -90,7 +95,8 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that gets random 10 quotes as JSON from quotes table.
-    * Anyone can perform this action
+    *
+    *  Anyone can call this API endpoint.
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
@@ -102,24 +108,30 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action and should be stored to user's id only
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
-    val user: UserDetail = DecodeHeader(request.headers)
-    log.info(s"Executing favQuote by user: ${user.email}")
-
-    if (csvIdPattern.matches(csvId)) {
-      responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
-    } else {
-      responseErrorResult(InvalidCsvId(csvId))
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(s"Executing favQuote by user: ${user.email}")
+        if (csvIdPattern.matches(csvId)) {
+          responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
+        } else {
+          responseErrorResult(InvalidCsvId(csvId))
+        }
+      case Left(errorMsg) => responseErrorResult(errorMsg)
     }
+
   }
 
   /**
     * A REST endpoint that gets all favorite quotes as JSON from fav_quotes table.
-    * Only the logged user can perform this action and should retrieve own fav quotes only
+    * Only the logged user can perform this action and should retrieve their own fav quotes only
     */
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
-    val user: UserDetail = DecodeHeader(request.headers)
-    log.info(s"Executing getFavQuotes by user: ${user.email}")
-    responseSeqResult(favQuoteService.listAllQuotes(user.id))
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(s"Executing getFavQuotes by user: ${user.email}")
+        responseSeqResult(favQuoteService.listAllQuotes(user.id))
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+    }
   }
 
   /**

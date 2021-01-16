@@ -1,7 +1,7 @@
 package service
 
 import com.krishna.model.{ AllQuotesOfDay, QuotesQuery }
-import com.krishna.response.ResponseMsg
+import com.krishna.response.ErrorMsg
 import com.krishna.util.DateConversion.getCurrentDate
 import com.krishna.util.Logging
 import daos.CacheDAO
@@ -14,7 +14,7 @@ class CacheService @Inject()(
     cacheDao: CacheDAO
 ) extends Logging {
 
-  def cacheQuoteOfTheDay(contentDate: String): Either[ResponseMsg, QuotesQuery] = {
+  def cacheQuoteOfTheDay(contentDate: String): Either[ErrorMsg, QuotesQuery] = {
 
     // Get the quote from the content date key from global cache storage in Redis
     cache.get[String](contentDate) match {
@@ -27,7 +27,7 @@ class CacheService @Inject()(
     }
   }
 
-  def getAllCachedQuotes: Either[ResponseMsg, Seq[AllQuotesOfDay]] = {
+  def getAllCachedQuotes: Either[ErrorMsg, Seq[AllQuotesOfDay]] = {
     // Get all the cached keys(max 5) and will be in date format
     val allCachedKeys: SynchronousResult[Seq[String]] = cache.matching("20*")
 

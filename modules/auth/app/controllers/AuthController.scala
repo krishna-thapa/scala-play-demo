@@ -131,10 +131,13 @@ class AuthController @Inject()(
   def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    val user: UserDetail   = DecodeHeader(request.headers)
-    val overrideEmail      = if (user.isAdmin) email else user.email
-    val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
-    runApiAction(overrideEmail)(getUserInfoDetails)
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        val overrideEmail      = if (user.isAdmin) email else user.email
+        val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
+        runApiAction(overrideEmail)(getUserInfoDetails)
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+    }
   }
 
   /**
