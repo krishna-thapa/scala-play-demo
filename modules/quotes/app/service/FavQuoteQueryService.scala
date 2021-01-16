@@ -17,4 +17,8 @@ class FavQuoteQueryService @Inject()(favQuote: FavQuoteQueryDAO) extends Logging
   def createOrUpdateFavQuote(userId: Int, csvId: String): Try[FavQuoteQuery] = {
     favQuote.modifyFavQuote[FavQuoteQuery](userId, csvId)
   }
+
+  def getFavCachedQuotes(userId: Int): Seq[FavQuoteQuery] = {
+    favQuote.listCachedFavQuotes[FavQuoteQuery](userId)
+  }
 }

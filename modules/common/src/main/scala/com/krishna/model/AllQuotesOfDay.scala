@@ -6,6 +6,7 @@ import play.api.libs.json.{ Json, OFormat }
 case class AllQuotesOfDay(
     id: Int,
     contentDate: String,
+    isFavQuote: Boolean = false,
     quote: QuotesQuery
 ) extends IdResource
 

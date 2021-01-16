@@ -2,8 +2,8 @@
 package controllers.quotes
 
 import com.krishna.model.Genre.Genre
-import com.krishna.response.ErrorMsg.InvalidCsvId
-import com.krishna.response.{ ErrorMsg, ResponseResult }
+import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidCsvId }
+import com.krishna.response.ResponseResult
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
 import daos.QuoteQueryDAO
@@ -34,7 +34,7 @@ class QuoteController @Inject()(
     with Logging {
 
   // CsvId should start with "CSV" prefix
-  private val csvIdPattern: Regex = "CSV[0-9]+$".r
+  private lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
@@ -77,9 +77,23 @@ class QuoteController @Inject()(
     */
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing get last five quotes of the day")
-    cacheService.getAllCachedQuotes match {
+    DecodeHeader(request.headers) match {
       case Left(errorMsg) => responseErrorResult(errorMsg)
-      case Right(quotes)  => responseSeqResult(quotes)
+      case Right(user: UserDetail) =>
+        cacheService.getAllCachedQuotes match {
+          case Left(errorMsg) => responseErrorResult(errorMsg)
+          case Right(quotes) =>
+            if (quotes.nonEmpty) {
+              val cachedFavQuoteIds: Seq[String] =
+                favQuoteService.getFavCachedQuotes(user.id).map(_.csvId)
+              val x = quotes.map { cachedQuote =>
+                if (cachedFavQuoteIds.contains(cachedQuote.quote.csvId))
+                  cachedQuote.copy(isFavQuote = true)
+                else cachedQuote
+              }
+              responseSeqResult(x)
+            } else notFound(EmptyDbMsg.msg)
+        }
     }
   }
 

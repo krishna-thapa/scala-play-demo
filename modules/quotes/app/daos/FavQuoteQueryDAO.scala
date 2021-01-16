@@ -43,6 +43,14 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     runDbAction(query.result).map(_._1.asInstanceOf[T])
   }
 
+  def listCachedFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
+    val query = favQuotesTable.filter { record =>
+      record.userId === userId && record.favTag
+    }.result
+
+    runDbAction(query).map(_.asInstanceOf[T])
+  }
+
   // list all records from the fav_quotes table
   //def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)
 

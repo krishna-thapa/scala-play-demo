@@ -45,6 +45,10 @@ GET      /quoteOfTheDay         controllers.quotes.QuoteController.getQuoteOfThe
 #        $ref: '#/definitions/com.krishna.model.QuotesQuery'
 #    404:
 #      description: Not found. Database is empty.
+#    502:
+#      description: Bad Gateway.
+#  security:
+#    - TokenKey: []
 ###
 GET      /quotesOfTheDay         controllers.quotes.QuoteController.getCachedQuotes
 
@@ -74,6 +78,8 @@ GET      /randomTen             controllers.quotes.QuoteController.getFirst10Quo
 #        $ref: '#/definitions/com.krishna.model.QuotesQuery'
 #    404:
 #      description: Not found. Database is empty.
+#    502:
+#      description: Bad Gateway.
 #  security:
 #    - TokenKey: []
 ###
@@ -99,6 +105,8 @@ GET      /allQuotes            controllers.quotes.QuoteController.getAllQuotes
 #      description: Bad request. ID should be in CSV[0-9] format
 #    404:
 #      description: Not found. Database is empty.
+#    502:
+#      description: Bad Gateway.
 #  security:
 #    - TokenKey: []
 ###
@@ -115,6 +123,8 @@ POST     /fav/:csvId            controllers.quotes.QuoteController.favQuote(csvI
 #        $ref: '#/definitions/com.krishna.model.QuotesQuery'
 #    404:
 #      description: Not found. Database is empty.
+#    502:
+#      description: Bad Gateway.
 #  security:
 #    - TokenKey: []
 ###
