@@ -19,9 +19,6 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     A cache API that uses synchronous calls rather than async calls.
     Useful when you know you have a fast in-memory cache.
    */
-  protected lazy val randomQuoteCacheList: RedisList[String, SynchronousResult] =
-    cache.list[String]("cache-random-quote")
-
   protected lazy val quoteOfTheDayCacheList: RedisList[String, SynchronousResult] =
     cache.list[String]("cache-quoteOfTheDay")
 
@@ -60,17 +57,6 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   }
 
   /**
-    * Cache storage for the random quote API
-    * First 500 response should be unique quote
-    * @return the quote in the JSON format
-    */
-  def cacheRandomQuote(): Either[ResponseMsg, QuotesQuery] = {
-    randomQuote.fold[Either[ResponseMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
-      getUniqueQuoteFromDB(quote, randomQuoteCacheList)
-    })
-  }
-
-  /**
     * Recursive method that checks if the quote is present in cache list
     * If it is then retrieve the new quote and call the same method, if not then
     * it updates the redis cache list and return the quote
@@ -78,6 +64,7 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
     * @param cachedQuotes redis cache list that has all the past called quote csv ids
     * @return random quote that has not been called before
     */
+  //TODO: Convert this to tail recursive
   def getUniqueQuoteFromDB(
       quote: QuotesQuery,
       cachedQuotes: RedisList[String, SynchronousResult]

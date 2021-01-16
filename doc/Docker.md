@@ -1,3 +1,10 @@
+## Run the project in any server using containers
+- Install a docker and docker-compose in the server
+- Copy the docker-compose file in the any directory 
+- Copy .env file to the same directory 
+- Copy CSV file to the respective mounted volume directory for the postgres container's volume 
+- Run the command: `docker-compose up`
+
 ## Docker
 Docker is an open-source containerization platform that allows you to quickly build, test, and deploy applications as portable containers that can run virtually anywhere. A container represents a runtime for a single application and includes everything the software needs to run.
 
@@ -94,7 +101,6 @@ docker exec -it <container-id> redis-cli
 KEYS * 
 
 // Delete the list
-DEL cache-random-quote
 DEL cache-quoteOfTheDay
 
 // Get all the stored values inside the list

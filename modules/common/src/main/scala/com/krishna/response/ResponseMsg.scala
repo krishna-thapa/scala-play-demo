@@ -6,7 +6,7 @@ trait ResponseMsg {
 }
 
 object ResponseMsg {
-
+  //TODO add more for auth and search modules
   case object EmptyDbMsg extends ResponseMsg {
     override val msg: String = "Database is empty!"
   }

@@ -27,14 +27,17 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   /**
     * @return List of all stored quotes from database
     */
-  def listAllQuotes: Seq[QuotesQuery] =
+  def listAllQuotes: Seq[QuotesQuery] = {
+    log.info("Getting all the records from the table")
     runDbAction(getAllQuotes)
+  }
 
   /**
     * @param records number of records to return
     * @return Random quote from the database table
     */
   def listRandomQuote(records: Int): Seq[QuotesQuery] = {
+    log.info(s"Getting random quotes from the table with total size: $records")
     runDbAction(getRandomRecords(records))
   }
 
@@ -43,6 +46,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return Random quote that matches input genre
     */
   def listGenreQuote(genre: Genre): Option[QuotesQuery] = {
+    log.info(s"Getting random quote from the table with genre: ${genre.value}")
     runDbAction(
       tables
         .filter(_.genre === genre)

@@ -39,15 +39,13 @@ class QuoteController @Inject()(
 
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
-    * Should be unique to last 500 retrieved records from this end point
-    * Uses Redis cache database to store last 500 csv id to get unique record
-    * Anyone can do perform this action
+    * Anyone can call this API endpoint
     *
     * By default Play Framework is asynchronous from the bottom up
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getRandomQuote")
-    responseEitherResult(cacheService.getCacheRandomQuote)
+    responseSeqResult(quotesDAO.listRandomQuote(1))
   }
 
   /**
@@ -74,12 +72,15 @@ class QuoteController @Inject()(
     * @return last 5 quote of the day
     */
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getLastFiveQuotes")
-    responseSeqResult(cacheService.getAllCachedQuotes)
+    log.info("Executing get last five quotes of the day")
+    cacheService.getAllCachedQuotes match {
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+      case Right(quotes)  => responseSeqResult(quotes)
+    }
   }
 
   /**
-    * A REST endpoint that gets all the quotes as JSON from quotes table
+    * A REST endpoint that gets all the quotes as JSON from quotes table.
     * Only Admin can perform this action
     */
   def getAllQuotes: Action[AnyContent] = AdminAction { implicit request =>
@@ -88,7 +89,7 @@ class QuoteController @Inject()(
   }
 
   /**
-    * A REST endpoint that gets random 10 quotes as JSON from quotes table
+    * A REST endpoint that gets random 10 quotes as JSON from quotes table.
     * Anyone can perform this action
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
@@ -107,7 +108,7 @@ class QuoteController @Inject()(
     if (csvIdPattern.matches(csvId)) {
       responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
     } else {
-      badRequest(InvalidCsvId(csvId).msg)
+      responseErrorResult(InvalidCsvId(csvId))
     }
   }
 
