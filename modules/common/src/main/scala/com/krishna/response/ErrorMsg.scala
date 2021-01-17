@@ -6,7 +6,7 @@ trait ErrorMsg {
 }
 
 object ErrorMsg {
-  //TODO add more for auth and search modules
+  //TODO add more from auth and search modules
   case object EmptyDbMsg extends ErrorMsg {
     override val msg: String = "Database is empty!"
   }
@@ -25,5 +25,13 @@ object ErrorMsg {
 
   case class TokenDecodeFailure(exception: String) extends ErrorMsg {
     override val msg: String = s"JWT token decode failed with an error : $exception"
+  }
+
+  case object AuthenticationFailed extends ErrorMsg {
+    override val msg: String = "Authentication failed: Do not have access!"
+  }
+
+  case class AuthorizationForbidden(email: String) extends ErrorMsg {
+    override val msg: String = s"Forbidden authorization for user: $email"
   }
 }

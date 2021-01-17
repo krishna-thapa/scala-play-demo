@@ -55,12 +55,14 @@ trait ResponseResult extends ResponseError {
 
   def responseErrorResult(errorMsg: ErrorMsg): Result = {
     errorMsg match {
-      case EmptyDbMsg                             => notFound(EmptyDbMsg.msg)
-      case invalidDate: InvalidDate               => badRequest(invalidDate.msg)
-      case invalidCsvId: InvalidCsvId             => badRequest(invalidCsvId.msg)
-      case NoAuthorizationField                   => badGateway(NoAuthorizationField.msg)
-      case tokenDecodeFailure: TokenDecodeFailure => badGateway(tokenDecodeFailure.msg)
-      case _                                      => badRequest("Something went wrong")
+      case EmptyDbMsg                                     => notFound(EmptyDbMsg.msg)
+      case invalidDate: InvalidDate                       => badRequest(invalidDate.msg)
+      case invalidCsvId: InvalidCsvId                     => badRequest(invalidCsvId.msg)
+      case NoAuthorizationField                           => badGateway(NoAuthorizationField.msg)
+      case tokenDecodeFailure: TokenDecodeFailure         => badGateway(tokenDecodeFailure.msg)
+      case AuthenticationFailed                           => unauthorized(AuthenticationFailed.msg)
+      case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden.email)
+      case _                                              => badRequest("Something went wrong")
     }
   }
 

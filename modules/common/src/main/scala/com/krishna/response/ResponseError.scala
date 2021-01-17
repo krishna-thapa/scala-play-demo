@@ -37,15 +37,13 @@ trait ResponseError extends Logging {
   }
 
   def unauthorized(msg: String): Result = {
-    val errorMessage: String = s"Unauthorized with reason: $msg"
-    log.error(errorMessage)
-    Unauthorized(Json.toJson(ResponseErrorMsg(errorMessage)))
+    log.error(s"Unauthorized with reason: $msg")
+    Unauthorized(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def forbidden(msg: String): Result = {
-    val errorMessage: String = s"Forbidden for user: $msg"
-    log.error(errorMessage)
-    Forbidden(Json.toJson(ResponseErrorMsg(errorMessage)))
+    log.error(s"Forbidden request: $msg")
+    Forbidden(Json.toJson(ResponseErrorMsg(msg)))
   }
 
   def notAcceptable(msg: String): Result = {

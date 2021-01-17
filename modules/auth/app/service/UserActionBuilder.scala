@@ -2,7 +2,8 @@ package service
 
 import java.time.Clock
 
-import com.krishna.response.ResponseError
+import com.krishna.response.ErrorMsg.AuthenticationFailed
+import com.krishna.response.ResponseResult
 import javax.inject.Inject
 import model.UserDetail
 import pdi.jwt.JwtSession._
@@ -16,7 +17,7 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
     implicit ec: ExecutionContext,
     conf: Configuration
 ) extends ActionBuilderImpl(parser)
-    with ResponseError
+    with ResponseResult
     with JwtKey {
 
   implicit val clock: Clock = Clock.systemUTC
@@ -35,7 +36,7 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
         log.info(s"Giving access to the user: ${userDetail.name}")
         block(new AuthenticatedRequest[A](userDetail, request)).map(_.refreshJwtSession(request))
       case _ =>
-        Future(unauthorized(s"Do not have access!"))
+        Future(responseErrorResult(AuthenticationFailed))
     }
   }
 }

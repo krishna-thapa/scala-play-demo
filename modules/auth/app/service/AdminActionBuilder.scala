@@ -2,7 +2,8 @@ package service
 
 import java.time.Clock
 
-import com.krishna.response.ResponseError
+import com.krishna.response.ErrorMsg.{ AuthenticationFailed, AuthorizationForbidden }
+import com.krishna.response.ResponseResult
 import javax.inject.Inject
 import model.UserDetail
 import pdi.jwt.JwtSession.RichRequestHeader
@@ -17,7 +18,7 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
     implicit ec: ExecutionContext,
     conf: Configuration
 ) extends ActionBuilderImpl(parser)
-    with ResponseError
+    with ResponseResult
     with JwtKey {
 
   implicit val clock: Clock = Clock.systemUTC
@@ -32,9 +33,12 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
         block(new AuthenticatedRequest[A](userDetail, request)).map(_.refreshJwtSession(request))
       // If the logged in user doesn't have an admin role
       case Some(userDetail) =>
-        Future(forbidden(s"${userDetail.email}").refreshJwtSession(request))
+        Future(
+          responseErrorResult(AuthorizationForbidden(s"${userDetail.email}"))
+            .refreshJwtSession(request)
+        )
       case _ =>
-        Future(unauthorized(s"Do not have access!"))
+        Future(responseErrorResult(AuthenticationFailed))
     }
   }
 }
