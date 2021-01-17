@@ -2,21 +2,16 @@
 package controllers.quotes
 
 import com.krishna.model.Genre.Genre
-import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidCsvId }
 import com.krishna.response.ResponseResult
-import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
-import daos.QuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject._
 import model.UserDetail
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.mvc._
-import service.{ CacheService, FavQuoteQueryService }
+import service.QuoteQueryService
 import util.DecodeHeader
 
 import scala.concurrent.ExecutionContext
-import scala.util.matching.Regex
 
 /**
   * This controller creates an 'Action' to handle HTTP requests to the
@@ -24,17 +19,12 @@ import scala.util.matching.Regex
   */
 @Singleton
 class QuoteController @Inject()(
-    cacheService: CacheService,
-    scc: SecuredControllerComponents,
-    quotesDAO: QuoteQueryDAO,
-    favQuoteService: FavQuoteQueryService
+    quoteService: QuoteQueryService,
+    scc: SecuredControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends SecuredController(scc)
     with ResponseResult
     with Logging {
-
-  // CsvId should start with "CSV" prefix
-  private lazy val csvIdPattern: Regex = "CSV[0-9]+$".r
 
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
@@ -44,8 +34,8 @@ class QuoteController @Inject()(
     * This API endpoint is not used in mobile app
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
-    log.info("Executing getRandomQuote")
-    responseSeqResult(quotesDAO.listRandomQuote(1))
+    log.info("Executing getRandomQuote in Controller ")
+    quoteService.randomQuoteService(1)
   }
 
   /**
@@ -62,12 +52,7 @@ class QuoteController @Inject()(
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
-
-    val contentDate: String =
-      date.fold[String](getCurrentDate)((strDate: String) => convertToDate(strDate))
-    log.info("Content Date from the API call: " + contentDate)
-
-    responseEitherResult(cacheService.cacheQuoteOfTheDay(contentDate))
+    quoteService.quoteOfTheDayService(date)
   }
 
   /**
@@ -78,22 +63,11 @@ class QuoteController @Inject()(
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing get last five quotes of the day")
     DecodeHeader(request.headers) match {
-      case Left(errorMsg) => responseErrorResult(errorMsg)
+      case Left(_) =>
+        log.info("Getting cached quotes for users that are not logged in")
+        quoteService.cachedQuotesService(None)
       case Right(user: UserDetail) =>
-        cacheService.getAllCachedQuotes match {
-          case Left(errorMsg) => responseErrorResult(errorMsg)
-          case Right(quotes) =>
-            if (quotes.nonEmpty) {
-              val cachedFavQuoteIds: Seq[String] =
-                favQuoteService.getFavCachedQuotes(user.id).map(_.csvId)
-              val x = quotes.map { cachedQuote =>
-                if (cachedFavQuoteIds.contains(cachedQuote.quote.csvId))
-                  cachedQuote.copy(isFavQuote = true)
-                else cachedQuote
-              }
-              responseSeqResult(x)
-            } else notFound(EmptyDbMsg.msg)
-        }
+        quoteService.cachedQuotesService(Some(user))
     }
   }
 
@@ -104,7 +78,7 @@ class QuoteController @Inject()(
     */
   def getAllQuotes: Action[AnyContent] = AdminAction { implicit request =>
     log.info("Executing getAllQuotes")
-    responseSeqResult(quotesDAO.listAllQuotes)
+    quoteService.allQuotesService()
   }
 
   /**
@@ -114,7 +88,7 @@ class QuoteController @Inject()(
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
-    responseSeqResult(quotesDAO.listRandomQuote(10))
+    quoteService.randomQuoteService(10)
   }
 
   /**
@@ -125,11 +99,7 @@ class QuoteController @Inject()(
     DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing favQuote by user: ${user.email}")
-        if (csvIdPattern.matches(csvId)) {
-          responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
-        } else {
-          responseErrorResult(InvalidCsvId(csvId))
-        }
+        quoteService.updateFavQuoteService(csvId: String, user)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
 
@@ -143,7 +113,7 @@ class QuoteController @Inject()(
     DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing getFavQuotes by user: ${user.email}")
-        responseSeqResult(favQuoteService.listAllQuotes(user.id))
+        quoteService.getFavQuotesService(user.id)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }
@@ -155,6 +125,6 @@ class QuoteController @Inject()(
     */
   def getGenreQuote(genre: Genre): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getGenreQuote")
-    responseOptionResult(quotesDAO.listGenreQuote(genre))
+    quoteService.genreQuoteService(genre)
   }
 }
