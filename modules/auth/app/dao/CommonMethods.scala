@@ -1,5 +1,6 @@
 package dao
 
+import com.krishna.response.ErrorMsg.AccountNotFound
 import com.krishna.response.ResponseError
 import com.krishna.util.{ DbRunner, Logging }
 import model.UserInfo
@@ -30,9 +31,7 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
         log.info(s"Account is already in the table with id: ${userInfo.id}")
         Right(fun(userInfo))
       case None =>
-        val errorMsg: String = s"User account is not found: $email"
-        log.info(errorMsg)
-        Left(notFound(errorMsg))
+        Left(notFound(AccountNotFound(email)))
     }
   }
 

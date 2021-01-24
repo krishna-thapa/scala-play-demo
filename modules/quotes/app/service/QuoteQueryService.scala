@@ -26,6 +26,11 @@ class QuoteQueryService @Inject()(
 
   def randomQuoteService(records: Int): Result = {
     log.info("Executing randomQuoteService in Service")
+    responseOptionResult(quotesDAO.listRandomQuote(records).headOption)
+  }
+
+  def random10QuoteService(records: Int): Result = {
+    log.info("Executing random10QuoteService in Service")
     responseSeqResult(quotesDAO.listRandomQuote(records))
   }
 
@@ -57,7 +62,7 @@ class QuoteQueryService @Inject()(
           cachedQuote.copy(isFavQuote = true)
         else cachedQuote
       })
-    } else notFound(EmptyDbMsg.msg)
+    } else notFound(EmptyDbMsg)
   }
 
   def allQuotesService(): Result = {

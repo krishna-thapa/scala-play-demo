@@ -1,11 +1,12 @@
 package dao
 
 import java.sql.Date
+
 import bcrypt.BcryptException
 import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
+import com.krishna.response.ErrorMsg.{ InvalidPassword, invalidBcryptValidation }
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
-
 import javax.inject.{ Inject, Singleton }
 import model.{ UserDetail, UserInfo }
 import play.api.db.slick.DatabaseConfigProvider
@@ -65,9 +66,10 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     val user: UserInfo = checkValidEmail(details.email).head
     // Check for the password match
     validatePassword(details.password, user.password) match {
-      case Success(true)      => Right(user)
-      case Success(false)     => Left(unauthorized(s"${details.email}"))
-      case Failure(exception) => Left(bcryptValidationFailed(exception.getMessage))
+      case Success(true)  => Right(user)
+      case Success(false) => Left(unauthorized(InvalidPassword(details.email)))
+      case Failure(exception) =>
+        Left(bcryptValidationFailed(invalidBcryptValidation(exception.getMessage)))
     }
   }
 

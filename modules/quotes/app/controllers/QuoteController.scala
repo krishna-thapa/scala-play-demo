@@ -88,7 +88,7 @@ class QuoteController @Inject()(
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing getFirst10Quotes")
-    quoteService.randomQuoteService(10)
+    quoteService.random10QuoteService(10)
   }
 
   /**

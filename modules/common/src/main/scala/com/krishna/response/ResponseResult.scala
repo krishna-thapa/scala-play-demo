@@ -17,13 +17,13 @@ trait ResponseResult extends ResponseError {
 
   def responseSeqResult[T <: IdResource](records: Seq[T])(implicit conv: OFormat[T]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
-    else notFound(EmptyDbMsg.msg)
+    else notFound(EmptyDbMsg)
   }
 
   // TODO have to remove it
   def responseSeqString(records: Seq[String]): Result = {
     if (records.nonEmpty) Ok(Json.toJson(records))
-    else notFound(EmptyDbMsg.msg)
+    else notFound(EmptyDbMsg)
   }
 
   def responseOptionResult[T <: IdResource](
@@ -32,7 +32,7 @@ trait ResponseResult extends ResponseError {
     record match {
       case Some(quote) => Ok(Json.toJson(quote))
       case None =>
-        notFound(EmptyDbMsg.msg)
+        notFound(EmptyDbMsg)
     }
   }
 
@@ -53,25 +53,12 @@ trait ResponseResult extends ResponseError {
     }
   }
 
-  def responseErrorResult(errorMsg: ErrorMsg): Result = {
-    errorMsg match {
-      case EmptyDbMsg                                     => notFound(EmptyDbMsg.msg)
-      case invalidDate: InvalidDate                       => badRequest(invalidDate.msg)
-      case invalidCsvId: InvalidCsvId                     => badRequest(invalidCsvId.msg)
-      case NoAuthorizationField                           => badGateway(NoAuthorizationField.msg)
-      case tokenDecodeFailure: TokenDecodeFailure         => badGateway(tokenDecodeFailure.msg)
-      case AuthenticationFailed                           => unauthorized(AuthenticationFailed.msg)
-      case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden.email)
-      case _                                              => badRequest("Something went wrong")
-    }
-  }
-
   def responseEsResult[T](response: Response[T]): Result = {
     if (response.isSuccess) {
       Ok(s"Success: ${response.body}")
     } else {
       log.error(s"Error while deleting an index: ${response.error.reason}")
-      notFound(s"${response.error.reason}")
+      notFound(EsPlaceHolder(response.error.reason))
     }
   }
 
@@ -81,7 +68,22 @@ trait ResponseResult extends ResponseError {
       Ok(s"Success with response code: ${responses.head.status}")
     } else {
       log.error(s"Error while writing on index: ${headResponse.error.reason}")
-      notFound(s"${headResponse.error.reason}")
+      notFound(EsPlaceHolder(headResponse.error.reason))
+    }
+  }
+
+  // Use this method on each response error
+  def responseErrorResult(errorMsg: ErrorMsg): Result = {
+    errorMsg match {
+      case EmptyDbMsg                                     => notFound(EmptyDbMsg)
+      case invalidDate: InvalidDate                       => badRequest(invalidDate.msg)
+      case invalidCsvId: InvalidCsvId                     => badRequest(invalidCsvId.msg)
+      case NoAuthorizationField                           => badGateway(NoAuthorizationField.msg)
+      case tokenDecodeFailure: TokenDecodeFailure         => badGateway(tokenDecodeFailure.msg)
+      case AuthenticationFailed                           => unauthorized(AuthenticationFailed)
+      case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden.email)
+      case accountNotFound: AccountNotFound               => notFound(accountNotFound)
+      case _                                              => badRequest("Something went wrong")
     }
   }
 

@@ -1,12 +1,12 @@
 package controllers.customQuote
 
+import com.krishna.response.ErrorMsg.RecordNotFound
 import com.krishna.response.{ OkResponse, ResponseResult }
 import com.krishna.util.Logging
 import dao.CustomQuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import forms.RequestForm
 import model.UserDetail
-
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 import util.DecodeHeader
@@ -110,7 +110,7 @@ class CustomQuoteController @Inject()(
               case Success(recordsUpdated) if recordsUpdated == 1 =>
                 responseOk(OkResponse(s"Successfully updated record with id: $id"))
               case Success(recordsUpdated) if recordsUpdated != 1 =>
-                notFound(s"Record not found with id: $id")
+                notFound(RecordNotFound(id))
               case Failure(exception) => internalServerError(exception.getMessage)
             }
           }

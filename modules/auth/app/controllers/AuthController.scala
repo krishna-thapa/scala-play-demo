@@ -3,11 +3,12 @@ package controllers.auth
 
 import java.time.Clock
 
+import com.krishna.response.ErrorMsg.{ AccountNotFound, InvalidFormFormat, invalidBcryptValidation }
 import com.krishna.response.ResponseResult
 import com.krishna.util.Logging
 import dao.AuthDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
-import form.AuthForms
+import form.{ AuthForms, SignInForm }
 import javax.inject.{ Inject, Singleton }
 import model.UserDetail
 import pdi.jwt.JwtSession.RichResult
@@ -36,8 +37,9 @@ class AuthController @Inject()(
     if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
 
   /**
-    * Sign In the existing user
-    * @return Auth JWT token in the header if success
+    * Sign In the existing user using sing in form
+    * @return Auth JWT token in the header if success with response body of user details
+    *  Returns response error if the sign in is not success
     */
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
@@ -46,21 +48,22 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
+          invalidForm[SignInForm](formWithErrors, InvalidFormFormat("Login"))
         },
         signInDetails => {
           // Need to check if the user has enter wrong password but has an account already
           if (authDAO.isAccountExist(signInDetails.email)) {
             authDAO.isValidLogin(signInDetails) match {
               case Right(validUser) =>
-                log.info("Success on authentication!")
-                Ok.addingToJwtSession(
+                val userDetail: UserDetail = UserDetail(validUser)
+                log.info(s"Success on authentication for user: ${userDetail.name}")
+                responseOk(userDetail).addingToJwtSession(
                   jwtSessionKey,
                   UserDetail(validUser)
                 )
               case Left(exceptionResult) => exceptionResult
             }
-          } else notFound(s"User account is not found for : ${signInDetails.email}")
+          } else responseErrorResult(AccountNotFound(signInDetails.email))
         }
       )
     Future(signInResult)
@@ -77,14 +80,15 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
+          badRequest(s"The signup From was not in the expected format: $formWithErrors")
         },
         signUpDetails => {
           // need to check if the account already exist
           if (!authDAO.isAccountExist(signUpDetails.email)) {
             authDAO.signUpUser(signUpDetails) match {
-              case Right(value)    => responseOk(value)
-              case Left(exception) => bcryptValidationFailed(exception.getMessage)
+              case Right(value) => responseOk(value)
+              case Left(exception) =>
+                bcryptValidationFailed(invalidBcryptValidation(exception.getMessage))
             }
           } else notAcceptable(s"${signUpDetails.email}")
         }
@@ -152,7 +156,7 @@ class AuthController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          badRequest(s"The searchForm was not in the expected format: $formWithErrors")
+          badRequest(s"The update Form was not in the expected format: $formWithErrors")
         },
         userDetails => {
           authDAO.updateUserInfo(id, userDetails) match {
@@ -162,7 +166,8 @@ class AuthController @Inject()(
                   responseOk(UserDetail(authDAO.checkValidEmail(userDetails.email).head))
                 case Failure(exception) => badRequest(exception.getMessage)
               }
-            case Left(exception) => bcryptValidationFailed(exception.getMessage)
+            case Left(exception) =>
+              bcryptValidationFailed(invalidBcryptValidation(exception.getMessage))
           }
         }
       )
