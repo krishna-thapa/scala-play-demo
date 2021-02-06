@@ -1,4 +1,4 @@
-## Aim
+## Initial Aim
 - Use of proper logs system throughout the project
 - Logging is a very simple idea of writing to some storage events, data or anything about what happens during your application’s execution.
 - Each log message is made of, at the very least: timestamp, level and the message itself.
@@ -20,7 +20,7 @@
 ## Todo and fix
 - Redirect all the logs coming from Docker compose up to the new log files under the same folder. [Stackoverflow](https://stackoverflow.com/questions/35414495/save-docker-compose-logs-to-a-file)
 - ~~Log file is not generated as configured in the logback config file. There is a folder under the project root, but it won't produce any file while the app is running.~~ It was hidden by Intellij that have to fixed in preferences. 
-- Since the project will be running from the docker image, not sure where will the logs file will be saved in the server machine. I think instead of saving the in the project root directory, can be saved under: `/var/lib`. Might hav to researcg where is the best place to save the log files.
+- Since the project will be running from the docker image, not sure where will the logs file will be saved in the server machine. I think instead of saving in the project root directory, can be saved under: `/var/lib`. Might have to research where is the best place to save the log files.
 - Might have to research for the third party services that provides the logging UI build-in platforms like [finagle](https://twitter.github.io/finagle/).
 
 ## Resources

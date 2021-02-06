@@ -30,6 +30,17 @@ services:
       - "./conf/docker/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "es-data:/usr/share/elasticsearch/data:rw"
     restart: unless-stopped
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.2
+    # Kibana does not need a volume as it uses ElasticSearch to persist its configuration.
+    ports:
+      - 5601:5601
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.10.2
+    user: root
+    volumes:
+    - "./conf/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+    - "/var/lib/docker:/var/lib/docker:ro"
   redis:
     image: redis:latest
     ports:
