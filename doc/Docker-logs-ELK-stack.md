@@ -20,5 +20,7 @@
 - image for Kibana
 - image for filebeat
 
+### Problems:
+- [Filebeat docker Mac support](https://github.com/elastic/beats/issues/17310)
 ## Resources:
 - [Sending Docker Logs to ElasticSearch and Kibana with FileBeat](https://www.sarulabs.com/post/5/2019-08-12/sending-docker-logs-to-elasticsearch-and-kibana-with-filebeat.html)
