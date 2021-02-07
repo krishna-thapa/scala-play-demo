@@ -48,4 +48,10 @@ class FavQuoteQueryDAOSpec extends PostgresInstance with Matchers {
     val allFavQuotes: Seq[QuotesQuery] = favQuoteQueryDAO.listFavQuotes(1)
     allFavQuotes.length shouldBe 1
   }
+
+  it should "return the all quotes that has favTag as true only" in {
+    favQuoteQueryDAO.modifyFavQuote(1, "CSV103")
+    val allFavQuotes: Seq[QuotesQuery] = favQuoteQueryDAO.listCachedFavQuotes(1)
+    allFavQuotes.length shouldBe 2
+  }
 }

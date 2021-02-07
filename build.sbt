@@ -37,7 +37,9 @@ lazy val quotes = project
         Seq(
           cacheApi,
           playRedis,
-          quartzScheduler
+          quartzScheduler,
+          "com.github.sebruck" %% "scalatest-embedded-redis" % "0.4.0",
+          "org.mockito"        %% "mockito-scala-scalatest"  % "1.13.0" % "test"
         )
   )
 

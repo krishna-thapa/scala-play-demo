@@ -14,6 +14,7 @@ import scheduler.ApplicationStart
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
+    // TODO: Need to override in GuiceBuilder in test to remove this while testing
     bind(classOf[ApplicationStart]).asEagerSingleton()
     //bind[Config].toInstance(ConfigFactory.load())
   }

@@ -1,6 +1,9 @@
 name: Inspirational-quote-api CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:

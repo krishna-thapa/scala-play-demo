@@ -25,6 +25,11 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   val quotesTable    = QuoteQueriesTable.quoteQueries
   val favQuotesTable = FavQuoteQueriesTable.favQuoteQueries
 
+  val filterRecordQuery: Int => Query[FavQuoteQueriesTable, FavQuoteQuery, Seq] = (userId: Int) =>
+    favQuotesTable.filter { record =>
+      record.userId === userId && record.favTag
+    }
+
   /*
     NOTE: Use of Upper bounds using super trait of IdResource: Just to use the scala generic bounds
     In this case, each abstract methods have their own Type so not really need of upper bounds
@@ -35,26 +40,20 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     */
   def listFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
     val query = quotesTable
-      .join(favQuotesTable.filter { favQuote =>
-        favQuote.userId === userId && favQuote.favTag
-      })
+      .join(filterRecordQuery(userId))
       .on(_.csvId === _.csvId)
 
     runDbAction(query.result).map(_._1.asInstanceOf[T])
   }
 
   def listCachedFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
-    val query = favQuotesTable.filter { record =>
-      record.userId === userId && record.favTag
-    }.result
+    val query = filterRecordQuery(userId).result
 
     runDbAction(query).map(_.asInstanceOf[T])
   }
 
-  // list all records from the fav_quotes table
-  //def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)
-
   /**
+    * TODO: Use of slick: insertOrUpdate here
     * @param userId primary id from user_details_table
     * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table

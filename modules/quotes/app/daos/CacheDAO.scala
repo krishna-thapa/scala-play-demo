@@ -28,6 +28,10 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO)
   // Gets a single random quote from the `quotes` table
   private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
 
+  def testCache: String = {
+    cache.get[String]("test").getOrElse("not Found")
+  }
+
   /**
     * Cache previous 5 days of quote of the day in the Redis storage
     * @param contentDate: To check the date as a key in the Redis
