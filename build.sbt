@@ -77,7 +77,8 @@ lazy val common = project
   )
 
 lazy val commonDependencies = Seq(
-  guice
+  guice,
+  logbackEncoder intransitive ()
 )
 
 lazy val slickDatabaseDependencies = Seq(

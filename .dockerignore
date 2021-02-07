@@ -1,4 +1,4 @@
-# To prevent storing target and othr directories
+# To prevent storing target and other directories
 logs
 target
 .idea
@@ -24,3 +24,6 @@ README.md
 # To prevent storing dev/temporary container data
 tmp
 .DS_Store
+
+# Not sure why this file is not covered by target
+project/target/sbt-load.sock

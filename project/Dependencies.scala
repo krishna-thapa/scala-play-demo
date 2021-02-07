@@ -16,6 +16,9 @@ object Dependencies {
     val scalaTest      = "3.2.0"
     val playtest       = "5.0.0"
     val testContainers = "0.38.8"
+
+    // logs
+    val logbackEncoder = "6.6"
   }
 
   object Libraries {
@@ -40,6 +43,10 @@ object Dependencies {
     def testContainersLib(artifact: String): ModuleID =
       "com.dimafeng" %% artifact % Versions.testContainers
 
+    // logs
+    def logbackEncoderLib(artifact: String): ModuleID =
+      "net.logstash.logback" % artifact % Versions.logbackEncoder
+
     val playSlick           = playSlickLib("play-slick")
     val playSlickEvolutions = playSlickLib("play-slick-evolutions")
     val postgres            = postgresLib("postgresql")
@@ -50,6 +57,9 @@ object Dependencies {
     val elastic4s           = elastic4sLib("elastic4s-client-esjava")
     val elastic4sJson       = elastic4sLib("elastic4s-json-play")
     val quartzScheduler     = quartzSchedulerLib("akka-quartz-scheduler")
+
+    // logs
+    val logbackEncoder = logbackEncoderLib("logstash-logback-encoder")
 
     // tests
     val scalaTest         = scalaTestLib("scalatest")                            % "test"

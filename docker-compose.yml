@@ -2,22 +2,25 @@ version: '3.3'
 
 services:
   #Get the inspirational api from the dockerhub account
-#  inspirationa-quote-api:
-#    image: inspirational-quote-api:v0.1
-#    ports:
-#    - 9000:9000
-#    environment:
-#      - PROJECT_ENV
-#      - POSTGRES_DB
-#      - POSTGRES_USER
-#      - POSTGRES_PASSWORD
-#      - POSTGRES_HOST
-#      - ES_HOST
-#      - REDIS_HOST
-#    depends_on:
-#      - elasticsearch
-#      - redis
-#      - postgres
+  inspirationa-quote-api:
+    image: inspirational-quote-api:latest
+    container_name: inspirationa-quote-api
+    ports:
+    - 9000:9000
+    environment:
+      - PROJECT_ENV
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - ES_HOST
+      - REDIS_HOST
+    depends_on:
+      - elasticsearch
+      - redis
+      - postgres
+      - kibana
+      - filebeat
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     container_name: elasticsearch
@@ -34,7 +37,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.2
     container_name: kibana
-    # Kibana does not need a volume as it uses ElasticSearch to persist its configuration.
+    # Kibana does not need a persistence volume as it uses ElasticSearch to persist its configuration.
     ports:
       - 5601:5601
     volumes:
