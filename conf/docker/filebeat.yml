@@ -1,0 +1,24 @@
+filebeat.inputs:
+  # specifically designed to import logs from docker
+  - type: container
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+
+processors:
+  # enrich the docker logs with useful information, such as the name of the image or the name of the container
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+
+  # parse logs encoded in JSON
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  indices:
+    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+logging.json: true
+logging.metrics.enabled: false

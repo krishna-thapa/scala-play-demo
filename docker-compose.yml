@@ -19,7 +19,8 @@ services:
 #      - redis
 #      - postgres
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    container_name: elasticsearch
     environment:
       discovery.type: single-node
       network.host: 0.0.0.0
@@ -32,17 +33,26 @@ services:
     restart: unless-stopped
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.2
+    container_name: kibana
     # Kibana does not need a volume as it uses ElasticSearch to persist its configuration.
     ports:
       - 5601:5601
+    volumes:
+    - "./conf/docker/kibana.yml:/usr/share/kibana/config/kibana.yml"
+    depends_on:
+      - elasticsearch
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.10.2
+    container_name: filebeat
+    # user running FileBeat needs to be able to access all logs inside the containers
     user: root
     volumes:
     - "./conf/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
     - "/var/lib/docker:/var/lib/docker:ro"
+    - "/var/run/docker.sock:/var/run/docker.sock"
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - 6379:6379
     volumes:
@@ -68,7 +78,7 @@ services:
       # for debian system use: /var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata
       # for mac OS: ./pgdata/:/var/lib/postgresql/data/pgdata and copy the CSV files under pgdata
       # which will be under the project level directory, not the root level
-      - "./pgdata/:/var/lib/postgresql/data/pgdata"
+      - "/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata"
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 volumes:
   es-data:
