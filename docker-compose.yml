@@ -1,9 +1,9 @@
 version: '3.3'
 
 services:
-  #Get the inspirational api from the dockerhub account
+  #Get the inspirational api from https://github.com/features/packages
   inspirationa-quote-api:
-    image: inspirational-quote-api:latest
+    image: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:latest
     container_name: inspirationa-quote-api
     ports:
     - 9000:9000
