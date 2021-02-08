@@ -27,4 +27,6 @@ jobs:
       - name: Delete Package Versions
         uses: actions/delete-package-versions@v1.0.3
         with:
+          package-name: inspirational-quote-api
+          num-old-versions-to-delete: 1
           token: ${{ secrets.CR_PAT }}  
