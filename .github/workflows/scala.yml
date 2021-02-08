@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  build:
+  build_compile_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +23,7 @@ jobs:
           sbt test
 
   push_to_registry:
-    needs: [build]
+    needs: [build_compile_test]
     name: Push Docker image to GitHub Packages
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' # Running this job only for master branch
@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
+          password: ${{ secrets.CR_PAT }}
+          registry: ghcr.io
           repository: krishna-thapa/inspirational-quote-api/inspirational-quote-api
-          tags: 1.1 # https://github.com/docker/build-push-action/tree/releases/v1#tag_with_ref
+          tag_with_ref: true # https://github.com/docker/build-push-action/tree/releases/v1#tag_with_ref
