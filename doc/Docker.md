@@ -22,6 +22,7 @@ Compose is a tool for defining and running multi-container Docker applications. 
 - Rest of the files are copied over the image directory that can build and run the project
 - `.github/workflows/scala.yml` file runs when the new code is merged to the master branch of this repository 
 - When any code is merged to the master, first it will do format checking and then runs the sbt commands for clean, compile and test
+- When the `inspirational-quote-api` is released, `.github/workflows/pushImage.yml` file will run and it will build and publish the image with the same tag given in release. It will only run when the repo is released and make sure to give the proper tag since the same version tag is used in the docker image. 
 - Once the first job to build and compile success, it will start to build the image using the `Dockerfile` file and push to the GitHub Container Registry using the [build-push-action](https://github.com/docker/build-push-action/tree/releases/v1) action.
 - You can find these packages under the Packages section of this repository: https://github.com/krishna-thapa/inspirational-quote-api
 - You can configure the image name, and the tags while building a new image. You have to provide your own personal access token (PAT) that should be stored in github secrets, and it should have at least access for read, write, or delete package scope. [More information](https://docs.github.com/en/packages/guides/migrating-to-github-container-registry-for-docker-images)
@@ -30,7 +31,7 @@ Compose is a tool for defining and running multi-container Docker applications. 
 
 #### Future improvements
 - Upgrade newer version of [build-push-action](https://github.com/marketplace/actions/build-and-push-docker-images)
-- Make a separate action file to build and publish the image when the repo is release with the version tags, instead of building and pushing everytime there is a new merge in the master branch. 
+- ~~Make a separate action file to build and publish the image when the repo is release with the version tags, instead of building and pushing everytime there is a new merge in the master branch.~~
 
 ### Install Docker on Ubuntu 20.04
 Link [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-20-04/)
