@@ -1,14 +1,36 @@
-## Run the project in any server using containers
-- Install a docker and docker-compose in the server
-- Copy the docker-compose file in the any directory 
-- Copy .env file to the same directory 
-- Copy CSV file to the respective mounted volume directory for the postgres container's volume 
+## Run the project using containers
+- Install a docker and docker-compose in the machine
+- Create a directory anywhere to hold all the config and docker-compose file
+- Copy the `docker-compose.yml` file in the directory 
+- Copy the `.env` file to the same directory 
+- Copy `data/Quotes.csv` file to the respective mounted volume directory for the postgres container's volume
+  - for macOS: copy the CSV file to the same directory under the new folder `/pgdata`
+  - for Ubuntu: copy the CSV file to the `/var/lib/postgresql/data/`, create the path if it doesn't exit
 - Run the command: `docker-compose up`
 
-## Docker
+## Docker and Docker compose
 Docker is an open-source containerization platform that allows you to quickly build, test, and deploy applications as portable containers that can run virtually anywhere. A container represents a runtime for a single application and includes everything the software needs to run.
 
 Docker is an integral part of modern software development and DevOps continuous integration and deployment pipelines.
+
+Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. Compose works in all environments: production, staging, development, testing, as well as CI workflows.
+
+## Build and Push the docker image to GitHub Container Registry
+- Use the `Dockerfile` to create the docker image of the main scala play project
+- `Dockerfile` uses the open jdk version 8 as the base image and install sbt tool to run the commands for clean, test and run once the image is run in the machine
+- `.dockerignore` file is used to ignore all the targets, git related and documentations files
+- Rest of the files are copied over the image directory that can build and run the project
+- `.github/workflows/scala.yml` file runs when the new code is merged to the master branch of this repository 
+- When any code is merged to the master, first it will do format checking and then runs the sbt commands for clean, compile and test
+- Once the first job to build and compile success, it will start to build the image using the `Dockerfile` file and push to the GitHub Container Registry using the [build-push-action](https://github.com/docker/build-push-action/tree/releases/v1) action.
+- You can find these packages under the Packages section of this repository: https://github.com/krishna-thapa/inspirational-quote-api
+- You can configure the image name, and the tags while building a new image. You have to provide your own personal access token (PAT) that should be stored in github secrets, and it should have at least access for read, write, or delete package scope. [More information](https://docs.github.com/en/packages/guides/migrating-to-github-container-registry-for-docker-images)
+- **Note**: Make sure that you are using GitHub Container Registry, not the GitHub Packages Docker registry. The GitHub Container Registry supersedes the existing Packages Docker registry and is optimized to support some unique needs of containers. The registry url should be `ghcr.io/OWNER/IMAGE_NAME` not `docker.pkg.github.com/OWNER/REPOSITORY/IMAGE_NAME`. 
+- **Note**: Package versions of a public repository cannot be deleted by the maintainer if you are using GitHub Packages Docker registry and also it cannot be pulled anonymously even if it is present in public repository, have to log in first. So highly recommend using GitHub Container Registry. I had to configure the repository as a private so that I can delete the packages and then converted back to public, see more [details here](https://stackoverflow.com/questions/59103177/how-to-delete-remove-unlink-unversion-a-package-from-the-github-package-registry/59105581#59105581).  
+
+#### Future improvements
+- Upgrade newer version of [build-push-action](https://github.com/marketplace/actions/build-and-push-docker-images)
+- Make a separate action file to build and publish the image when the repo is release with the version tags, instead of building and pushing everytime there is a new merge in the master branch. 
 
 ### Install Docker on Ubuntu 20.04
 Link [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-20-04/)
@@ -19,6 +41,7 @@ Link [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-
 ### docker-compose cheatsheet
 Link [here](https://devhints.io/docker-compose)
 
+### Quick commands:
 ```
 docker-compose start
 docker-compose stop
@@ -51,13 +74,11 @@ docker-compose down -v
 `\c inspiration_db`
 - See all the tables 
 `\dt`
-
+- See the table description
+`\d <table_name>`
 
 ## Install ElasticSearch Server in Docker
 Link [here](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/docker.html#docker-prod-cluster-composefile)
-
-Data volumes will persist, so it’s possible to start the cluster again with the same data using `docker-compose up`. To destroy the cluster and the data volumes, just type `docker-compose down -v`.
-
 
 ### Elasticsearch in Docker
 The images use centos:7 as the base image.
