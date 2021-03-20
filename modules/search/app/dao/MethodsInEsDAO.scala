@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
+
 import javax.inject.Inject
 import com.krishna.model.QuotesQuery
 import com.krishna.util.Logging
@@ -11,13 +12,18 @@ import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
 import daos.QuoteQueryDAO
+import play.api.Configuration
 import util.InitEs
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO)(implicit ec: ExecutionContext)
-    extends InitEs
+class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
+    implicit ec: ExecutionContext
+) extends InitEs
     with Logging {
+
+  override val elasticHost: String = sys.env.getOrElse("ES_HOST", config.get[String]("ES.ES_HOST"))
+  override val elasticPort: String = sys.env.getOrElse("ES_PORT", config.get[String]("ES.ES_PORT"))
 
   def getAndStoreQuotes(records: Int): Seq[Future[Response[IndexResponse]]] = {
     log.info(s"Getting $records random quotes from database")
