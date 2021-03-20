@@ -3,25 +3,36 @@
 ## To build and run the project
 
 ### Prerequisite
-1. Download and install Java, Scala and sbt tool
-2. Download and install your choice of an IDEA(no need for just to run the project)
-3. Download and install a docker and docker compose for your OS to run databases virtually
+1. Java JDK (>8.0), Scala and sbt tool
+2. IDEA(no need for just to run the project)
+3. Docker and docker compose for your OS to run databases virtually
 
-### Steps to run the project locally
+### Steps to run the project locally using sbt run
 1. Git clone or download the project from github
 2. Import the sbt project using your choice of IDEA
 3. Run sbt command: `sbt clean compile test`
 4. Run Docker compose command to start and run databases: `docker-compose up`
 5. Run the sbt command to run the project in localhost: `sbt run`
-6. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
+6. Comment out `inspirationa-quote-api` from line 5-23 in `docker-compose.yml` file
+7. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
+8. **TODO** Dependent on OS for Postgres volume and what if CSV file is not present
+
+### Steps to run the project locally using docker containers
+1. Download `docker-compose.yml` file only from the repo
+2. Configure Postgres volume depending on your OS 
+3. Download and Store CSV file that will be imported to make the database
+4. Run `docker-compose up`
+5. Wait for the `inspirational-quote-api` to start on local server in `HTTP on /0.0.0.0:9000`   
+5. Swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
+6. Logs management in Kibana: `http://localhost:5601`, reach more doc on `/doc/Docker-logs-ELK-stack.md`.
 
 ### Structure of the project
-Project is divided using the sbt sub-projects modules. These project has four sub-modules inside the modules folder. Each module beside the `common` is play application that has its own routes configuration file and own `build.sbt` file. Each play module has its own controller, service and test. All the common models and methods are defined in the `common` sbt project. All the configuration and dependency of the modules can be found in the root `build.sbt` file.
+Project is divided using the sbt sub-projects modules. These project has four sub-modules inside the modules' folder. Each module beside the `common` is play application that has its own routes configuration file and own `build.sbt` file. Each play module has its own controller, service and test. All the common models and methods are defined in the `common` sbt project. All the configuration and dependency of the modules can be found in the root `build.sbt` file.
 
-* `auth`: will contain all the specific code for the authorization and authentication service using postgres database.
-* `quotes`: will contain all the specific code for the CRUD operation in quote service using postgres and Redis cache database.
-* `search`: will contain all the specific code for the search service using elastic search database.
-* `common`: will contain all the common code shared between the other subprojects.
+* `auth` will contain all the specific code for the authorization and authentication service using postgres database.
+* `quotes` will contain all the specific code for the CRUD operation in quote service using postgres and Redis cache database.
+* `search` will contain all the specific code for the search service using elastic search database.
+* `common` will contain all the common code shared between the other subprojects.
 
 This is the basic structure of the whole project:
 ```
