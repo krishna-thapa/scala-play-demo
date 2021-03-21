@@ -15,7 +15,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.time._
 import play.api.Configuration
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
 
 class SearchInEsDAOSpec
@@ -61,7 +61,7 @@ class SearchInEsDAOSpec
   "getAndStoreQuotes" should "store 2 mock quotes in ES" in {
     when(mockQuoteQueryDAO.listRandomQuote(2)).thenReturn(mockQuotes)
     val result: Seq[Response[IndexResponse]] =
-      Await.result(Future.sequence(searchDao.getAndStoreQuotes(2)), 5.seconds)
+      Await.result(Future.sequence(searchDao.getAndStoreQuotes(2)), Duration.Inf)
     val indexIds: Seq[String] = result.map(_.result).map(_.id)
 
     result.head.isSuccess shouldBe true
