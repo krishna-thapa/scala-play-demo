@@ -6,7 +6,7 @@ import com.krishna.util.Logging
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
-import dao.MethodsInEsDAO
+import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
@@ -17,7 +17,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 @Singleton
 class SearchController @Inject()(
     scc: SecuredControllerComponents,
-    methodsInEsDAO: MethodsInEsDAO
+    searchInEsDao: SearchInEsDAO
 )(
     implicit executionContext: ExecutionContext
 ) extends SecuredController(scc)
@@ -35,7 +35,7 @@ class SearchController @Inject()(
     log.info("Executing writeInEs Controller")
 
     val listOfFutureResults: Seq[Future[Response[IndexResponse]]] =
-      methodsInEsDAO.getAndStoreQuotes(records)
+      searchInEsDao.getAndStoreQuotes(records)
 
     // Sequence all the futures into a single future of list
     val futureListResults: Future[Seq[Response[IndexResponse]]] =
@@ -61,7 +61,7 @@ class SearchController @Inject()(
     log.info(s"Executing deleteIndex controller for: $indexName")
     log.warn("Hope you know what you are doing!")
 
-    methodsInEsDAO
+    searchInEsDao
       .deleteQuotesIndex(indexName)
       .map(responseEsResult)
       .recover {
@@ -87,7 +87,7 @@ class SearchController @Inject()(
           Future(badRequest(s"The searchForm was not in the expected format: $formWithErrors"))
         },
         searchRequest => {
-          methodsInEsDAO
+          searchInEsDao
             .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
             .map { response =>
               log.info(
@@ -114,7 +114,7 @@ class SearchController @Inject()(
   def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
     implicit request =>
       log.info("Executing getAuthorsAutocomplete")
-      responseSeqString(methodsInEsDAO.searchAuthorsSql(parameter))
+      responseSeqString(searchInEsDao.searchAuthorsSql(parameter))
   }
 
 }

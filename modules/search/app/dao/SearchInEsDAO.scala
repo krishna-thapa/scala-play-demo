@@ -1,29 +1,29 @@
 package dao
 
+import com.krishna.model.QuotesQuery
+import com.krishna.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
-import com.sksamuel.elastic4s.requests.indexes.IndexResponse
-
-import javax.inject.Inject
-import com.krishna.model.QuotesQuery
-import com.krishna.util.Logging
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
+import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
 import daos.QuoteQueryDAO
 import play.api.Configuration
 import util.InitEs
 
+import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
-class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
+class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
     implicit ec: ExecutionContext
 ) extends InitEs
     with Logging {
 
   override val elasticHost: String = sys.env.getOrElse("ES_HOST", config.get[String]("ES.ES_HOST"))
   override val elasticPort: String = sys.env.getOrElse("ES_PORT", config.get[String]("ES.ES_PORT"))
+  override val indexName: String   = config.get[String]("ES.ES_INDEX_NAME")
 
   def getAndStoreQuotes(records: Int): Seq[Future[Response[IndexResponse]]] = {
     log.info(s"Getting $records random quotes from database")
@@ -70,7 +70,7 @@ class MethodsInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
 
   def doesIndexExists: Boolean = {
-    log.warn(s"Checking if the index exists already")
+    log.info(s"Checking if the index: $indexName exists already")
     client
       .execute {
         indexExists(indexName)
