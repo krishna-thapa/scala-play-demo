@@ -15,7 +15,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.time._
 import play.api.Configuration
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{ Duration, DurationInt, FiniteDuration }
 import scala.concurrent.{ Await, Future }
 
 class SearchInEsDAOSpec
@@ -24,6 +24,8 @@ class SearchInEsDAOSpec
     with DockerElasticsearchService
     with DockerTestKit
     with DockerKitDockerJava {
+
+  override val StartContainersTimeout: FiniteDuration = 5.minutes
 
   implicit val pc: PatienceConfig = PatienceConfig(Span(20, Seconds), Span(1, Second))
 
