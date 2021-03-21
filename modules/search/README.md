@@ -62,5 +62,7 @@ curl -X DELETE http://localhost:9200/sink2
 - https://sksamuel.github.io/elastic4s/
 - https://qiita.com/n-gondo123/items/63c067ca9ada30e240c0
 
-## TODO:
-- Write some test cases: https://github.com/sksamuel/elastic4s#example-application
+## Test using Docker:
+- Use of [Set of utility classes to make integration testing with dockerised services in Scala easy.](https://github.com/whisklabs/docker-it-scala)
+- Use of [Java API client for Docker](https://github.com/docker-java/docker-java) 
+- Write some test cases for [Elastic4s](https://github.com/sksamuel/elastic4s#example-application)
