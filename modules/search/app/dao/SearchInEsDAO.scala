@@ -25,6 +25,11 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
   override val elasticPort: String = sys.env.getOrElse("ES_PORT", config.get[String]("ES.ES_PORT"))
   override val indexName: String   = config.get[String]("ES.ES_INDEX_NAME")
 
+  /**
+    * Gets the records from Postgres table and store in ES
+    * @param records Number of records to be stored in ES (max?)
+    * @return Response once records are stored in ES
+    */
   def getAndStoreQuotes(records: Int): Seq[Future[Response[IndexResponse]]] = {
     log.info(s"Getting $records random quotes from database")
     val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
@@ -51,7 +56,18 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
     )
   }
 
-  def searchQuote(text: String, offset: Int, limit: Int): Future[Response[SearchResponse]] = {
+  /**
+    * Text search using ES search API
+    * @param text -> text to search, does any
+    * @param offset -> For pagination, default to 0
+    * @param limit -> Have to be greater than 1, default to 10
+    * @return Search response that have matched quotes
+    */
+  def searchQuote(
+      text: String,
+      offset: Int = 0,
+      limit: Int = 10
+  ): Future[Response[SearchResponse]] = {
     log.warn(s"Searching text : $text in the index: $indexName")
     client
       .execute(
@@ -61,6 +77,7 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
       )
   }
 
+  // Move to quotesDao class
   def searchAuthorsSql(text: String): Seq[String] = {
     quotesDAO.searchAuthors(text)
   }
@@ -69,6 +86,10 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
   val searchRequest: String => SearchRequest = (text: String) =>
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
 
+  /*
+    Check if the index is present in the ElasticSearch
+    Returns a boolean
+   */
   def doesIndexExists: Boolean = {
     log.info(s"Checking if the index: $indexName exists already")
     client
@@ -78,5 +99,18 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
       .await
       .result
       .isExists
+  }
+
+  /*
+    Count the total docs inside the index, used for testing
+   */
+  def countDocsInIndex: Long = {
+    client
+      .execute {
+        count(indexName)
+      }
+      .await
+      .result
+      .count
   }
 }

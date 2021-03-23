@@ -7,7 +7,6 @@ trait InitEs {
 
   // Environment variables should be declared in the docker compose file while creating the docker
   // image of the whole sbt play project
-  // in this example we create a client to a local Docker container at localhost:9200
   def elasticHost: String
   def elasticPort: String
   def indexName: String
