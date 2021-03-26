@@ -86,3 +86,6 @@ Have implemented [play cache](https://www.playframework.com/documentation/2.8.x/
 - http://www.icharm.me/use-akka-quartz-scheduler-for-cron-schedule-in-play-framework-2-7.html
 - https://www.playframework.com/documentation/2.8.x/ScalaDependencyInjection
 - https://stackoverflow.com/questions/33889224/play-2-4-how-to-inject-akka-actors-using-guice
+
+## Test using scala-docker
+- [spin redis from docker-it-scala](https://stackoverflow.com/questions/48510658/spin-redis-from-docker-it-scala/49436687)

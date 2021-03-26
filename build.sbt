@@ -62,7 +62,8 @@ lazy val search = project
   .settings(
     libraryDependencies ++=
       commonDependencies ++
-        elastic4sDependencies ++ testSearch
+        elastic4sDependencies ++
+        dockerTestKitWithMock
   )
 
 lazy val common = project
@@ -76,10 +77,10 @@ lazy val common = project
         slickDatabaseDependencies
   )
 
-lazy val testSearch = Seq(
-  "org.mockito" %% "mockito-scala-scalatest"         % "1.13.0" % "test",
-  "com.whisk"   %% "docker-testkit-scalatest"        % "0.9.9"  % "test",
-  "com.whisk"   %% "docker-testkit-impl-docker-java" % "0.9.9"  % "test"
+lazy val dockerTestKitWithMock = Seq(
+  mockito,
+  dockerScalaTest,
+  dockerImplScala
 )
 lazy val commonDependencies = Seq(
   guice,
