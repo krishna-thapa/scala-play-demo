@@ -1,5 +1,7 @@
 package daos
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
 import com.krishna.services.RepositoryQuoteMethods
@@ -7,9 +9,8 @@ import com.krishna.util.DbRunner
 import com.krishna.util.Implicits._
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.PostgresProfile.api._
-import slick.jdbc.{ JdbcBackend, JdbcProfile }
+import slick.jdbc.{ JdbcBackend, JdbcProfile, ResultSetConcurrency, ResultSetType }
 import tables.QuoteQueriesTable
-
 import javax.inject.{ Inject, Singleton }
 
 /**
@@ -24,12 +25,33 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override def tables: TableQuery[QuoteQueriesTable] = QuoteQueriesTable.quoteQueries
 
+  //implicit lazy val system: ActorSystem = ActorSystem("reactive-streams-end-to-end")
+  //implicit lazy val materializer = ActorMaterializer()
+
   /**
     * @return List of all stored quotes from database
     */
   def listAllQuotes: Seq[QuotesQuery] = {
     log.info("Getting all the records from the table")
     runDbAction(getAllQuotes)
+  }
+
+  /**
+    * Create an akka-streams Source from a reactive-streams publisher,
+    * entering akka-streams land where we get access to a richer API for stream element processing
+    * Execution of the DBIOAction does not start until a Subscriber is attached to the stream.
+    * Note: https://scala-slick.org/doc/3.2.0/dbio.html#streaming
+    */
+  def allQuotesSource: Source[QuotesQuery, NotUsed] = Source.fromPublisher {
+    dbConfig.stream {
+      getAllQuotes
+        .withStatementParameters(
+          rsType = ResultSetType.ForwardOnly,
+          rsConcurrency = ResultSetConcurrency.ReadOnly,
+          fetchSize = 500
+        )
+        .transactionally
+    }
   }
 
   /**
