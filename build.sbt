@@ -103,7 +103,8 @@ lazy val testContainerDependencies = Seq(
 
 lazy val elastic4sDependencies = Seq(
   elastic4s,
-  elastic4sJson
+  elastic4sJson,
+  elastic4sStreams
 )
 
 /*

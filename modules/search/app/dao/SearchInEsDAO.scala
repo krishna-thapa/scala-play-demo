@@ -1,22 +1,28 @@
 package dao
 
+import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.stream.scaladsl.Sink
 import com.krishna.model.QuotesQuery
 import com.krishna.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
+import com.sksamuel.elastic4s.requests.bulk.BulkCompatibleRequest
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
+import com.sksamuel.elastic4s.streams.ReactiveElastic._
+import com.sksamuel.elastic4s.streams.RequestBuilder
 import daos.QuoteQueryDAO
 import play.api.Configuration
 import util.InitEs
-
 import javax.inject.Inject
-import scala.concurrent.{ ExecutionContext, Future }
 
-class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
+import scala.concurrent.{ ExecutionContext, Future, Promise }
+
+class SearchInEsDAO @Inject()(system: ActorSystem, quotesDAO: QuoteQueryDAO, config: Configuration)(
     implicit ec: ExecutionContext
 ) extends InitEs
     with Logging {
@@ -46,6 +52,21 @@ class SearchInEsDAO @Inject()(quotesDAO: QuoteQueryDAO, config: Configuration)(
         // have set as false (default) so that duplicate records can override the existing records
         indexInto(indexName).id(csvId).doc(quote).refresh(RefreshPolicy.Immediate)
       }
+    }
+  }
+
+  def builder(indexName: String): RequestBuilder[QuotesQuery] =
+    (t: QuotesQuery) => indexInto(indexName).id(t.csvId).doc(t).refresh(RefreshPolicy.Immediate)
+
+  def bulkInsertQuotesToES = {
+    val promise = Promise[Unit]()
+
+    val esSink: Sink[QuotesQuery, NotUsed] = Sink.fromSubscriber {
+      client.subscriber[QuotesQuery](batchSize = 500, completionFn = { () =>
+        promise.success(()); ()
+      }, errorFn = { (t: Throwable) =>
+        promise.failure(t); ()
+      })(builder(indexName), system)
     }
   }
 

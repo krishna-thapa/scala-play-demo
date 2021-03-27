@@ -35,6 +35,8 @@ object Dependencies {
       "com.github.t3hnar" %% artifact % Versions.bcrypt
     def elastic4sLib(artifact: String): ModuleID =
       "com.sksamuel.elastic4s" %% artifact % Versions.elastic4s
+    def elastic4sSteamLib(artifact: String): ModuleID =
+      "com.sksamuel.elastic4s" %% artifact % Versions.elastic4s
     def quartzSchedulerLib(artifact: String): ModuleID =
       "com.enragedginger" %% artifact % Versions.quartzScheduler
 
@@ -62,6 +64,7 @@ object Dependencies {
     val scalaBcrypt         = scalaBcryptLib("scala-bcrypt")
     val elastic4s           = elastic4sLib("elastic4s-client-esjava")
     val elastic4sJson       = elastic4sLib("elastic4s-json-play")
+    val elastic4sStreams    = elastic4sSteamLib("elastic4s-http-streams")
     val quartzScheduler     = quartzSchedulerLib("akka-quartz-scheduler")
 
     // logs

@@ -1,7 +1,7 @@
 package daos
 
 import akka.NotUsed
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{ Flow, Sink, Source }
 import com.krishna.model.Genre.Genre
 import com.krishna.model.QuotesQuery
 import com.krishna.services.RepositoryQuoteMethods
@@ -12,6 +12,8 @@ import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{ JdbcBackend, JdbcProfile, ResultSetConcurrency, ResultSetType }
 import tables.QuoteQueriesTable
 import javax.inject.{ Inject, Singleton }
+
+import scala.concurrent.Future
 
 /**
   * A repository for Quotes stored in quotes table.
@@ -51,6 +53,33 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
           fetchSize = 500
         )
         .transactionally
+    }
+  }
+
+  /**
+    * Construct a Flow[QuotesQuery] that emits Quote elements from a function
+    * that returns a Future[QuotesQuery].
+    * Parallelism of the Future-producing call is controlled under the hood by the actor
+    * behind the Flow.
+    */
+  def addAuthorDetails(
+      getAuthorDetails: QuotesQuery => Future[QuotesQuery]
+  ): Flow[QuotesQuery, QuotesQuery, NotUsed] = {
+    Flow[QuotesQuery].mapAsync(parallelism = 5) { quote =>
+      getAuthorDetails(quote)
+    }
+  }
+
+  /**
+    * Sink that indiscriminately tallies up and prints the count of elements it has seen.
+    */
+  def logElementsPerBlock[T]: Sink[T, Future[Int]] = {
+    Sink.fold[Int, T](0) { (sum, _) =>
+      val newSum = sum + 1
+      if (newSum % 500 == 0) {
+        log.info(s"\rCount: $newSum")
+      }
+      newSum
     }
   }
 
