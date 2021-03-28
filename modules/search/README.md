@@ -47,13 +47,13 @@ sudo systemctl stop kibana.service
 ## GET
 ```
 curl -XGET 'http://localhost:9200/'
-curl -X GET http://localhost:9200/_cat/indices
+curl -X GET http://localhost:9200/_cat/indices?v
 curl -X GET http://localhost:9200/quotes/_doc/_search | jq
 ```
 
 ## DELETE
 ```
-curl -X DELETE http://localhost:9200/sink2  
+curl -X DELETE http://localhost:9200/quotes  
 ```
 
 ### [Install jq in Ubuntu](https://www.howtoinstall.me/ubuntu/18-04/jq/)

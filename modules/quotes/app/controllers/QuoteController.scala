@@ -9,7 +9,7 @@ import javax.inject._
 import model.UserDetail
 import play.api.mvc._
 import service.QuoteQueryService
-import util.DecodeHeader
+import config.DecodeHeader
 
 import scala.concurrent.ExecutionContext
 
@@ -127,4 +127,14 @@ class QuoteController @Inject()(
     log.info("Executing getGenreQuote")
     quoteService.genreQuoteService(genre)
   }
+
+  /**
+    * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
+    */
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
+    implicit request =>
+      log.info("Executing getAuthorsAutocomplete")
+      responseSeqString(quoteService.searchAuthorsSql(parameter))
+  }
+
 }

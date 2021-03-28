@@ -2,7 +2,6 @@ package com.krishna.response
 
 import com.krishna.model.base.IdResource
 import com.krishna.response.ErrorMsg._
-import com.sksamuel.elastic4s.Response
 import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
@@ -53,25 +52,6 @@ trait ResponseResult extends ResponseError {
     }
   }
 
-  def responseEsResult[T](response: Response[T]): Result = {
-    if (response.isSuccess) {
-      Ok(s"Success: ${response.body}")
-    } else {
-      log.error(s"Error while deleting an index: ${response.error.reason}")
-      notFound(EsPlaceHolder(response.error.reason))
-    }
-  }
-
-  def responseEsSeqResult[T](responses: Seq[Response[T]]): Result = {
-    val headResponse: Response[T] = responses.head
-    if (headResponse.isSuccess) {
-      Ok(s"Success with response code: ${responses.head.status}")
-    } else {
-      log.error(s"Error while writing on index: ${headResponse.error.reason}")
-      notFound(EsPlaceHolder(headResponse.error.reason))
-    }
-  }
-
   // Use this method on each response error
   def responseErrorResult(errorMsg: ErrorMsg): Result = {
     errorMsg match {
@@ -86,5 +66,4 @@ trait ResponseResult extends ResponseError {
       case _                                              => badRequest("Something went wrong")
     }
   }
-
 }

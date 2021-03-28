@@ -1,13 +1,11 @@
 package controllers.search
 
-import com.krishna.model.QuotesQuery
-import com.krishna.response.ResponseResult
 import com.krishna.util.Logging
 import com.sksamuel.elastic4s.Response
-import com.sksamuel.elastic4s.playjson.playJsonHitReader
-import com.sksamuel.elastic4s.requests.indexes.IndexResponse
+import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
+import responseHandler.EsResponseHandler._
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 import searchForm.SearchForm
@@ -21,8 +19,9 @@ class SearchController @Inject()(
 )(
     implicit executionContext: ExecutionContext
 ) extends SecuredController(scc)
-    with ResponseResult
     with Logging {
+
+  implicit val indexName: String = searchInEsDao.indexName
 
   /**
     * Write records in index name under "quotes", need to pass number of records that will be generated randomly from postgres table
@@ -34,15 +33,11 @@ class SearchController @Inject()(
   def writeInEs(records: Int): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing writeInEs Controller")
 
-    val listOfFutureResults: Seq[Future[Response[IndexResponse]]] =
+    val listOfFutureResults: Future[Response[BulkResponse]] =
       searchInEsDao.getAndStoreQuotes(records)
 
-    // Sequence all the futures into a single future of list
-    val futureListResults: Future[Seq[Response[IndexResponse]]] =
-      Future.sequence(listOfFutureResults)
-
-    futureListResults
-      .map(responseEsSeqResult)
+    listOfFutureResults
+      .map(responseEsResult(_)(indexName))
       //add recover to handle the case where the future fails.
       .recover {
         case exception =>
@@ -63,7 +58,7 @@ class SearchController @Inject()(
 
     searchInEsDao
       .deleteQuotesIndex(indexName)
-      .map(responseEsResult)
+      .map(responseEsResult(_)(indexName))
       .recover {
         case exception =>
           log.error(
@@ -94,7 +89,7 @@ class SearchController @Inject()(
                 s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
               )
               // Convert the success future result to the QuotesQuery case class
-              responseSeqResult(response.result.to[QuotesQuery].toList)
+              responseEsResult(response)(indexName)
             }
             .recover {
               case exception =>
@@ -107,14 +102,4 @@ class SearchController @Inject()(
       )
     searchResults
   }
-
-  /**
-    * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
-    */
-  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
-    implicit request =>
-      log.info("Executing getAuthorsAutocomplete")
-      responseSeqString(searchInEsDao.searchAuthorsSql(parameter))
-  }
-
 }

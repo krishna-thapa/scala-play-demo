@@ -74,7 +74,6 @@ lazy val common = project
     version := "1.0-SNAPSHOT",
     libraryDependencies ++=
       commonDependencies ++
-        elastic4sDependencies ++
         slickDatabaseDependencies
   )
 

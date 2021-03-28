@@ -1,9 +1,10 @@
 package dao
 
+import akka.actor.ActorSystem
 import com.krishna.model.{ Genre, QuotesQuery }
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
-import com.sksamuel.elastic4s.requests.indexes.IndexResponse
+import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
 import com.whisk.docker.impl.dockerjava.DockerKitDockerJava
 import com.whisk.docker.scalatest.DockerTestKit
@@ -34,14 +35,15 @@ class SearchInEsDAOSpec
 
   val mockConfig: Configuration = Configuration.from(
     Map(
-      "ES.ES_HOST"       -> "localhost",
-      "ES.ES_PORT"       -> "2237",
-      "ES.ES_INDEX_NAME" -> "test"
+      "elasticsearch.ESHOST"      -> "localhost",
+      "elasticsearch.ESPORT"      -> "2237",
+      "elasticsearch.ESINDEXNAME" -> "test"
     )
   )
 
   val mockQuoteQueryDAO: QuoteQueryDAO = mock[QuoteQueryDAO]
-  val searchDao: SearchInEsDAO         = new SearchInEsDAO(mockQuoteQueryDAO, mockConfig)
+  val mockActorSystem: ActorSystem     = mock[ActorSystem]
+  val searchDao: SearchInEsDAO         = new SearchInEsDAO(mockActorSystem, mockQuoteQueryDAO, mockConfig)
 
   val baseQuote: QuotesQuery = QuotesQuery(
     id = 1,
@@ -67,11 +69,11 @@ class SearchInEsDAOSpec
   it should "store 2 mock quotes in ES" in {
     when(mockQuoteQueryDAO.listRandomQuote(2)).thenReturn(mockQuotes)
 
-    val result: Seq[Response[IndexResponse]] =
-      Await.result(Future.sequence(searchDao.getAndStoreQuotes(2)), Duration.Inf)
-    val indexIds: Seq[String] = result.map(_.result).map(_.id)
+    val result: Response[BulkResponse] =
+      Await.result(searchDao.getAndStoreQuotes(2), Duration.Inf)
+    val indexIds: Seq[String] = result.map(_.items).result.map(_.id)
 
-    result.head.isSuccess shouldBe true
+    result.isSuccess shouldBe true
     indexIds shouldBe Seq("csv101", "csv102")
 
     searchDao.countDocsInIndex shouldBe 2
@@ -128,5 +130,4 @@ class SearchInEsDAOSpec
         .acknowledged
     isDeleted shouldBe true
   }
-
 }
