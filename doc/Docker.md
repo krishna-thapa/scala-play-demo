@@ -209,3 +209,4 @@ docker-compose up -d
 ## Known errors while setting up docker:
 - [Docker Container exited with code 137](https://www.petefreitag.com/item/848.cfm#:~:text=As%20it%20turns%20out%20this,in%20and%20terminated%20the%20process.)
 - Problem faced while working [sbt-native-packager](https://sbt-native-packager.readthedocs.io/en/latest/): While running the `sbt docker:publishLocal`, there was an error regarding swagger package. I believe this error is related with swagger library, and I don't think there is a solution unless the library is removed from the project. [Error issue page](https://github.com/iheartradio/play-swagger/issues/190). 
+- PostgreSQL Database directory appears to contain a database; Skipping initialization - empty `pgdata` directory and run again `docker-compose up`

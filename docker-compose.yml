@@ -2,25 +2,25 @@ version: '3.3'
 
 services:
   #Get the inspirational api from https://github.com/features/packages
-  inspirationa-quote-api:
-    image: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:v1.0
-    container_name: inspirationa-quote-api
-    ports:
-    - 9000:9000
-    environment:
-      - PROJECT_ENV
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - ES_HOST
-      - REDIS_HOST
-    depends_on:
-      - elasticsearch
-      - redis
-      - postgres
-      - kibana
-      - filebeat
+#  inspirationa-quote-api:
+#    image: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:v1.0
+#    container_name: inspirationa-quote-api
+#    ports:
+#    - 9000:9000
+#    environment:
+#      - PROJECT_ENV
+#      - POSTGRES_DB
+#      - POSTGRES_USER
+#      - POSTGRES_PASSWORD
+#      - POSTGRES_HOST
+#      - ES_HOST
+#      - REDIS_HOST
+#    depends_on:
+#      - elasticsearch
+#      - redis
+#      - postgres
+#      - kibana
+#      - filebeat
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     container_name: elasticsearch
@@ -34,25 +34,25 @@ services:
       - "./conf/docker/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "es-data:/usr/share/elasticsearch/data:rw"
     restart: unless-stopped
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.2
-    container_name: kibana
-    # Kibana does not need a persistence volume as it uses ElasticSearch to persist its configuration.
-    ports:
-      - 5601:5601
-    volumes:
-    - "./conf/docker/kibana.yml:/usr/share/kibana/config/kibana.yml"
-    depends_on:
-      - elasticsearch
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.10.2
-    container_name: filebeat
-    # user running FileBeat needs to be able to access all logs inside the containers
-    user: root
-    volumes:
-    - "./conf/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-    - "/var/lib/docker:/var/lib/docker:ro"
-    - "/var/run/docker.sock:/var/run/docker.sock"
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.10.2
+#    container_name: kibana
+#    # Kibana does not need a persistence volume as it uses ElasticSearch to persist its configuration.
+#    ports:
+#      - 5601:5601
+#    volumes:
+#    - "./conf/docker/kibana.yml:/usr/share/kibana/config/kibana.yml"
+#    depends_on:
+#      - elasticsearch
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat:7.10.2
+#    container_name: filebeat
+#    # user running FileBeat needs to be able to access all logs inside the containers
+#    user: root
+#    volumes:
+#    - "./conf/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+#    - "/var/lib/docker:/var/lib/docker:ro"
+#    - "/var/run/docker.sock:/var/run/docker.sock"
   redis:
     image: redis:latest
     container_name: redis
@@ -70,10 +70,10 @@ services:
     container_name: pg-docker
     restart: always
     environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - PGDATA
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
     ports:
       - 5432:5432
     volumes:
@@ -81,7 +81,7 @@ services:
       # for debian system use: /var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata
       # for mac OS: ./pgdata/:/var/lib/postgresql/data/pgdata and copy the CSV files under pgdata
       # which will be under the project level directory, not the root level
-      - "/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata"
+      - "./pgdata/:/var/lib/postgresql/data/pgdata"
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 volumes:
   es-data:

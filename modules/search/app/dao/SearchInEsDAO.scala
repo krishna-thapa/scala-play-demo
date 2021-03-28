@@ -8,7 +8,6 @@ import com.krishna.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
-import com.sksamuel.elastic4s.requests.bulk.BulkCompatibleRequest
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse

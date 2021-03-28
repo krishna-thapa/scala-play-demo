@@ -27,9 +27,6 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
   override def tables: TableQuery[QuoteQueriesTable] = QuoteQueriesTable.quoteQueries
 
-  //implicit lazy val system: ActorSystem = ActorSystem("reactive-streams-end-to-end")
-  //implicit lazy val materializer = ActorMaterializer()
-
   /**
     * @return List of all stored quotes from database
     */

@@ -11,20 +11,20 @@
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!--    <encoder>-->
-    <!--      <pattern>%d - %coloredLevel - [%thread] - %logger %X{method} - %message%n%xException</pattern>-->
-    <!--    </encoder>-->
+        <encoder>
+          <pattern>%d - %coloredLevel - [%thread] - %logger %X{method} - %message%n%xException</pattern>
+        </encoder>
     <!-- Console output log as Json so that Kibana can convert to indices and use for filter and sorting -->
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-      <fieldNames>
-        <timestamp>timestamp</timestamp>
-        <message>message</message>
-        <thread>[ignore]</thread>
-        <levelValue>[ignore]</levelValue>
-        <logger>logger</logger>
-        <version>[ignore]</version>
-      </fieldNames>
-    </encoder>
+<!--    <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+<!--      <fieldNames>-->
+<!--        <timestamp>timestamp</timestamp>-->
+<!--        <message>message</message>-->
+<!--        <thread>[ignore]</thread>-->
+<!--        <levelValue>[ignore]</levelValue>-->
+<!--        <logger>logger</logger>-->
+<!--        <version>[ignore]</version>-->
+<!--      </fieldNames>-->
+<!--    </encoder>-->
   </appender>
 
   <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">
@@ -43,6 +43,11 @@
   <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF"/>
   <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF"/>
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF"/>
+
+  <!-- To print all the debug coming from hikari Postgres container -->
+  <!--  <logger name="com.zaxxer.hikari" level="debug" additivity="false">-->
+  <!--    <appender-ref ref="STDOUT"/>-->
+  <!--  </logger>-->
 
   <root level="INFO">
     <appender-ref ref="ASYNCFILE"/>
