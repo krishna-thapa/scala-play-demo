@@ -10,7 +10,7 @@ import pdi.jwt.JwtSession.RichRequestHeader
 import play.api.mvc._
 import pdi.jwt.JwtSession._
 import play.api.Configuration
-import util.JwtKey
+import config.JwtKey
 
 import scala.concurrent.{ ExecutionContext, Future }
 

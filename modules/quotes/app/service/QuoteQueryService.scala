@@ -88,4 +88,8 @@ class QuoteQueryService @Inject()(
     log.info(s"Executing genreQuoteService in Service")
     responseOptionResult(quotesDAO.listGenreQuote(genre))
   }
+
+  def searchAuthorsSql(text: String): Seq[String] = {
+    quotesDAO.searchAuthors(text)
+  }
 }

@@ -9,7 +9,7 @@ import forms.RequestForm
 import model.UserDetail
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
-import util.DecodeHeader
+import config.DecodeHeader
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }

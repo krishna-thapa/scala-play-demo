@@ -24,7 +24,7 @@ class ApplicationStart @Inject()(
   val now: Date = Calendar.getInstance().getTime
 
   val projectEnv: String = sys.env.getOrElse("PROJECT_ENV", "local")
-  log.info(s"Project is started in $projectEnv at $now")
+  log.info(s"Project is started in $projectEnv environment at $now")
 
   // TODO: Start scheduling
   val scheduler: QuartzSchedulerExtension = QuartzSchedulerExtension(system)

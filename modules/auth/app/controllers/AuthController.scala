@@ -15,7 +15,7 @@ import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
 import play.api.libs.json.OFormat
 import play.api.mvc._
-import util.{ DecodeHeader, JwtKey }
+import config.{ DecodeHeader, JwtKey }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }

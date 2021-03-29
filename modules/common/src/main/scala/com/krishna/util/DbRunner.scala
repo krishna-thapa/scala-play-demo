@@ -33,7 +33,7 @@ trait DbRunner extends Logging {
       Success(runDbAction(action, timeout))
     } catch {
       case ex: Exception =>
-        log.warn(" Db Action failed", ex)
+        log.warn("Db Action failed: ", ex)
         Failure(ex)
     }
   }

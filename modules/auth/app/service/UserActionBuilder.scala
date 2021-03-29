@@ -9,7 +9,7 @@ import model.UserDetail
 import pdi.jwt.JwtSession._
 import play.api.Configuration
 import play.api.mvc._
-import util.JwtKey
+import config.JwtKey
 
 import scala.concurrent.{ ExecutionContext, Future }
 

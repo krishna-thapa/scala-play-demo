@@ -10,12 +10,15 @@
 ### Steps to run the project locally using sbt run
 1. Git clone or download the project from github
 2. Import the sbt project using your choice of IDEA
-3. Run sbt command: `sbt clean compile test`
-4. Run Docker compose command to start and run databases: `docker-compose up`
-5. Run the sbt command to run the project in localhost: `sbt run`
-6. Comment out `inspirationa-quote-api` from line 5-23 in `docker-compose.yml` file
-7. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
-8. **TODO** Dependent on OS for Postgres volume and what if CSV file is not present
+3. Uncomment section for local deployment in `.env` file and comment for other environments
+4. Comment out `inspirationa-quote-api` from line 5-23 in `docker-compose.yml` file
+5. Make changes volume local for Postgres container as per the operating system - is explained in comment under Postgres volume
+6. Run Docker compose command to start and run databases: `docker-compose up`
+7. Copy `Quotes.csv` file from `/data` to automatically create folder `/.pgdata` - (for macOS) and to `/var/lib/postgresql/data/` - (for Ubuntu: have to create directory if not present)
+8. Run sbt command: `sbt clean compile test`
+9. Run the sbt command to run the project in localhost: `sbt run`
+10. Goto localhost 9000 with swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
+11. **TODO** Dependent on OS for Postgres volume and what if CSV file is not present
 
 ### Steps to run the project locally using docker containers
 1. Download `docker-compose.yml` file only from the repo
@@ -25,6 +28,17 @@
 5. Wait for the `inspirational-quote-api` to start on local server in `HTTP on /0.0.0.0:9000`   
 5. Swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
 6. Logs management in Kibana: `http://localhost:5601`, reach more doc on `/doc/Docker-logs-ELK-stack.md`.
+
+### Use of `.env` file
+1. While running locally with sbt run instead of running docker image of `inspirationa-quote-api`
+    - Have to uncomment all the environment variables that are declared for the local environment 
+    - Host name for each of the container used (databases) has to be `localhost`
+    - Can declare username and password that can be used for local deployment 
+2. While running whole project as a docker image of `inspirationa-quote-api`
+    - Have to uncomment all the environment variables that are declared for the dev environment
+    - Host name for each of the container used (databases) has to be name of the docker container: `container_name`
+    - Can declare username and password that can be used for dev deployment 
+3. **TODO**: Can make use of the dependency injection by using environment name as a condition to insert different config for the containers
 
 ### Structure of the project
 Project is divided using the sbt sub-projects modules. These project has four sub-modules inside the modules' folder. Each module beside the `common` is play application that has its own routes configuration file and own `build.sbt` file. Each play module has its own controller, service and test. All the common models and methods are defined in the `common` sbt project. All the configuration and dependency of the modules can be found in the root `build.sbt` file.

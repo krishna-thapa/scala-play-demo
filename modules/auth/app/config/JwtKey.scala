@@ -1,4 +1,4 @@
-package util
+package config
 
 import com.krishna.conf.AppConfig
 

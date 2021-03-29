@@ -63,6 +63,7 @@ lazy val search = project
     libraryDependencies ++=
       commonDependencies ++
         elastic4sDependencies ++
+        akka ++
         dockerTestKitWithMock
   )
 
@@ -73,7 +74,6 @@ lazy val common = project
     version := "1.0-SNAPSHOT",
     libraryDependencies ++=
       commonDependencies ++
-        elastic4sDependencies ++
         slickDatabaseDependencies
   )
 
@@ -82,6 +82,15 @@ lazy val dockerTestKitWithMock = Seq(
   dockerScalaTest,
   dockerImplScala
 )
+
+val AkkaVersion = "2.6.13"
+lazy val akka = Seq(
+  "com.typesafe.akka" %% "akka-stream"                % AkkaVersion,
+  "com.typesafe.akka" %% "akka-actor-typed"           % AkkaVersion,
+  "com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-slf4j"                 % AkkaVersion
+)
+
 lazy val commonDependencies = Seq(
   guice,
   scalaTest,
@@ -103,7 +112,8 @@ lazy val testContainerDependencies = Seq(
 
 lazy val elastic4sDependencies = Seq(
   elastic4s,
-  elastic4sJson
+  elastic4sJson,
+  elastic4sStreams
 )
 
 /*
