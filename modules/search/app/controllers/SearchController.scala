@@ -37,13 +37,9 @@ class SearchController @Inject()(
       searchInEsDao.getAndStoreQuotes(records)
 
     listOfFutureResults
-      .map(responseEsResult(_)(indexName))
+      .map(responseEsResult)
       //add recover to handle the case where the future fails.
-      .recover {
-        case exception =>
-          log.warn(s"Error while writing records on index: ${exception.getMessage}")
-          badGateway(s"${exception.getMessage}")
-      }
+      .errorRecover
   }
 
   /**
@@ -52,20 +48,15 @@ class SearchController @Inject()(
     * @param indexName that will be deleted from ES
     * @return success body or exception message
     */
-  def deleteIndex(indexName: String): Action[AnyContent] = AdminAction.async { implicit request =>
-    log.info(s"Executing deleteIndex controller for: $indexName")
-    log.warn("Hope you know what you are doing!")
+  def deleteIndex(implicit indexName: String): Action[AnyContent] = AdminAction.async {
+    implicit request =>
+      log.info(s"Executing deleteIndex controller for index: $indexName")
+      log.warn("Hope you know what you are doing!")
 
-    searchInEsDao
-      .deleteQuotesIndex(indexName)
-      .map(responseEsResult(_)(indexName))
-      .recover {
-        case exception =>
-          log.error(
-            s"Error while deleting an index: $indexName error: ${exception.getMessage}"
-          )
-          badGateway(s"${exception.getMessage}")
-      }
+      searchInEsDao
+        .deleteQuotesIndex(indexName)
+        .map(responseEsResult)
+        .errorRecover
   }
 
   /**
@@ -89,15 +80,9 @@ class SearchController @Inject()(
                 s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
               )
               // Convert the success future result to the QuotesQuery case class
-              responseEsResult(response)(indexName)
+              responseEsResult(response)
             }
-            .recover {
-              case exception =>
-                log.error(
-                  s"Error while searching the text: ${exception.getMessage}"
-                )
-                badRequest(s"${exception.getMessage}")
-            }
+            .errorRecover
         }
       )
     searchResults

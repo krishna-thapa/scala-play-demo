@@ -5,6 +5,7 @@ import com.krishna.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
+import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
@@ -14,6 +15,8 @@ import config.InitEs
 import scala.concurrent.Future
 
 trait SearchMethods extends InitEs with Logging {
+
+  def getAndStoreQuotes(records: Int): Future[Response[BulkResponse]]
 
   def deleteQuotesIndex(indexName: String): Future[Response[DeleteIndexResponse]]
 

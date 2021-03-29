@@ -12,7 +12,24 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
 
+import scala.concurrent.{ ExecutionContext, Future }
+
 object EsResponseHandler extends ResponseError {
+
+  // https://docs.scala-lang.org/overviews/core/implicit-classes.html
+  implicit class ErrorRecover(futureResult: Future[Result])(
+      implicit executionContext: ExecutionContext
+  ) {
+    def errorRecover: Future[Result] = {
+      futureResult.recover {
+        case exception =>
+          log.error(
+            s"Error while performing action on ES: ${exception.getMessage}"
+          )
+          badRequest(s"${exception.getMessage}")
+      }
+    }
+  }
 
   def responseEsResult[T](response: Response[T])(implicit indexName: String): Result = {
     response.result match {
@@ -36,7 +53,7 @@ object EsResponseHandler extends ResponseError {
       val records = response.to[QuotesQuery].toList
       Ok(Json.toJson(records))
     } else {
-      notFound(EmptyDbMsg)
+      notFound(EsPlaceHolder(EmptyDbMsg.msg))
     }
   }
 
