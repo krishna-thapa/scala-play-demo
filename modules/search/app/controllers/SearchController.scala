@@ -33,12 +33,9 @@ class SearchController @Inject()(
   def writeInEs(records: Int): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing writeInEs Controller")
 
-    val listOfFutureResults: Future[Response[BulkResponse]] =
-      searchInEsDao.getAndStoreQuotes(records)
-
-    listOfFutureResults
+    searchInEsDao
+      .getAndStoreQuotes(records)
       .map(responseEsResult)
-      //add recover to handle the case where the future fails.
       .errorRecover
   }
 
@@ -66,7 +63,7 @@ class SearchController @Inject()(
   def searchQuote: Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing searchQuote controller")
     // Add request validation
-    val searchResults = SearchForm.searchRequestForm
+    SearchForm.searchRequestForm
       .bindFromRequest()
       .fold(
         formWithErrors => {
@@ -85,6 +82,5 @@ class SearchController @Inject()(
             .errorRecover
         }
       )
-    searchResults
   }
 }

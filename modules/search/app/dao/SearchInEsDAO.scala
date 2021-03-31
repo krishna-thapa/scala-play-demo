@@ -20,9 +20,12 @@ import javax.inject.Inject
 
 import scala.concurrent.{ ExecutionContext, Future, Promise }
 
-class SearchInEsDAO @Inject()(system: ActorSystem, quotesDAO: QuoteQueryDAO, config: Configuration)(
-    implicit ec: ExecutionContext
-) extends SearchMethods {
+class SearchInEsDAO @Inject()(
+    system: ActorSystem,
+    quotesDAO: QuoteQueryDAO,
+    config: Configuration
+)(implicit ec: ExecutionContext)
+    extends SearchMethods {
 
   override val esConfig: ElasticsearchConfig =
     config.get[ElasticsearchConfig]("elasticsearch")
@@ -44,12 +47,13 @@ class SearchInEsDAO @Inject()(system: ActorSystem, quotesDAO: QuoteQueryDAO, con
     // providing index with csvId to avoid duplicates records with same csvId
     // if createOnly set to true then trying to update a document will fail
     // have set as false (default) so that duplicate records can override the existing records
-    val quotesToInserts: Seq[IndexRequest] = quotes.map { quote =>
-      indexInto(indexName).id(quote.csvId).doc(quote)
-    }
 
     client.execute {
-      bulk(quotesToInserts: _*).refresh(RefreshPolicy.Immediate)
+      bulk {
+        quotes.map { quote =>
+          indexInto(indexName).id(quote.csvId).doc(quote)
+        }
+      }.refresh(RefreshPolicy.Immediate)
 
     }
   }
