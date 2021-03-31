@@ -29,7 +29,7 @@ class SearchInEsDAOSpec
     with DockerKitDockerJava {
 
   // Github actions takes more than default 20 seconds to start containers
-  override val StartContainersTimeout: FiniteDuration = 5.minutes
+  override val StartContainersTimeout: FiniteDuration = 20.minutes
 
   implicit val pc: PatienceConfig = PatienceConfig(Span(20, Seconds), Span(1, Second))
 
