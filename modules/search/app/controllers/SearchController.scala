@@ -1,8 +1,6 @@
 package controllers.search
 
 import com.krishna.util.Logging
-import com.sksamuel.elastic4s.Response
-import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import responseHandler.EsResponseHandler._
