@@ -1,11 +1,11 @@
 ###
-#  summary: Get a autocomplete list of authors from search parameter
+#  summary: Get a autocomplete list of authors from search query parameter
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
 #  parameters:
-#    - name: "author"
-#      in: "path"
+#    - in: "query"
+#      name: "author"
 #      description: "Required min lenght of 3"
 #      required: true
 #      type: "string"
@@ -26,7 +26,7 @@
 #  security:
 #    - TokenKey: []
 ###
-GET      /:author                       controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
+GET     /quotes/        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
 
 ###
 #  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
@@ -53,16 +53,16 @@ GET      /:author                       controllers.quotes.QuoteController.getAu
 #  security:
 #    - TokenKey: []
 ###
-GET      /create/:records                controllers.search.SearchController.writeInEs(records: Int)
+POST    /quotes/:records        controllers.search.SearchController.writeInEs(records: Int)
 
 ###
-#  summary: Delete the index "quotes" - Should be used for the testing purpose only.
+#  summary: Delete the index from ES - Should be used for the testing purpose only.
 #  description: "The name of the index has to pass as a path parameter and this can only be done by Admin role"
 #  tags:
 #    - Search
 #  parameters:
-#    - name: "indexName"
-#      in: "path"
+#    - in: "query"
+#      name: "indexName"
 #      description: "Index name that will be deleted from ES"
 #      required: true
 #      type: "string"
@@ -80,20 +80,29 @@ GET      /create/:records                controllers.search.SearchController.wri
 #  security:
 #    - TokenKey: []
 ###
-GET      /delete/:indexName             controllers.search.SearchController.deleteIndex(indexName: String)
+DELETE      /quotes/        controllers.search.SearchController.deleteIndex(indexName: String)
 
 ###
-#  summary: Search quotes from the ES with text serach
+#  summary: Search full text quote from the ES
 #  description: "Searched text has to be min length of 3 and this can only be done by Logged/Admin role"
 #  tags:
 #    - Search
 #  parameters:
-#    - name: search request
-#      in: body
-#      description: Search request body
+#    - name: "text"
+#      in: "path"
+#      description: "Text to be searched in the quotes ES - min length required 3, max length of 50 characters"
 #      required: true
-#      schema:
-#        $ref: '#/definitions/searchForm.SearchRequest'
+#      type: "string"
+#      minLength: 3
+#      maxLength: 50
+#    - name: "offset"
+#      in: "query"
+#      description: "For paginiation - default to 0"
+#      type: "integer"
+#    - name: "limit"
+#      in: "query"
+#      description: "For paginiation - default to 10"
+#      type: "integer"
 #  responses:
 #    200:
 #      description: Success response on deleting an es index.
@@ -108,4 +117,4 @@ GET      /delete/:indexName             controllers.search.SearchController.dele
 #  security:
 #    - TokenKey: []
 ###
-POST      /quote                        controllers.search.SearchController.searchQuote
+GET     /quotes/:text        controllers.search.SearchController.searchQuote(text: String)

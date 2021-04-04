@@ -6,9 +6,8 @@ import depInject.{ SecuredController, SecuredControllerComponents }
 import responseHandler.EsResponseHandler._
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
-import searchForm.SearchForm
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class SearchController @Inject()(
@@ -58,27 +57,45 @@ class SearchController @Inject()(
     * List of the quotes that match the search text
     * @return Returns seq of matched quote
     */
-  def searchQuote: Action[AnyContent] = UserAction.async { implicit request =>
+  def searchQuote(text: String): Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing searchQuote controller")
-    // Add request validation
-    SearchForm.searchRequestForm
-      .bindFromRequest()
-      .fold(
-        formWithErrors => {
-          Future(badRequest(s"The searchForm was not in the expected format: $formWithErrors"))
-        },
-        searchRequest => {
-          searchInEsDao
-            .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
-            .map { response =>
-              log.info(
-                s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
-              )
-              // Convert the success future result to the QuotesQuery case class
-              responseEsResult(response)
-            }
-            .errorRecover
-        }
-      )
+
+    val limit: Int =
+      request.getQueryString("limit").map(_.toInt).getOrElse(10)
+    val offset: Int =
+      request.getQueryString("offset").map(_.toInt).getOrElse(0)
+
+    log.info(s"Searching for $text with offset: $offset and limit of $limit")
+
+    searchInEsDao
+      .searchQuote(text, offset, limit)
+      .map { response =>
+        log.info(
+          s"Total hits for the search: $text = ${response.result.totalHits}"
+        )
+        // Convert the success future result to the QuotesQuery case class
+        responseEsResult(response)
+      }
+      .errorRecover
+
+//    SearchForm.searchRequestForm
+//      .bindFromRequest()
+//      .fold(
+//        formWithErrors => {
+//          Future(badRequest(s"The searchForm was not in the expected format: $formWithErrors"))
+//        },
+//        searchRequest => {
+//          searchInEsDao
+//            .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
+//            .map { response =>
+//              log.info(
+//                s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
+//              )
+//              // Convert the success future result to the QuotesQuery case class
+//              responseEsResult(response)
+//            }
+//            .errorRecover
+//        }
+//      )
   }
 }
