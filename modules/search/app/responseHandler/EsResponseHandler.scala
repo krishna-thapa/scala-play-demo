@@ -50,6 +50,7 @@ object EsResponseHandler extends ResponseError {
       isResponseResult: Boolean
   )(implicit indexName: String): Result = {
     if (isResponseResult) {
+      log.info(s"Total hits for the searched text: ${response.size}")
       val records = response.to[QuotesQuery].toList
       Ok(Json.toJson(records))
     } else {

@@ -65,37 +65,11 @@ class SearchController @Inject()(
     val offset: Int =
       request.getQueryString("offset").map(_.toInt).getOrElse(0)
 
-    log.info(s"Searching for $text with offset: $offset and limit of $limit")
+    log.info(s"Searching for text: $text with offset: $offset and limit of $limit")
 
     searchInEsDao
       .searchQuote(text, offset, limit)
-      .map { response =>
-        log.info(
-          s"Total hits for the search: $text = ${response.result.totalHits}"
-        )
-        // Convert the success future result to the QuotesQuery case class
-        responseEsResult(response)
-      }
+      .map(responseEsResult)
       .errorRecover
-
-//    SearchForm.searchRequestForm
-//      .bindFromRequest()
-//      .fold(
-//        formWithErrors => {
-//          Future(badRequest(s"The searchForm was not in the expected format: $formWithErrors"))
-//        },
-//        searchRequest => {
-//          searchInEsDao
-//            .searchQuote(searchRequest.text, searchRequest.offset, searchRequest.limit)
-//            .map { response =>
-//              log.info(
-//                s"Total hits for the search: ${searchRequest.text} = ${response.result.totalHits}"
-//              )
-//              // Convert the success future result to the QuotesQuery case class
-//              responseEsResult(response)
-//            }
-//            .errorRecover
-//        }
-//      )
   }
 }

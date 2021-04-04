@@ -26,7 +26,7 @@
 #  security:
 #    - TokenKey: []
 ###
-GET     /quotes/        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
+GET     /quotes        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
 
 ###
 #  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
@@ -80,7 +80,7 @@ POST    /quotes/:records        controllers.search.SearchController.writeInEs(re
 #  security:
 #    - TokenKey: []
 ###
-DELETE      /quotes/        controllers.search.SearchController.deleteIndex(indexName: String)
+DELETE      /quotes        controllers.search.SearchController.deleteIndex(indexName: String)
 
 ###
 #  summary: Search full text quote from the ES
