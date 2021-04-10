@@ -1,6 +1,7 @@
 package httpService
 
 import com.krishna.httpService.HttpService
+import com.krishna.model.QuotesQuery
 import com.krishna.util.Logging
 import javax.inject.{Inject, Singleton}
 import models.AuthorDetails
@@ -16,9 +17,9 @@ class WikiMediaApi @Inject()(httpService: HttpService, config: Configuration)(
 ) extends Logging {
   private val wikiMediaApiUrl: String = config.get[String]("wiki.apiUrl")
 
-  def getWikiResponse(author: String): Future[AuthorDetails] = {
+  def getWikiResponse(quote: QuotesQuery): Future[AuthorDetails] = {
     val futureResponse: Future[AuthorDetails] = for {
-      wsResponse    <- httpService.get(wikiMediaApiUrl.concat(author))
+      wsResponse    <- httpService.get(wikiMediaApiUrl.concat(quote.author.get)) //TODO: fix
       authorDetails <- EsResponseHandler.validateJson(wsResponse.json.validate[AuthorDetails])
     } yield authorDetails
 

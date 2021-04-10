@@ -8,7 +8,9 @@ import com.krishna.model.QuotesQuery
 import com.sksamuel.elastic4s.streams.ReactiveElastic.ReactiveElastic
 import config.{ ElasticsearchConfig, InitEs }
 import daos.QuoteQueryDAO
+import httpService.WikiMediaApi
 import javax.inject.Inject
+import models.AuthorDetails
 import play.api.Configuration
 
 import scala.concurrent.Promise
@@ -16,6 +18,7 @@ import scala.concurrent.Promise
 class AkkaService @Inject()(
     system: ActorSystem,
     quotesDAO: QuoteQueryDAO,
+    wikiMediaApi: WikiMediaApi,
     config: Configuration
 ) extends InitEs
     with StreamsInit {
@@ -37,5 +40,9 @@ class AkkaService @Inject()(
         promise.failure(t); ()
       })(builder(indexName), system)
     }
+
+    // Create a full akka stream graph
+    recordsSource[QuotesQuery](quotesDAO.getAllQuotes)
+      .via(addFlowPerRecord[QuotesQuery, AuthorDetails](wikiMediaApi.getWikiResponse))
   }
 }
