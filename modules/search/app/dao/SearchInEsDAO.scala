@@ -1,8 +1,5 @@
 package dao
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.Sink
 import com.krishna.model.QuotesQuery
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
@@ -11,16 +8,14 @@ import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
-import com.sksamuel.elastic4s.streams.ReactiveElastic._
 import daos.QuoteQueryDAO
 import play.api.Configuration
 import config.ElasticsearchConfig
 import javax.inject.Inject
 
-import scala.concurrent.{ ExecutionContext, Future, Promise }
+import scala.concurrent.{ ExecutionContext, Future }
 
 class SearchInEsDAO @Inject()(
-    system: ActorSystem,
     quotesDAO: QuoteQueryDAO,
     config: Configuration
 )(implicit ec: ExecutionContext)
@@ -54,18 +49,6 @@ class SearchInEsDAO @Inject()(
         }
       }.refresh(RefreshPolicy.Immediate)
 
-    }
-  }
-
-  def bulkInsertQuotesToES = {
-    val promise = Promise[Unit]()
-
-    val esSink: Sink[QuotesQuery, NotUsed] = Sink.fromSubscriber {
-      client.subscriber[QuotesQuery](batchSize = 500, completionFn = { () =>
-        promise.success(()); ()
-      }, errorFn = { (t: Throwable) =>
-        promise.failure(t); ()
-      })(builder(indexName), system)
     }
   }
 

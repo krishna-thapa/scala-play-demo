@@ -1,15 +1,11 @@
 package dao
 
-import com.krishna.model.QuotesQuery
 import com.krishna.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
-import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
-import com.sksamuel.elastic4s.requests.common.RefreshPolicy
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
-import com.sksamuel.elastic4s.streams.RequestBuilder
 import config.InitEs
 
 import scala.concurrent.Future
@@ -25,12 +21,6 @@ trait SearchMethods extends InitEs with Logging {
       offset: Int,
       limit: Int
   ): Future[Response[SearchResponse]]
-
-  /*
-  An implementation of RequestBuilder to load stream in ElasticSearch
-   */
-  def builder(indexName: String): RequestBuilder[QuotesQuery] =
-    (q: QuotesQuery) => indexInto(indexName).id(q.csvId).doc(q).refresh(RefreshPolicy.Immediate)
 
   /*
   Count the total docs inside the index, used for testing

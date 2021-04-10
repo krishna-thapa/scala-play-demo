@@ -8,13 +8,18 @@ import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsResult, Json }
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 object EsResponseHandler extends ResponseError {
+
+  def validateJson[T](jsResult: JsResult[T]): Future[T] = {
+    if (jsResult.isSuccess) Future.successful(jsResult.get)
+    else Future.failed(new NoSuchElementException("Json parse error"))
+  }
 
   // https://docs.scala-lang.org/overviews/core/implicit-classes.html
   implicit class ErrorRecover(futureResult: Future[Result])(
