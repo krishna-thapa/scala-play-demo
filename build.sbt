@@ -74,7 +74,8 @@ lazy val common = project
     version := "1.0-SNAPSHOT",
     libraryDependencies ++=
       commonDependencies ++
-        slickDatabaseDependencies
+        slickDatabaseDependencies ++
+        Seq(ws)
   )
 
 lazy val dockerTestKitWithMock = Seq(
