@@ -13,7 +13,6 @@ class HttpService @Inject()(ws: WSClient) extends Logging {
       params: Seq[(String, String)] = Nil,
       headers: Seq[(String, String)] = Nil
   ): Future[WSResponse] = {
-    log.info(s"Calling HTTP GET for: $url")
 
     ws.url(url)
       .withQueryStringParameters(params: _*)

@@ -51,7 +51,7 @@ class AkkaService @Inject()(
     }
 
     // Create a full akka stream graph
-    recordsSource[QuotesQuery](quotesDAO.getRandomRecords(50))
+    recordsSource[QuotesQuery](quotesDAO.getRandomRecords(300))
       .via(addFlowPerRecord[QuotesQuery, QuoteWithAuthor](wikiMediaApi.getWikiResponse))
       .alsoTo(logElementsPerBlock)
       .runWith(esSink)

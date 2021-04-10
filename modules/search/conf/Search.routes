@@ -35,7 +35,7 @@ GET     /quotes        controllers.quotes.QuoteController.getAuthorsAutocomplete
 #    - Search
 #  parameters:
 #    - name: "records"
-#      in: "path"
+#      in: "query"
 #      description: "Number of records to be added in ElasticSearch DB"
 #      required: true
 #      type: "integer"
@@ -53,7 +53,7 @@ GET     /quotes        controllers.quotes.QuoteController.getAuthorsAutocomplete
 #  security:
 #    - TokenKey: []
 ###
-POST    /quotes/:records        controllers.search.SearchController.writeInEs(records: Int)
+POST    /quotes        controllers.search.SearchController.writeInEs(records: Int ?= 50)
 
 ###
 #  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
