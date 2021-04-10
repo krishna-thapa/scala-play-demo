@@ -1,6 +1,5 @@
 package dao
 
-import akka.actor.ActorSystem
 import com.krishna.model.{ Genre, QuotesQuery }
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
@@ -42,8 +41,7 @@ class SearchInEsDAOSpec
   )
 
   val mockQuoteQueryDAO: QuoteQueryDAO = mock[QuoteQueryDAO]
-  val mockActorSystem: ActorSystem     = mock[ActorSystem]
-  val searchDao: SearchInEsDAO         = new SearchInEsDAO(mockActorSystem, mockQuoteQueryDAO, mockConfig)
+  val searchDao: SearchInEsDAO         = new SearchInEsDAO(mockQuoteQueryDAO, mockConfig)
 
   val baseQuote: QuotesQuery = QuotesQuery(
     id = 1,

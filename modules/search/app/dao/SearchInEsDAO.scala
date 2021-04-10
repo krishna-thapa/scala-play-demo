@@ -6,7 +6,6 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
-import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
 import daos.QuoteQueryDAO
 import play.api.Configuration
@@ -50,18 +49,6 @@ class SearchInEsDAO @Inject()(
       }.refresh(RefreshPolicy.Immediate)
 
     }
-  }
-
-  /**
-    * Delete the index in elastic search with given index name
-    * @param indexName -> Index to delete
-    * @return -> Future response
-    */
-  def deleteQuotesIndex(indexName: String): Future[Response[DeleteIndexResponse]] = {
-    log.warn(s"Deleting the index: $indexName")
-    client.execute(
-      deleteIndex(indexName)
-    )
   }
 
   /**

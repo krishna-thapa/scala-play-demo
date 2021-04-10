@@ -1,0 +1,28 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "pageid": 736,
+        "ns": 0,
+        "title": "Author",
+        "thumbnail": {
+          "source": "url for the image",
+          "width": 381,
+          "height": 500
+        },
+        "terms": {
+          "alias": [
+            "Einstein"
+          ],
+          "label": [
+            "Albert"
+          ],
+          "description": [
+            "description of the author"
+          ]
+        }
+      }
+    ]
+  }
+}

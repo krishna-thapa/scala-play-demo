@@ -56,6 +56,27 @@ GET     /quotes        controllers.quotes.QuoteController.getAuthorsAutocomplete
 POST    /quotes/:records        controllers.search.SearchController.writeInEs(records: Int)
 
 ###
+#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
+#  description: "It will migrate all the quotes from Postgres table and store in ES and this can only be done by Admin role"
+#  tags:
+#    - Search
+#  responses:
+#    200:
+#      description: Success response after writing on ES index.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
+#    404:
+#      description: Not found with input index in an ES.
+#    502:
+#      description: Bad Gateway - Connection refused.
+#  security:
+#    - TokenKey: []
+###
+POST    /quotes/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
+
+###
 #  summary: Delete the index from ES - Should be used for the testing purpose only.
 #  description: "The name of the index has to pass as a path parameter and this can only be done by Admin role"
 #  tags:

@@ -1,5 +1,6 @@
 package controllers.search
 
+import akkaService.AkkaService
 import com.krishna.util.Logging
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
@@ -12,7 +13,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class SearchController @Inject()(
     scc: SecuredControllerComponents,
-    searchInEsDao: SearchInEsDAO
+    searchInEsDao: SearchInEsDAO,
+    akkaService: AkkaService
 )(
     implicit executionContext: ExecutionContext
 ) extends SecuredController(scc)
@@ -33,6 +35,14 @@ class SearchController @Inject()(
     searchInEsDao
       .getAndStoreQuotes(records)
       .map(responseEsResult)
+      .errorRecover
+  }
+
+  def writeMigrateQuotesToEs: Action[AnyContent] = AdminAction.async { implicit request =>
+    log.info("Executing writeMigrateQuotesToEs Controller")
+
+    akkaService.bulkInsertQuotesToES
+      .map(_ => Ok("Success"))
       .errorRecover
   }
 

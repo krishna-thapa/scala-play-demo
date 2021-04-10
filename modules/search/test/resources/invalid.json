@@ -1,0 +1,19 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "normalized": [
+      {
+        "fromencoded": false,
+        "from": "jpt",
+        "to": "Jpt"
+      }
+    ],
+    "pages": [
+      {
+        "ns": 0,
+        "invalid": "jpt",
+        "missing": true
+      }
+    ]
+  }
+}
