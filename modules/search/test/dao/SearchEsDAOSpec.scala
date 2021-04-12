@@ -1,41 +1,36 @@
 package dao
 
+import com.dimafeng.testcontainers.ElasticsearchContainer
+import com.dimafeng.testcontainers.scalatest.TestContainerForAll
 import com.krishna.model.{ Genre, QuotesQuery }
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
-import com.whisk.docker.impl.dockerjava.DockerKitDockerJava
-import com.whisk.docker.scalatest.DockerTestKit
 import daos.QuoteQueryDAO
-import helper.DockerElasticsearchService
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import org.scalatest.time._
 import play.api.Configuration
 
-import scala.concurrent.duration.{ Duration, DurationInt, FiniteDuration }
 import scala.concurrent.{ Await, Future }
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
-class SearchInEsDAOSpec
-    extends AnyFlatSpec
-    with Matchers
-    with DockerElasticsearchService
-    with DockerTestKit
-    with DockerKitDockerJava {
+class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
-  // Github actions takes more than default 20 seconds to start containers
-  override val StartContainersTimeout: FiniteDuration = 20.minutes
+  override val containerDef: ElasticsearchContainer.Def =
+    ElasticsearchContainer.Def("docker.elastic.co/elasticsearch/elasticsearch:7.10.1")
 
-  implicit val pc: PatienceConfig = PatienceConfig(Span(20, Seconds), Span(1, Second))
+  val container: ElasticsearchContainer = startContainers()
+
+  val getHostAddress: Array[String] = container.httpHostAddress.split(":")
 
   val mockConfig: Configuration = Configuration.from(
     Map(
-      "elasticsearch.ESHOST"      -> "localhost",
-      "elasticsearch.ESPORT"      -> "2237",
+      "elasticsearch.ESHOST"      -> s"${getHostAddress.head}",
+      "elasticsearch.ESPORT"      -> s"${getHostAddress(1)}",
       "elasticsearch.ESINDEXNAME" -> "test"
     )
   )
@@ -54,12 +49,6 @@ class SearchInEsDAOSpec
     Seq(baseQuote, baseQuote.copy(id = 2, csvId = "csv102", quote = "Test quote 2"))
 
   behavior of "SearchInEsDAO"
-  it should "elasticsearch container test should be ready" in {
-    isContainerReady(elasticsearchContainer).futureValue shouldBe true
-    elasticsearchContainer.getPorts().futureValue.get(9300) should not be empty
-    elasticsearchContainer.getIpAddresses().futureValue should not be Seq.empty
-  }
-
   it should "return check indication if the index exists" in {
     searchDao.doesIndexExists shouldBe false
   }
