@@ -80,8 +80,8 @@ lazy val common = project
 
 lazy val dockerTestKitWithMock = Seq(
   mockito,
-  dockerScalaTest,
-  dockerImplScala
+  testContainers,
+  elasticSearchContainer
 )
 
 val AkkaVersion = "2.6.13"
@@ -108,7 +108,7 @@ lazy val slickDatabaseDependencies = Seq(
 lazy val testContainerDependencies = Seq(
   testContainers,
   postgresContainer,
-  playScalaTest
+  playScalaTest // Need this?
 )
 
 lazy val elastic4sDependencies = Seq(

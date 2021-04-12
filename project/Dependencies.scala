@@ -16,7 +16,6 @@ object Dependencies {
     val scalaTest      = "3.2.0"
     val playtest       = "5.0.0"
     val testContainers = "0.38.8"
-    val dockerTest     = "0.9.9"
     val mockitoVer     = "1.13.0"
 
     // logs
@@ -46,8 +45,6 @@ object Dependencies {
       "org.scalatestplus.play" %% artifact % Versions.playtest
     def testContainersLib(artifact: String): ModuleID =
       "com.dimafeng" %% artifact % Versions.testContainers
-    def dockerScalaLib(artifact: String): ModuleID =
-      "com.whisk" %% artifact % Versions.dockerTest
     def mockitoLib(artifact: String): ModuleID =
       "org.mockito" %% artifact % Versions.mockitoVer
 
@@ -71,16 +68,13 @@ object Dependencies {
     val logbackEncoder = logbackEncoderLib("logstash-logback-encoder")
 
     // tests
-    val scalaTest         = scalaTestLib("scalatest")                            % "test"
-    val playScalaTest     = playScalaTestlib("scalatestplus-play")               % "test"
-    val testContainers    = testContainersLib("testcontainers-scala-scalatest")  % "test"
-    val postgresContainer = testContainersLib("testcontainers-scala-postgresql") % "test"
+    val scalaTest              = scalaTestLib("scalatest")                               % "test"
+    val playScalaTest          = playScalaTestlib("scalatestplus-play")                  % "test"
+    val testContainers         = testContainersLib("testcontainers-scala-scalatest")     % "test"
+    val postgresContainer      = testContainersLib("testcontainers-scala-postgresql")    % "test"
+    val elasticSearchContainer = testContainersLib("testcontainers-scala-elasticsearch") % "test"
 
     // mock
     val mockito = mockitoLib("mockito-scala-scalatest") % "test"
-
-    // scala-test docker-kit
-    val dockerScalaTest = dockerScalaLib("docker-testkit-scalatest")        % "test"
-    val dockerImplScala = dockerScalaLib("docker-testkit-impl-docker-java") % "test"
   }
 }
