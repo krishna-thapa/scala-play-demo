@@ -10,10 +10,6 @@ CREATE TABLE quotes (
     genre varchar(100)
 );
 
--- First have to manually import the csv file to the docker container by mounting the local folder to the docker pgdata path, see docker-compose yml file
--- Copy the CSV that is stored in the docker container where postgres is running
- COPY quotes(quote,author,genre) FROM '/var/lib/postgresql/data/pgdata/Quotes-test.csv' DELIMITER ';;' CSV HEADER;
-
 CREATE TABLE fav_quotations (
     id serial PRIMARY KEY,
     user_id INTEGER NOT NULL,
