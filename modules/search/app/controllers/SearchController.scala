@@ -1,10 +1,12 @@
 package controllers.search
 
 import akkaService.AkkaService
+import com.krishna.util.FutureErrorHandler.ErrorRecover
 import com.krishna.util.Logging
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import responseHandler.EsResponseHandler._
+
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 

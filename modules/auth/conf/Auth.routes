@@ -200,3 +200,29 @@ POST     /admin/:email                    controllers.auth.AuthController.toggle
 #    - TokenKey: []
 ###
 DELETE     /user/:email                   controllers.auth.AuthController.removeUser(email: String)
+
+###
+#  summary: Post a user picture with the user email id
+#  description: >
+#   Store the uploaded user picture as GridFS in MongoDB
+#  tags:
+#    - Auth
+#  consumes:
+#    - multipart/form-data
+#  parameters:
+#    - name: upload
+#      in: formData
+#      type: file
+#      required: true
+#      description: Picture to upload for the user profile
+#  responses:
+#    200:
+#      description: success with response code
+#    400:
+#      description: Bad request (Has to be in picture format)
+#    500:
+#      description: internal server error (connection issues)
+#  security:
+#    - TokenKey: []
+###
+POST    /user/picture/:emailId               controllers.auth.GridFsController.saveUserPicture(emailId: String)

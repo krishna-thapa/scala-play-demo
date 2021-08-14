@@ -49,6 +49,7 @@ lazy val auth = project
     libraryDependencies ++=
       commonDependencies ++
         slickDatabaseDependencies ++
+        mongoDependencies ++
         Seq(
           playJwt,
           scalaBcrypt
@@ -115,6 +116,13 @@ lazy val elastic4sDependencies = Seq(
   elastic4s,
   elastic4sJson,
   elastic4sStreams
+)
+
+lazy val mongoDependencies = Seq(
+  // Enable reactive mongo for Play 2.8
+  "org.reactivemongo" %% "play2-reactivemongo" % "1.0.4-play28",
+  // Provide JSON serialization for reactive mongo
+  "org.reactivemongo" %% "reactivemongo-play-json-compat" % "1.0.4-play28"
 )
 
 /*

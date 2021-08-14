@@ -1,9 +1,10 @@
 package service
 
 import java.time.Clock
-
 import com.krishna.response.ErrorMsg.AuthenticationFailed
 import com.krishna.response.ResponseResult
+import com.krishna.util.FutureErrorHandler.ErrorRecover
+
 import javax.inject.Inject
 import model.UserDetail
 import pdi.jwt.JwtSession._
@@ -34,7 +35,9 @@ class UserActionBuilder @Inject()(parser: BodyParsers.Default)(
        */
       case Some(userDetail) =>
         log.info(s"Giving access to the user: ${userDetail.name}")
-        block(new AuthenticatedRequest[A](userDetail, request)).map(_.refreshJwtSession(request))
+        block(new AuthenticatedRequest[A](userDetail, request))
+          .map(_.refreshJwtSession(request))
+          .errorRecover
       case _ =>
         Future(responseErrorResult(AuthenticationFailed))
     }
