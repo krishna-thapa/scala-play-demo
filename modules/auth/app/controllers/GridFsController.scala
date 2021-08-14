@@ -1,7 +1,9 @@
 package controllers.auth
 
-import com.krishna.util.FutureErrorHandler.ErrorRecover
+import com.krishna.response.ResponseResult
+import com.krishna.util.FutureErrorHandler.{ ErrorRecover, ToFuture }
 import com.krishna.util.Logging
+import config.DecodeHeader
 import dao.MongoControllerRefactored
 import depInject.{ SecuredController, SecuredControllerComponents }
 import play.api.Configuration
@@ -24,21 +26,27 @@ class GridFsController @Inject()(
     extends SecuredController(scc)
     with MongoControllerRefactored
     with ReactiveMongoComponents
+    with ResponseResult
     with Logging {
 
-  def saveUserPicture(
-      emailId: String
-  ): Action[MultipartFormData[ReadFile[BSONValue, BSONDocument]]] =
+  /**
+    * Save the user profile picture in the mongo db with email as user id
+    * @return
+    */
+  def saveUserPicture: Action[MultipartFormData[ReadFile[BSONValue, BSONDocument]]] =
     UserAction.async(gridFSBodyParser(gridFsAttachmentService.gridFS)) { request =>
-      log.info(s"Executing saveUserPicture for the request user email id: $emailId")
-
-      val fileOption: Option[MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]] =
-        request.body.files.headOption
-      fileOption match {
-        case Some(file) =>
-          log.info(s"Received file: ${file.filename} with content type of: ${file.contentType}")
-          gridFsAttachmentService.addImageAttachment(emailId, file)
-        case _ => Future.successful(NotFound("Select the picture to upload"))
+      DecodeHeader(request.headers) match {
+        case Right(user) =>
+          log.info(s"Executing saveUserPicture for the request user email: ${user.email}")
+          val fileOption: Option[MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]] =
+            request.body.files.headOption
+          fileOption match {
+            case Some(file) =>
+              log.info(s"Received file: ${file.filename} with content type of: ${file.contentType}")
+              gridFsAttachmentService.addImageAttachment(user.email, file)
+            case _ => NotFound("Select the picture to upload").toFuture
+          }
+        case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
       }
     }
 

@@ -33,8 +33,8 @@ trait AttachmentDAO extends ReactiveMongoComponents with Logging {
         throw error
     }
 
-  def existUserPicture(userId: String) = {
-    gridFS.flatMap(_.find(BSONDocument("userId" -> userId)).headOption)
+  def existUserPicture(emailId: String) = {
+    gridFS.flatMap(_.find(BSONDocument("emailId" -> emailId)).headOption)
   }
 
   def parseBSONObjectId(

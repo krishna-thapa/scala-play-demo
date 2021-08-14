@@ -20,4 +20,11 @@ object FutureErrorHandler extends Logging {
       }
     }
   }
+
+  // An implicit class to apply for result to return future of result
+  implicit class ToFuture(result: Result) {
+    def toFuture: Future[Result] = {
+      Future.successful(result)
+    }
+  }
 }
