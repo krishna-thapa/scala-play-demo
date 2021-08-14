@@ -1,14 +1,10 @@
 package dao
 
-import com.krishna.util.FutureErrorHandler.ErrorRecover
 import com.krishna.util.Logging
-import play.api.mvc.Result
-import play.api.mvc.Results.BadRequest
 import play.modules.reactivemongo.ReactiveMongoComponents
-import reactivemongo.api.bson.{ BSONDocument, BSONObjectID }
+import reactivemongo.api.bson.BSONDocument
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 
 trait AttachmentDAO extends ReactiveMongoComponents with Logging {
@@ -36,19 +32,4 @@ trait AttachmentDAO extends ReactiveMongoComponents with Logging {
   def existUserPicture(emailId: String) = {
     gridFS.flatMap(_.find(BSONDocument("emailId" -> emailId)).headOption)
   }
-
-  def parseBSONObjectId(
-      id: String,
-      callService: BSONObjectID => Future[Result]
-  ): Future[Result] = {
-    BSONObjectID.parse(id) match {
-      case Success(objectId) =>
-        callService(objectId).errorRecover
-      case Failure(exception) =>
-        Future.successful(
-          BadRequest(s"Cannot parse the id: $id, error with: ${exception.getMessage}")
-        )
-    }
-  }
-
 }

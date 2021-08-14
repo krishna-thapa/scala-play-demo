@@ -16,16 +16,12 @@
 #      description: success
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized with wrong password but with valid email
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: User account is not found in the database
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#    422:
+#      description: Invalid request form format
 ###
 POST        /signIn                 controllers.auth.AuthController.signIn
 
@@ -45,20 +41,14 @@ POST        /signIn                 controllers.auth.AuthController.signIn
 #  responses:
 #    200:
 #      description: success with id of newly created record
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    406:
 #      description: Account already exist in the database
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#    422:
+#      description: Invalid request form format
 ###
 POST        /signUp                  controllers.auth.AuthController.signUp
 
@@ -75,12 +65,8 @@ POST        /signUp                  controllers.auth.AuthController.signUp
 #        $ref: '#/definitions/model.UserDetail'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
@@ -99,16 +85,10 @@ GET        /users                    controllers.auth.AuthController.getAllUser
 #        $ref: '#/definitions/model.UserDetail'
 #    400:
 #      description: Bad request (have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
@@ -162,12 +142,10 @@ POST    /user/picture                      controllers.auth.GridFsController.sav
 #        $ref: '#/definitions/model.UserDetail'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
+#    422:
+#      description: Invalid request form format
 #  security:
 #    - TokenKey: []
 ###
@@ -186,16 +164,10 @@ POST        /user/:id                     controllers.auth.AuthController.update
 #        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
@@ -214,17 +186,47 @@ POST     /admin/:email                    controllers.auth.AuthController.toggle
 #        $ref: '#/definitions/com.krishna.response.OkResponse'
 #    400:
 #      description: Bad request (have to be in correct email format)
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    401:
 #      description: Unauthorized
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #    404:
 #      description: Not found. Database is empty.
-#      schema:
-#        $ref: '#/definitions/com.krishna.response.ResponseErrorMsg'
 #  security:
 #    - TokenKey: []
 ###
 DELETE     /user/:email                   controllers.auth.AuthController.removeUser(email: String)
+
+###
+#  summary: Get the selected attched picture from the GridFs index
+#  description: >
+#   Get the user profile picture for the logged in user account
+#  tags:
+#    - Auth
+#  responses:
+#    200:
+#      description: success
+#    404:
+#      description: empty response from database
+#    500:
+#      description: internal server error (connection issues)
+#  security:
+#    - TokenKey: []
+###
+GET  /user/picture/                     controllers.auth.GridFsController.getAttachedPicture
+
+###
+#  summary: Delete the selected attched picture from the GridFs index
+#  description: >
+#   Delete the user profile picture from the mongo db
+#  tags:
+#    - Auth
+#  responses:
+#    200:
+#      description: success
+#    404:
+#      description: empty response from database
+#    500:
+#      description: internal server error (connection issues)
+#  security:
+#    - TokenKey: []
+###
+DELETE  /user/picture/                  controllers.auth.GridFsController.removeAttachedPicture

@@ -43,7 +43,7 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
 
   /** Returns a future Result that serves the first matched file, or a `NotFound` result.
     */
-  protected final def serve[Id <: BSONValue](gfs: GridFS)(
+  protected final def serve[Id <: BSONValue](gfs: GridFS, emailId: String)(
       foundFile: Cursor[gfs.ReadFile[Id]],
       dispositionMode: String = CONTENT_DISPOSITION_INLINE
   )(implicit materializer: Materializer): Future[Result] = {
@@ -74,7 +74,7 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
       }
       .recover {
         case _ =>
-          NotFound
+          NotFound(s"Picture is not found in the database for the user: $emailId")
       }
   }
 

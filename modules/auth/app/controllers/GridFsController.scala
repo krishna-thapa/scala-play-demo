@@ -51,22 +51,32 @@ class GridFsController @Inject()(
     }
 
   // Returns a future Result that serves the first matched file, or a NotFound result.
-  def getAttachedPicture(id: String): Action[AnyContent] = UserAction.async { _ =>
-    log.info(s"Executing getAttachedPicture for the request attached file id: $id")
-    gridFsAttachmentService.parseBSONObjectId(id, getAttachment)
+  def getAttachedPicture: Action[AnyContent] = UserAction.async { request =>
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(s"Executing getAttachedPicture for the request user email: ${user.email}")
+        getAttachment(user.email)
+      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+    }
   }
 
   // Removes a attachment picture from index store.
-  def removeAttachedPicture(id: String): Action[AnyContent] = UserAction.async { _ =>
-    log.info(s"Executing removeAttachedPicture for the request attached file id: $id")
-    gridFsAttachmentService.parseBSONObjectId(id, gridFsAttachmentService.removeAttachment)
+  def removeAttachedPicture: Action[AnyContent] = UserAction.async { request =>
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(s"Executing removeAttachedPicture for the request user email: ${user.email}")
+        gridFsAttachmentService
+          .removeUserPicture(user.email)
+          .map(_ => Ok("Success on removing the profile picture"))
+      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+    }
   }
 
-  private def getAttachment(id: BSONObjectID): Future[Result] = {
+  private def getAttachment(emailId: String): Future[Result] = {
     gridFsAttachmentService.gridFS.flatMap { gfs =>
-      val attachment = gfs.find(BSONDocument("_id" -> id))
+      val attachment = gfs.find(BSONDocument("emailId" -> emailId))
       // Content-Disposition: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-      serve(gfs)(attachment).errorRecover
+      serve(gfs, emailId)(attachment).errorRecover
     }
   }
 

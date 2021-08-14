@@ -6,7 +6,7 @@ import dao.AttachmentDAO
 import play.api.mvc.Results.{ BadRequest, Ok, UnsupportedMediaType }
 import play.api.mvc.{ MultipartFormData, Result }
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.bson.{ BSONDocument, BSONObjectID, BSONValue }
+import reactivemongo.api.bson.{ BSONDocument, BSONValue }
 import reactivemongo.api.gridfs.ReadFile
 
 import javax.inject.Inject
@@ -20,7 +20,36 @@ class GridFsAttachmentService @Inject()(
     with Logging {
 
   /*
-    Add a new picture in the GridFS index or update the existing with a new picture
+    Add a new user profile picture or updates the existing user profile picture
+    by deleting the old one
+   */
+  def addImageAttachment(
+      emailId: String,
+      file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
+  ): Future[Result] = {
+    file.contentType
+      .fold[Future[Result]](
+        Future.successful(
+          BadRequest(s"Couldn't find the content type of the attachment for the userId: $emailId")
+        )
+      ) { mimeType =>
+        if (mimeType.startsWith("image")) {
+          removeUserPicture(emailId)
+            .flatMap(_ => addOrReplaceUserPicture(emailId, file))
+        } else {
+          val errorMessage: String =
+            s"Unsupported MediaType for userId: $emailId with MIME type of ${file.contentType}"
+          log.error(errorMessage)
+          Future.successful(
+            UnsupportedMediaType(errorMessage)
+          )
+        }
+      }
+      .errorRecover
+  }
+
+  /*
+  Add a new picture in the GridFS index or update the existing with a new picture
    */
   def addOrReplaceUserPicture(
       emailId: String,
@@ -54,46 +83,5 @@ class GridFsAttachmentService @Inject()(
         gridFS.flatMap(_.remove(picture.id))
       }
     }
-  }
-
-  /*
-    Get the attached BSON object Id of the requested user id
-   */
-  def getUserPictureId(userId: String): Future[Option[BSONObjectID]] = {
-    existUserPicture(userId).map(_.map(_.id.asInstanceOf[BSONObjectID]))
-  }
-
-  /*
-    Remove the attachment picture from both (chunks and files) index for the given picture file id
-   */
-  def removeAttachment(id: BSONObjectID): Future[Result] = {
-    gridFS.flatMap { gfs =>
-      gfs.remove(id).map(_ => Ok("Successfully removed the attached picture")).errorRecover
-    }
-  }
-
-  def addImageAttachment(
-      emailId: String,
-      file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
-  ): Future[Result] = {
-    file.contentType
-      .fold[Future[Result]](
-        Future.successful(
-          BadRequest(s"Couldn't find the content type of the attachment for the userId: $emailId")
-        )
-      ) { mimeType =>
-        if (mimeType.startsWith("image")) {
-          removeUserPicture(emailId)
-            .flatMap(_ => addOrReplaceUserPicture(emailId, file))
-        } else {
-          val errorMessage: String =
-            s"Unsupported MediaType for userId: $emailId with MIME type of ${file.contentType}"
-          log.error(errorMessage)
-          Future.successful(
-            UnsupportedMediaType(errorMessage)
-          )
-        }
-      }
-      .errorRecover
   }
 }
