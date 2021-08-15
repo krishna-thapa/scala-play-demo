@@ -6,19 +6,19 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
-import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
+import config.ElasticsearchConfig
 import daos.QuoteQueryDAO
 import play.api.Configuration
-import config.ElasticsearchConfig
-import javax.inject.Inject
 
+import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
 class SearchInEsDAO @Inject()(
     quotesDAO: QuoteQueryDAO,
     config: Configuration
 )(implicit ec: ExecutionContext)
-    extends SearchMethods {
+    extends CommonEsMethods {
 
   override val esConfig: ElasticsearchConfig =
     config.get[ElasticsearchConfig]("elasticsearch")
@@ -29,7 +29,7 @@ class SearchInEsDAO @Inject()(
     * @return Response once records are stored in ES
     */
   def getAndStoreQuotes(records: Int): Future[Response[BulkResponse]] = {
-    log.info(s"Getting $records random quotes from database")
+    log.info(s"Getting $records random quotes from postgres database")
     val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
 
     // if the index exist, have to wait until the index is deleted without any error
@@ -47,7 +47,6 @@ class SearchInEsDAO @Inject()(
           indexInto(indexName).id(quote.csvId).doc(quote)
         }
       }.refresh(RefreshPolicy.Immediate)
-
     }
   }
 
@@ -70,5 +69,13 @@ class SearchInEsDAO @Inject()(
           .from(offset)
           .size(limit)
       )
+  }
+
+  /*
+    Use search API query to match phrase prefix
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
+   */
+  private def searchRequest(text: String): SearchRequest = {
+    search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
   }
 }

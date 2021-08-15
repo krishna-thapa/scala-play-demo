@@ -11,7 +11,7 @@ import scala.concurrent.Future
 trait CommonEsMethods extends InitEs with Logging {
 
   /*
- Count the total docs inside the index, used for testing
+    Count the total docs inside the index, used for testing
    */
   def countDocsInIndex: Long = {
     client
@@ -35,10 +35,10 @@ trait CommonEsMethods extends InitEs with Logging {
     )
   }
 
-  /*
-  Check if the index is present in the ElasticSearch
-  Returns a boolean
-   */
+  /**
+    * Check if the index is present in the ElasticSearch
+    * @return a boolean
+    */
   def doesIndexExists: Boolean = {
     log.info(s"Checking if the index: $indexName exists already")
     client

@@ -12,11 +12,12 @@ import config.ElasticsearchConfig
 import dao.CommonEsMethods
 import daos.QuoteQueryDAO
 import httpService.WikiMediaApi
+
 import javax.inject.Inject
 import models.QuoteWithAuthor
 import play.api.Configuration
 
-import scala.concurrent.Promise
+import scala.concurrent.{ Future, Promise }
 
 class AkkaService @Inject()(
     quotesDAO: QuoteQueryDAO,
@@ -34,7 +35,7 @@ class AkkaService @Inject()(
 
   implicit lazy val system: ActorSystem = ActorSystem()
 
-  def bulkInsertQuotesToES = {
+  def bulkInsertQuotesToES: Future[Unit] = {
 
     // if the index exist, have to wait until the index is deleted without any error
     if (doesIndexExists) deleteQuotesIndex(indexName).await

@@ -34,7 +34,7 @@ class WikiMediaApi @Inject()(httpService: HttpService, config: Configuration)(
     }
   }
 
-  def handleAuthorStr(author: String): String = {
+  private def handleAuthorStr(author: String): String = {
     author.split(" ").map(_.capitalize).mkString(" ")
   }
 }

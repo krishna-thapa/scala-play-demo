@@ -25,10 +25,10 @@ class SearchController @Inject()(
   implicit val indexName: String = searchInEsDao.indexName
 
   /**
-    * Write records in index name under "quotes", need to pass number of records that will be generated randomly from postgres table
+    * Copy random quotes from Postgres table and store them in ES index name under "quotes" index
     * Can only be done by Admin role
     * Duplicate records will be overridden
-    * @param records will be fetched from database and store under ES
+    * @param records will be fetched from Postgres quotes database and store under ES index
     * @return success body or exception message
     */
   def writeInEs(records: Int): Action[AnyContent] = AdminAction.async { implicit request =>
