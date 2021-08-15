@@ -65,6 +65,8 @@ POST        /signUp                  controllers.auth.AuthController.signUp
 #        $ref: '#/definitions/model.UserDetail'
 #    401:
 #      description: Unauthorized
+#    403:
+#      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
 #  security:
@@ -87,6 +89,8 @@ GET        /users                    controllers.auth.AuthController.getAllUser
 #      description: Bad request (have to be in correct email format)
 #    401:
 #      description: Unauthorized
+#    403:
+#      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
 #  security:
@@ -115,6 +119,8 @@ GET        /user/:email                   controllers.auth.AuthController.getUse
 #      description: success with response code
 #    400:
 #      description: Bad request (Has to be in picture format)
+#    403:
+#      description: Forbidden authorization for user
 #    500:
 #      description: internal server error (connection issues)
 #  security:
@@ -144,12 +150,14 @@ POST    /user/picture                      controllers.auth.GridFsController.sav
 #      description: Unauthorized
 #    400:
 #      description: Bad request (min length of password is 3 and have to be in correct email format)
+#    403:
+#      description: Forbidden authorization for user
 #    422:
 #      description: Invalid request form format
 #  security:
 #    - TokenKey: []
 ###
-POST        /user/:id                     controllers.auth.AuthController.updateUserInfo(id:Int)
+POST        /user/                         controllers.auth.AuthController.updateUserInfo
 
 ###
 #  summary: Toggle the user account for admin role
@@ -166,6 +174,8 @@ POST        /user/:id                     controllers.auth.AuthController.update
 #      description: Bad request (have to be in correct email format)
 #    401:
 #      description: Unauthorized
+#    403:
+#      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
 #  security:
@@ -188,6 +198,8 @@ POST     /admin/:email                    controllers.auth.AuthController.toggle
 #      description: Bad request (have to be in correct email format)
 #    401:
 #      description: Unauthorized
+#    403:
+#      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
 #  security:
@@ -206,6 +218,8 @@ DELETE     /user/:email                   controllers.auth.AuthController.remove
 #      description: success
 #    404:
 #      description: empty response from database
+#    403:
+#      description: Forbidden authorization for user
 #    500:
 #      description: internal server error (connection issues)
 #  security:
@@ -224,6 +238,8 @@ GET  /user/picture/                     controllers.auth.GridFsController.getAtt
 #      description: success
 #    404:
 #      description: empty response from database
+#    403:
+#      description: Forbidden authorization for user
 #    500:
 #      description: internal server error (connection issues)
 #  security:

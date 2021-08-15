@@ -2,39 +2,30 @@
 package controllers.auth
 
 import java.time.Clock
-
-import com.krishna.response.ErrorMsg.{ AccountNotFound, InvalidFormFormat, invalidBcryptValidation }
+import com.krishna.response.ErrorMsg.InvalidFormFormat
 import com.krishna.response.ResponseResult
+import com.krishna.util.FutureErrorHandler.ToFuture
 import com.krishna.util.Logging
-import dao.AuthDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import form.{ AuthForms, SignInForm }
+
 import javax.inject.{ Inject, Singleton }
-import model.UserDetail
-import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
-import play.api.libs.json.OFormat
 import play.api.mvc._
-import config.{ DecodeHeader, JwtKey }
+import config.DecodeHeader
+import service.AuthService
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
-
+import scala.concurrent.ExecutionContext
 @Singleton
 class AuthController @Inject()(
     scc: SecuredControllerComponents,
-    authDAO: AuthDAO
+    authService: AuthService
 )(implicit executionContext: ExecutionContext, config: Configuration)
     extends SecuredController(scc)
     with Logging
-    with ResponseResult
-    with JwtKey {
+    with ResponseResult {
 
   implicit val clock: Clock = Clock.systemUTC
-
-  // Regex to validate the email pattern
-  def isEmailValid(email: String): Boolean =
-    if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
 
   /**
     * Sign In the existing user using sing in form
@@ -44,64 +35,39 @@ class AuthController @Inject()(
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
     // Add request validation
-    val signInResult = AuthForms.signInForm
+    AuthForms.signInForm
       .bindFromRequest()
       .fold(
-        formWithErrors => {
-          invalidForm[SignInForm](formWithErrors, InvalidFormFormat("Login"))
-        },
-        signInDetails => {
-          // Need to check if the user has enter wrong password but has an account already
-          if (authDAO.isAccountExist(signInDetails.email)) {
-            authDAO.isValidLogin(signInDetails) match {
-              case Right(validUser) =>
-                val userDetail: UserDetail = UserDetail(validUser)
-                log.info(s"Success on authentication for user: ${userDetail.name}")
-                responseOk(userDetail).addingToJwtSession(
-                  jwtSessionKey,
-                  UserDetail(validUser)
-                )
-              case Left(exceptionResult) => exceptionResult
-            }
-          } else responseErrorResult(AccountNotFound(signInDetails.email))
-        }
+        formWithErrors => invalidForm[SignInForm](formWithErrors, InvalidFormFormat("Login")),
+        signInForm => authService.signInService(signInForm)
       )
-    Future(signInResult)
+      .toFuture
   }
 
   /**
     * Sign up the new account in the database
     * @return Record id or an exception
     */
-  def signUp: Action[AnyContent] = Action { implicit request =>
+  def signUp: Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing signUp Controller")
     // Add request validation
     AuthForms.signUpForm
       .bindFromRequest()
       .fold(
-        formWithErrors => {
-          badRequest(s"The signup From was not in the expected format: $formWithErrors")
-        },
-        signUpDetails => {
-          // need to check if the account already exist
-          if (!authDAO.isAccountExist(signUpDetails.email)) {
-            authDAO.signUpUser(signUpDetails) match {
-              case Right(value) => responseOk(value)
-              case Left(exception) =>
-                bcryptValidationFailed(invalidBcryptValidation(exception.getMessage))
-            }
-          } else notAcceptable(s"${signUpDetails.email}")
-        }
+        formWithErrors =>
+          badRequest(s"The signup From was not in the expected format: $formWithErrors"),
+        signUpForm => authService.singUpService(signUpForm)
       )
+      .toFuture
   }
 
   /**
     * List all the users from the database: Only Admin can perform this action
     * @return Seq of users
     */
-  def getAllUser: Action[AnyContent] = AdminAction { implicit request =>
+  def getAllUser: Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing getAllUser Controller")
-    responseSeqResult(authDAO.listAllUser())
+    authService.getAllUserService.toFuture
   }
 
   /**
@@ -109,10 +75,9 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record id or an exception
     */
-  def toggleAdminRole(email: String): Action[AnyContent] = AdminAction { implicit request =>
+  def toggleAdminRole(email: String): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing toggleAdminRole Controller")
-    val toggleAdmin = (email: String) => authDAO.toggleAdmin(email)
-    runApiAction(email)(toggleAdmin)
+    authService.toggleAdminRoleService(email).toFuture
   }
 
   /**
@@ -120,10 +85,9 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record id or an exception
     */
-  def removeUser(email: String): Action[AnyContent] = AdminAction { implicit request =>
+  def removeUser(email: String): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing removeUser Controller")
-    val removeAccount = (email: String) => authDAO.removeUserAccount(email)
-    runApiAction(email)(removeAccount)
+    authService.removeUserService(email).toFuture
   }
 
   /**
@@ -132,45 +96,35 @@ class AuthController @Inject()(
     * @param email to select the user's account
     * @return Record details or an exception
     */
-  def getUserInfo(email: String): Action[AnyContent] = UserAction { implicit request =>
+  def getUserInfo(email: String): Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    DecodeHeader(request.headers) match {
+    val userInfo: Result = DecodeHeader(request.headers) match {
       case Right(user) =>
-        val overrideEmail      = if (user.isAdmin) email else user.email
-        val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
-        runApiAction(overrideEmail)(getUserInfoDetails)
+        authService.getUserInfoService(user, email)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
+    userInfo.toFuture
   }
 
   /**
     * Update the user info details, different email will replace the older email. Only logged in user can do
-    * @param id to select the user's account
     * @return User Info once the success update on the record or an error response
+    * TODO: Updating the email have to update jwt token, might need to refresh and update in front-end
     */
-  def updateUserInfo(id: Int): Action[AnyContent] = UserAction { implicit request =>
+  def updateUserInfo: Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing updateUserInfo Controller")
-    // Add request validation
-    AuthForms.signUpForm
-      .bindFromRequest()
-      .fold(
-        formWithErrors => {
-          badRequest(s"The update Form was not in the expected format: $formWithErrors")
-        },
-        userDetails => {
-          authDAO.updateUserInfo(id, userDetails) match {
-            case Right(user) =>
-              user match {
-                case Success(_) =>
-                  responseOk(UserDetail(authDAO.checkValidEmail(userDetails.email).head))
-                case Failure(exception) => badRequest(exception.getMessage)
-              }
-            case Left(exception) =>
-              bcryptValidationFailed(invalidBcryptValidation(exception.getMessage))
-          }
-        }
-      )
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        AuthForms.signUpForm
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              badRequest(s"The update Form was not in the expected format: $formWithErrors").toFuture,
+            userDetails => authService.updateUserInfoService(user.email, userDetails)
+          )
+      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+    }
   }
 
   // sign out
@@ -179,22 +133,5 @@ class AuthController @Inject()(
     When the user is successfully sign in, then the token has to be stored in the Session storage in the web page
     Once the user clicks the sign out button that is visible to logged in user only,
     then the session storage has to be cleared out and redirect to login page
-    */
-  /**
-    * Common method to verify the email and run the called function
-    * @param email to select the user account record
-    * @param fun function to be called upon the selected record
-    * @return Result of the API response
-    */
-  def runApiAction[T](
-      email: String
-  )(fun: String => Either[Result, T])(implicit conv: OFormat[T]): Result = {
-    log.info(s"Checking the format of an email: $email")
-    if (isEmailValid(email)) {
-      fun(email) match {
-        case Right(value)    => responseOk(value)
-        case Left(exception) => exception
-      }
-    } else badRequest(s"Email is in wrong format: $email")
-  }
+  */
 }

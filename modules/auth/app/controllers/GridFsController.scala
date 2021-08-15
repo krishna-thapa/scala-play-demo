@@ -29,10 +29,7 @@ class GridFsController @Inject()(
     with ResponseResult
     with Logging {
 
-  /**
-    * Save the user profile picture in the mongo db with email as user id
-    * @return
-    */
+  // Save the user profile picture in the mongo db with email as user id
   def saveUserPicture: Action[MultipartFormData[ReadFile[BSONValue, BSONDocument]]] =
     UserAction.async(gridFSBodyParser(gridFsAttachmentService.gridFS)) { request =>
       DecodeHeader(request.headers) match {

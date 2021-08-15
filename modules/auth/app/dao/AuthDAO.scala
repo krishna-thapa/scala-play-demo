@@ -124,11 +124,11 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
     * @param details Update details searchForm
     * @return Either exception or success id of the updated record
     */
-  def updateUserInfo(id: Int, details: SignUpForm): Either[Throwable, Try[Int]] = {
+  def updateUserInfo(oldEmail: String, details: SignUpForm): Either[Throwable, Try[Int]] = {
     encryptPassword(details.password) match {
       case Success(encrypted) =>
         val action = userInfo
-          .filter(_.id === id)
+          .filter(_.email === oldEmail)
           .map(user => (user.firstName, user.lastName, user.email, user.password))
           .update(
             details.firstName,

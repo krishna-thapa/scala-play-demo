@@ -38,9 +38,9 @@ trait ResponseError extends Logging {
     Unauthorized(Json.toJson(ResponseErrorMsg(errorMsg.msg)))
   }
 
-  def forbidden(msg: String): Result = {
-    log.error(s"Forbidden request: $msg")
-    Forbidden(Json.toJson(ResponseErrorMsg(msg)))
+  def forbidden(errorMsg: ErrorMsg): Result = {
+    log.error(s"Forbidden request: ${errorMsg.msg}")
+    Forbidden(Json.toJson(ResponseErrorMsg(errorMsg.msg)))
   }
 
   def notAcceptable(msg: String): Result = {

@@ -61,7 +61,7 @@ trait ResponseResult extends ResponseError {
       case NoAuthorizationField                           => badGateway(NoAuthorizationField.msg)
       case tokenDecodeFailure: TokenDecodeFailure         => badGateway(tokenDecodeFailure.msg)
       case AuthenticationFailed                           => unauthorized(AuthenticationFailed)
-      case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden.email)
+      case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden)
       case accountNotFound: AccountNotFound               => notFound(accountNotFound)
       case _                                              => badRequest("Something went wrong")
     }

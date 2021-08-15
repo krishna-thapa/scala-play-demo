@@ -13,8 +13,7 @@ import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
 class GridFsAttachmentService @Inject()(
-    implicit
-    val executionContext: ExecutionContext,
+    implicit val executionContext: ExecutionContext,
     val reactiveMongoApi: ReactiveMongoApi
 ) extends AttachmentDAO
     with Logging {
@@ -49,7 +48,7 @@ class GridFsAttachmentService @Inject()(
   }
 
   /*
-  Add a new picture in the GridFS index or update the existing with a new picture
+    Add a new picture in the GridFS index or update the existing with a new picture
    */
   def addOrReplaceUserPicture(
       emailId: String,
@@ -77,10 +76,30 @@ class GridFsAttachmentService @Inject()(
     existUserPicture(emailId).map {
       _.fold(
         log.info(s"Picture not found for user id: $emailId")
-      ) { picture =>
+      ) { record =>
         log.warn(s"Existing picture has been removed for user id: $emailId")
         // Return Unit once the picture is removed from mongoDb
-        gridFS.flatMap(_.remove(picture.id))
+        gridFS.flatMap(_.remove(record.id))
+      }
+    }
+  }
+
+  /*
+    Update the email of the record when the user decided to update the email
+    So that we won't have old picture for the old email
+   */
+  def updateEmailInfo(oldEmail: String, newEmail: String): Future[Unit] = {
+    existUserPicture(oldEmail).map {
+      _.fold(log.info(s"Picture not found for user id: $oldEmail")) { record =>
+        log.warn(s"Existing users email id will be replaced by new updated email: $newEmail")
+        gridFS.flatMap(
+          _.update(
+            record.id,
+            BSONDocument(
+              f"$$set" -> BSONDocument("emailId" -> newEmail)
+            )
+          )
+        )
       }
     }
   }
