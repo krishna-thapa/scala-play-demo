@@ -75,7 +75,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - "./conf/docker/postgres.conf:/etc/postgresql/postgresql.conf"
       # for debian system use: /var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata

@@ -22,4 +22,12 @@ class HomeController @Inject()(cc: ControllerComponents)(
     Ok("Your new application is ready.")
   }
 
+  /**
+    * To get the Ok response using ping url
+    * @return Ok
+    */
+  def ping: Action[AnyContent] = Action {
+    Ok("Ok")
+  }
+
 }

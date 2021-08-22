@@ -105,6 +105,7 @@ inspirational-quote-api
     - Redis for cache store management
     - ElasticSearch for indices storage 
     - Kibana and Filebeat for the log management tools
+    - MongoDB for picture storage
 - CI/CD tools
     - Docker compose
     - Git

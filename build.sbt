@@ -1,5 +1,7 @@
 import Dependencies.Libraries._
 
+import scala.language.postfixOps
+
 name := """inspirational-quote-api"""
 description := "Back-end project for Inspirational quotes"
 version := "1.0-SNAPSHOT"
@@ -124,6 +126,19 @@ lazy val mongoDependencies = Seq(
   // Provide JSON serialization for reactive mongo
   "org.reactivemongo" %% "reactivemongo-play-json-compat" % "1.0.4-play28"
 )
+
+// Creating a custom sbt task for the docker start-up
+import scala.sys.process._
+lazy val localStart = taskKey[Unit]("Start the project using docker containers")
+localStart := {
+  "./scripts/start_project.sh" !
+}
+
+// Creating a custom sbt task for the csv migration to the docker container
+lazy val csvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
+csvMigrate := {
+  "./csv_migration.sh" !
+}
 
 /*
  add domain package names for play-swagger to auto generate swagger
