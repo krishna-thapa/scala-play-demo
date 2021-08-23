@@ -1,5 +1,5 @@
 ###
-#  summary: Get a autocomplete list of authors from search query parameter
+#  summary: Get a autocomplete list of authors from search query parameter from Postgres table using Postgres Like conmmand
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
@@ -26,7 +26,33 @@
 #  security:
 #    - TokenKey: []
 ###
-GET     /quotes        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
+GET     /pg/author        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
+
+###
+#  summary: Do a auto completion and auto suggestion using elastic search completion and pharse suggestion API
+#  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
+#  tags:
+#    - Search
+#  parameters:
+#    - in: "query"
+#      name: "author"
+#      description: "Required min lenght of 3"
+#      required: true
+#      type: "string"
+#      minLength: 3
+#  responses:
+#    200:
+#      description: Success response of the quotes.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
+#    404:
+#      description: Not found. Database is empty.
+#  security:
+#    - TokenKey: []
+###
+GET     /es/author        controllers.search.SearchController.getAuthorsAutoSuggestion(author: String)
 
 ###
 #  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".

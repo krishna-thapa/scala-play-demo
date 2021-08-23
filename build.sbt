@@ -128,6 +128,7 @@ lazy val mongoDependencies = Seq(
 )
 
 // Creating a custom sbt task for the docker start-up
+// https://www.scala-sbt.org/1.x/docs/Tasks.html
 import scala.sys.process._
 lazy val localStart = taskKey[Unit]("Start the project using docker containers")
 localStart := {
@@ -137,7 +138,7 @@ localStart := {
 // Creating a custom sbt task for the csv migration to the docker container
 lazy val csvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
 csvMigrate := {
-  "./csv_migration.sh" !
+  "./scripts/csv_migration.sh" !
 }
 
 /*

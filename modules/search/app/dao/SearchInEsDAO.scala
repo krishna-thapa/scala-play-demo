@@ -6,8 +6,10 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
+import com.sksamuel.elastic4s.requests.searches.suggestion.SuggestMode.Always
+import com.sksamuel.elastic4s.requests.searches.suggestion.{ CompletionSuggestion, TermSuggestion }
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
-import config.ElasticsearchConfig
+import config.{ ElasticsearchConfig, SuggestionName }
 import daos.QuoteQueryDAO
 import play.api.Configuration
 
@@ -41,12 +43,14 @@ class SearchInEsDAO @Inject()(
     // if createOnly set to true then trying to update a document will fail
     // have set as false (default) so that duplicate records can override the existing records
 
-    client.execute {
-      bulk {
-        quotes.map { quote =>
-          indexInto(indexName).id(quote.csvId).doc(quote)
-        }
-      }.refresh(RefreshPolicy.Immediate)
+    createIndexWithCompletionField.flatMap { _ =>
+      client.execute {
+        bulk {
+          quotes.map { quote =>
+            indexInto(indexName).id(quote.csvId).doc(quote)
+          }
+        }.refresh(RefreshPolicy.Immediate)
+      }
     }
   }
 
@@ -77,5 +81,45 @@ class SearchInEsDAO @Inject()(
    */
   private def searchRequest(text: String): SearchRequest = {
     search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
+  }
+
+  // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#term-suggester
+  def suggestAuthorNames(
+      author: String
+  ): Future[Response[SearchResponse]] = {
+    log.info(s"Suggesting author name: $author in the index: $indexName")
+
+    val authorCompletion: TermSuggestion =
+      TermSuggestion(SuggestionName.suggestAuthor.toString, "author")
+        .text(author)
+        .size(2)
+        .mode(Always)
+        .minWordLength(3)
+
+    client
+      .execute(
+        search(indexName)
+          .suggestion(authorCompletion)
+      )
+  }
+
+  // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#completion-suggester
+  def completeAuthorNames(
+      author: String
+  ): Future[Response[SearchResponse]] = {
+    log.info(s"Auto completion author name : $author in the index: $indexName")
+
+    val authorCompletion: CompletionSuggestion =
+      CompletionSuggestion(SuggestionName.completionAuthor.toString, "suggest_author")
+      //.regex(s"Arthur")
+        .text(author)
+        .size(5)
+        .skipDuplicates(true)
+
+    client
+      .execute(
+        search(indexName)
+          .suggestion(authorCompletion)
+      )
   }
 }

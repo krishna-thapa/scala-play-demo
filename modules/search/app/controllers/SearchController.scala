@@ -1,16 +1,25 @@
 package controllers.search
 
 import akkaService.AkkaService
-import com.krishna.util.FutureErrorHandler.ErrorRecover
+import com.krishna.util.FutureErrorHandler.{ ErrorRecover, ToFuture }
 import com.krishna.util.Logging
+import com.sksamuel.elastic4s.Response
+import com.sksamuel.elastic4s.requests.searches.{
+  CompletionSuggestionOption,
+  SearchResponse,
+  TermSuggestionOption
+}
+import config.SuggestionName
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
+import models.{ AuthorCompletion, CompletionResponseType }
+import play.api.libs.json.Json
 import responseHandler.EsResponseHandler._
 
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SearchController @Inject()(
@@ -82,6 +91,59 @@ class SearchController @Inject()(
     searchInEsDao
       .searchQuote(text, offset, limit)
       .map(responseEsResult)
+      .errorRecover
+  }
+
+  def getAuthorsAutoSuggestion(author: String): Action[AnyContent] = UserAction.async { _ =>
+    log.info(
+      s"Searching for author: $author to retrieve auto completion and suggestion for any spell mistake"
+    )
+
+    searchInEsDao
+      .completeAuthorNames(author)
+      .flatMap(response => getCompletionAuthor(response, author))
+      .errorRecover
+  }
+
+  // create class for do you mean response type
+  private def getCompletionAuthor(
+      response: Response[SearchResponse],
+      author: String
+  ): Future[Result] = {
+    log.info(s"Getting auto completion for the searched text for author: $author")
+
+    val searchResponse: Seq[CompletionSuggestionOption] =
+      response.result
+        .suggestions(SuggestionName.completionAuthor.toString)
+        .flatMap(_.toCompletion.options)
+    if (searchResponse.isEmpty) getSuggestedAuthor(author)
+    else {
+      val results: Seq[String] = searchResponse.map(_.text)
+      Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results))).toFuture
+    }
+  }
+
+  private def getSuggestedAuthor(author: String): Future[Result] = {
+    log.warn(
+      s"There are no completion for the searched author text, getting any suggestion for author: $author"
+    )
+    searchInEsDao
+      .suggestAuthorNames(author)
+      .map { suggestion =>
+        val searchResponse: Seq[TermSuggestionOption] =
+          suggestion.result
+            .suggestions(SuggestionName.suggestAuthor.toString)
+            .flatMap(_.toTerm.options)
+        log.warn(
+          s"Debugging: ${suggestion.result}"
+        )
+        if (searchResponse.isEmpty) NotFound("Not found")
+        else {
+          val result = searchResponse.map(_.text).head
+          // Pass to the getCompletionAuthor to get the complete author name, use flag
+          Ok(Json.toJson(AuthorCompletion(CompletionResponseType.PhraseSuggestion, Seq(result))))
+        }
+      }
       .errorRecover
   }
 }
