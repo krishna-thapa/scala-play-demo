@@ -6,11 +6,12 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
-import com.sksamuel.elastic4s.requests.searches.suggestion.SuggestMode.Always
-import com.sksamuel.elastic4s.requests.searches.suggestion.{ CompletionSuggestion, TermSuggestion }
+import com.sksamuel.elastic4s.requests.searches.suggestion.CompletionSuggestion
+import com.sksamuel.elastic4s.requests.searches.suggestion.Fuzziness.Two
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
 import config.{ ElasticsearchConfig, SuggestionName }
 import daos.QuoteQueryDAO
+import models.QuoteWithAuthor
 import play.api.Configuration
 
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class SearchInEsDAO @Inject()(
       client.execute {
         bulk {
           quotes.map { quote =>
-            indexInto(indexName).id(quote.csvId).doc(quote)
+            indexInto(indexName).id(quote.csvId).doc(QuoteWithAuthor(quote))
           }
         }.refresh(RefreshPolicy.Immediate)
       }
@@ -80,40 +81,19 @@ class SearchInEsDAO @Inject()(
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
    */
   private def searchRequest(text: String): SearchRequest = {
-    search(indexName).query(matchPhrasePrefixQuery("quote", s"$text"))
-  }
-
-  // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#term-suggester
-  def suggestAuthorNames(
-      author: String
-  ): Future[Response[SearchResponse]] = {
-    log.info(s"Suggesting author name: $author in the index: $indexName")
-
-    val authorCompletion: TermSuggestion =
-      TermSuggestion(SuggestionName.suggestAuthor.toString, "author")
-        .text(author)
-        .size(2)
-        .mode(Always)
-        .minWordLength(3)
-
-    client
-      .execute(
-        search(indexName)
-          .suggestion(authorCompletion)
-      )
+    val query = matchPhrasePrefixQuery("quoteDetails.quote", s"$text")
+    search(indexName).query(query)
   }
 
   // https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#completion-suggester
-  def completeAuthorNames(
-      author: String
-  ): Future[Response[SearchResponse]] = {
+  def completeAuthorNames(author: String): Future[Response[SearchResponse]] = {
     log.info(s"Auto completion author name : $author in the index: $indexName")
 
     val authorCompletion: CompletionSuggestion =
       CompletionSuggestion(SuggestionName.completionAuthor.toString, "suggest_author")
-      //.regex(s"Arthur")
         .text(author)
         .size(5)
+        .fuzziness(Two)
         .skipDuplicates(true)
 
     client

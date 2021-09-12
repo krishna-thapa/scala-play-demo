@@ -4,7 +4,6 @@ import com.google.inject.Inject
 import com.krishna.util.Logging
 import play.api.inject.ApplicationLifecycle
 
-import java.util.{ Calendar, Date }
 import scala.concurrent.Future
 
 class ApplicationStart @Inject()(
@@ -16,11 +15,6 @@ class ApplicationStart @Inject()(
   lifecycle.addStopHook { () =>
     Future.successful()
   }
-
-  val now: Date = Calendar.getInstance().getTime
-
-  val projectEnv: String = sys.env.getOrElse("PROJECT_ENV", "local")
-  log.info(s"Project is started in $projectEnv environment at $now")
 
   // TODO: Start scheduling
   // val scheduler: QuartzSchedulerExtension = QuartzSchedulerExtension(system)

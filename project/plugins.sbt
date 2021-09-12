@@ -12,3 +12,6 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
 // https://github.com/mefellows/sbt-dotenv
 addSbtPlugin("au.com.onegeek" % "sbt-dotenv" % "2.1.204")
+
+// https://github.com/dwijnand/sbt-reloadquick
+addSbtPlugin("com.dwijnand" % "sbt-reloadquick" % "1.0.0")

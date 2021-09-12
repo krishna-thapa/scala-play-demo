@@ -1,5 +1,5 @@
 ###
-#  summary: Get a autocomplete list of authors from search query parameter from Postgres table using Postgres Like conmmand
+#  summary: Get an autocomplete list of authors with search query parameter from Postgres table using Postgres Like conmmand
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
@@ -29,7 +29,7 @@
 GET     /pg/author        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
 
 ###
-#  summary: Do a auto completion and auto suggestion using elastic search completion and pharse suggestion API
+#  summary:  Get an autocomplete and auto suggestion using elastic search completion and pharse suggestion API
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
@@ -103,16 +103,10 @@ POST    /quotes        controllers.search.SearchController.writeInEs(records: In
 POST    /quotes/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
 
 ###
-#  summary: Delete the index from ES - Should be used for the testing purpose only.
-#  description: "The name of the index has to pass as a path parameter and this can only be done by Admin role"
+#  summary: Delete the index quotes from ES - Should be used for the development purpose only.
+#  description: "Will delete the elastic search index quotes"
 #  tags:
 #    - Search
-#  parameters:
-#    - in: "query"
-#      name: "indexName"
-#      description: "Index name that will be deleted from ES"
-#      required: true
-#      type: "string"
 #  responses:
 #    200:
 #      description: Success response on deleting an es index.
@@ -127,7 +121,7 @@ POST    /quotes/migrate        controllers.search.SearchController.writeMigrateQ
 #  security:
 #    - TokenKey: []
 ###
-DELETE      /quotes        controllers.search.SearchController.deleteIndex(indexName: String)
+DELETE      /quotes        controllers.search.SearchController.deleteIndex()
 
 ###
 #  summary: Search full text quote from the ES

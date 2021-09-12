@@ -1,16 +1,17 @@
 package responseHandler
 
-import com.krishna.model.QuotesQuery
 import com.krishna.response.ErrorMsg.{ EmptyDbMsg, EsPlaceHolder }
 import com.krishna.response.ResponseError
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.{ CompletionSuggestionOption, SearchResponse }
+import config.SuggestionName
+import models.{ AuthorCompletion, CompletionResponseType, QuoteWithAuthor }
 import play.api.libs.json.{ JsResult, Json }
 import play.api.mvc.Result
-import play.api.mvc.Results.Ok
+import play.api.mvc.Results.{ NotFound, Ok }
 
 import scala.concurrent.Future
 
@@ -27,21 +28,23 @@ object EsResponseHandler extends ResponseError {
         checkResponse(response, bulkResponse.hasSuccesses)
       case deleteIndexResponse: DeleteIndexResponse =>
         checkResponse(response, deleteIndexResponse.acknowledged)
+      case searchResponse: SearchResponse if searchResponse.suggestions.isEmpty =>
+        sendSearchedResponse(searchResponse, searchResponse.nonEmpty)
       case searchResponse: SearchResponse =>
-        sendResponse(searchResponse, searchResponse.nonEmpty)
+        getCompletionAuthor(searchResponse)
       case _ =>
         checkResponse(response, isResponseResult = true)
 
     }
   }
 
-  private def sendResponse(
+  private def sendSearchedResponse(
       response: SearchResponse,
       isResponseResult: Boolean
   )(implicit indexName: String): Result = {
     if (isResponseResult) {
       log.info(s"Total hits for the searched text: ${response.size}")
-      val records = response.to[QuotesQuery].toList
+      val records = response.to[QuoteWithAuthor].toList
       Ok(Json.toJson(records))
     } else {
       notFound(EsPlaceHolder(EmptyDbMsg.msg))
@@ -59,6 +62,21 @@ object EsResponseHandler extends ResponseError {
         s"Error while performing action on index: $indexName with an error: ${response.error.reason}"
       )
       notFound(EsPlaceHolder(response.error.reason))
+    }
+  }
+
+  private def getCompletionAuthor(response: SearchResponse): Result = {
+    log.info(s"Getting list of the author auto completion list")
+
+    val searchResponse: Seq[CompletionSuggestionOption] =
+      response
+        .suggestions(SuggestionName.completionAuthor.toString)
+        .flatMap(_.toCompletion.options)
+
+    if (searchResponse.isEmpty) NotFound("Searched author not found")
+    else {
+      val results: Seq[String] = searchResponse.map(_.text) // Need to sort in FE code as per input text
+      Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results)))
     }
   }
 }

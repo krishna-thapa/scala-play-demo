@@ -6,17 +6,19 @@ import com.krishna.model.{ Genre, QuotesQuery }
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
-import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.requests.searches.{ CompletionSuggestionOption, SearchResponse }
+import config.SuggestionName
 import daos.QuoteQueryDAO
+import models.QuoteWithAuthor
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.Configuration
 
-import scala.concurrent.{ Await, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, Future }
 
 class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
@@ -42,11 +44,15 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     id = 1,
     csvId = "csv101",
     quote = "Test quote 1",
-    author = None,
+    author = Some("author1 Test"),
     genre = Some(Genre.age)
   )
   val mockQuotes: Seq[QuotesQuery] =
-    Seq(baseQuote, baseQuote.copy(id = 2, csvId = "csv102", quote = "Test quote 2"))
+    Seq(
+      baseQuote,
+      baseQuote.copy(id = 2, csvId = "csv102", author = Some("author2 Test"), quote = "Test quote 2"),
+      baseQuote.copy(id = 3, csvId = "csv103", author = Some("random author"), quote = "Random quote")
+    )
 
   behavior of "SearchInEsDAO"
   it should "return check indication if the index exists" in {
@@ -54,16 +60,16 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   }
 
   it should "store 2 mock quotes in ES" in {
-    when(mockQuoteQueryDAO.listRandomQuote(2)).thenReturn(mockQuotes)
+    when(mockQuoteQueryDAO.listRandomQuote(3)).thenReturn(mockQuotes)
 
     val result: Response[BulkResponse] =
-      Await.result(searchDao.getAndStoreQuotes(2), Duration.Inf)
+      Await.result(searchDao.getAndStoreQuotes(3), Duration.Inf)
     val indexIds: Seq[String] = result.map(_.items).result.map(_.id)
 
     result.isSuccess shouldBe true
-    indexIds shouldBe Seq("csv101", "csv102")
+    indexIds shouldBe Seq("csv101", "csv102", "csv103")
 
-    searchDao.countDocsInIndex shouldBe 2
+    searchDao.countDocsInIndex shouldBe 3
   }
 
   it should "perform search query in elastic search" in {
@@ -71,21 +77,22 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
     matchedQuote.ids shouldBe Seq("csv102")
-    matchedQuote.to[QuotesQuery].toList shouldBe mockQuotes.tail
+    val expected: QuoteWithAuthor = QuoteWithAuthor(mockQuotes.tail.head, None)
+    matchedQuote.to[QuoteWithAuthor].head shouldBe expected
   }
 
   it should "perform search on all matched docs" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
-    matchedQuote.to[QuotesQuery].toList.sortBy(_.id) shouldBe mockQuotes
+    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq("csv101", "csv102", "csv103")
   }
 
   it should "searched text case should not matter" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("QuOt")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
-    matchedQuote.to[QuotesQuery].toList.sortBy(_.id) shouldBe mockQuotes
+    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq("csv101", "csv102", "csv103")
   }
 
   it should "return empty if not found" in {
@@ -109,6 +116,26 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     matchedQuote.hits.size shouldBe 1
   }
 
+  it should "return auto completion for all the matched author names" in {
+    val result: Seq[String] = checkAutoCompletion("author")
+    result shouldBe Seq("author1 Test", "author2 Test")
+  }
+
+  it should "return auto completion for the exact match author name" in {
+    val result: Seq[String] = checkAutoCompletion("random")
+    result shouldBe Seq("random author")
+  }
+
+  it should "return auto completion for the matched author with typo in searched text" in {
+    val result: Seq[String] = checkAutoCompletion("auphor1")
+    result shouldBe Seq("author1 Test", "author2 Test")
+  }
+
+  it should "return empty if it is not found in the ES" in {
+    val result: Seq[String] = checkAutoCompletion("invalid")
+    result shouldBe Seq.empty
+  }
+
   it should "delete the index in ES" in {
     val isDeleted: Boolean =
       Await
@@ -116,5 +143,15 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
         .result
         .acknowledged
     isDeleted shouldBe true
+  }
+
+  private def checkAutoCompletion(searchedText: String): Seq[String] = {
+    val getAuthorCompletion: Future[Response[SearchResponse]] =
+      searchDao.completeAuthorNames(searchedText)
+    val autoCompletionAuthors: SearchResponse = Await.result(getAuthorCompletion, Duration.Inf).result
+    val result: Seq[CompletionSuggestionOption] = autoCompletionAuthors
+      .suggestions(SuggestionName.completionAuthor.toString)
+      .flatMap(_.toCompletion.options)
+    result.map(_.text)
   }
 }

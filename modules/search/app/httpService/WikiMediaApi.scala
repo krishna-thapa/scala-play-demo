@@ -1,27 +1,33 @@
 package httpService
 
-import com.krishna.httpService.HttpService
+import com.krishna.httpService.WebClient
 import com.krishna.model.QuotesQuery
 import com.krishna.util.Logging
-import javax.inject.{ Inject, Singleton }
 import models.{ AuthorDetails, QuoteWithAuthor }
 import play.api.Configuration
 import responseHandler.EsResponseHandler
 
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Failure
 
 @Singleton
-class WikiMediaApi @Inject()(httpService: HttpService, config: Configuration)(
+class WikiMediaApi @Inject()(httpService: WebClient, config: Configuration)(
     implicit executionContext: ExecutionContext
 ) extends Logging {
   private val wikiMediaApiUrl: String = config.get[String]("wiki.apiUrl")
 
+  /**
+    * Call the Wiki Media API and validate the response
+    * If the quote doesn't has any author name on it, we can simple return quote only
+    * @param quote quote where we can get author name
+    * @return quote with author details
+    */
   def getWikiResponse(quote: QuotesQuery): Future[QuoteWithAuthor] = {
 
     quote.author.fold(Future.successful(QuoteWithAuthor(quote))) { author =>
       val futureResponse: Future[QuoteWithAuthor] = for {
-        wsResponse    <- httpService.get(wikiMediaApiUrl.concat(handleAuthorStr(author)))
+        wsResponse    <- httpService.getWebClientResponse(wikiMediaApiUrl.concat(handleAuthorStr(author)))
         authorDetails <- EsResponseHandler.validateJson(wsResponse.json.validate[AuthorDetails])
       } yield QuoteWithAuthor(quote, Some(authorDetails))
 
@@ -34,6 +40,7 @@ class WikiMediaApi @Inject()(httpService: HttpService, config: Configuration)(
     }
   }
 
+  // Capitalize the word for the author name and surname
   private def handleAuthorStr(author: String): String = {
     author.split(" ").map(_.capitalize).mkString(" ")
   }

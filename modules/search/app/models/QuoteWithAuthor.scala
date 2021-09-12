@@ -8,8 +8,8 @@ import com.sksamuel.elastic4s.streams.RequestBuilder
 import play.api.libs.json.{ Json, OFormat }
 
 case class QuoteWithAuthor(
-    quote: QuotesQuery,
-    author: Option[AuthorDetails] = None
+    quoteDetails: QuotesQuery,
+    authorDetails: Option[AuthorDetails] = None
 )
 
 object QuoteWithAuthor {
@@ -19,10 +19,7 @@ object QuoteWithAuthor {
   /*
     An implementation of RequestBuilder to load stream in ElasticSearch
    */
-  def builder(
-      indexName: String
-  ): RequestBuilder[QuoteWithAuthor] =
-    (q: QuoteWithAuthor) =>
-      indexInto(indexName).id(q.quote.csvId).doc(q).refresh(RefreshPolicy.Immediate)
-
+  def builder(indexName: String): RequestBuilder[QuoteWithAuthor] = { (quote: QuoteWithAuthor) =>
+    indexInto(indexName).id(quote.quoteDetails.csvId).doc(quote).refresh(RefreshPolicy.Immediate)
+  }
 }

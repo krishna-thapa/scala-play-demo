@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.mappings.{ CompletionField, MappingDefinition, TextField }
+import com.sksamuel.elastic4s.requests.mappings.{ CompletionField, MappingDefinition, ObjectField, TextField }
 import config.InitEs
 
 import scala.concurrent.Future
@@ -54,7 +54,7 @@ trait CommonEsMethods extends InitEs with Logging {
 
   /*
     Create an index and a custom field with the type of completion field and copy the author data on it
-    We can copy next data on that completion field so that can be used for auto completion
+    We can copy data on that completion field so that can be used for auto completion
     https://www.elastic.co/guide/en/elasticsearch/reference/5.5/copy-to.html
    */
   def createIndexWithCompletionField: Future[Response[CreateIndexResponse]] = {
@@ -62,7 +62,10 @@ trait CommonEsMethods extends InitEs with Logging {
     client.execute {
       createIndex(indexName).mapping(
         MappingDefinition(
-          Seq(CompletionField("suggest_author"), TextField("author").copyTo("suggest_author"))
+          Seq(
+            CompletionField("suggest_author"),
+            ObjectField("quoteDetails").fields(Seq(TextField("author").copyTo("suggest_author")))
+          )
         )
       )
     }
