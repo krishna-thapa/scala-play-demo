@@ -27,7 +27,9 @@ class WikiMediaApi @Inject()(httpService: WebClient, config: Configuration)(
 
     quote.author.fold(Future.successful(QuoteWithAuthor(quote))) { author =>
       val futureResponse: Future[QuoteWithAuthor] = for {
-        wsResponse    <- httpService.getWebClientResponse(wikiMediaApiUrl.concat(handleAuthorStr(author)))
+        wsResponse <- httpService.getWebClientResponse(
+          wikiMediaApiUrl.concat(handleAuthorStr(author))
+        )
         authorDetails <- EsResponseHandler.validateJson(wsResponse.json.validate[AuthorDetails])
       } yield QuoteWithAuthor(quote, Some(authorDetails))
 

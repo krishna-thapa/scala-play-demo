@@ -97,7 +97,9 @@ class SearchController @Inject()(
     * @return list of the author names as an auto completion
     */
   def getAuthorsAutoSuggestion(author: String): Action[AnyContent] = UserAction.async { _ =>
-    log.info(s"Searching for author: $author to retrieve auto completion and suggestion for any spell mistake")
+    log.info(
+      s"Searching for author: $author to retrieve auto completion and suggestion for any spell mistake"
+    )
 
     searchInEsDao
       .completeAuthorNames(author)

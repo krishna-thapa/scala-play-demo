@@ -55,7 +55,9 @@ class AkkaService @Inject()(
       client.subscriber[QuoteWithAuthor](
         batchSize,
         completionFn = { () =>
-          log.info(s"Completed: Records are stored in the elastic search db under index: $indexName")
+          log.info(
+            s"Completed: Records are stored in the elastic search db under index: $indexName"
+          )
           promise.success(()); ()
         },
         errorFn = { (t: Throwable) =>
@@ -69,7 +71,7 @@ class AkkaService @Inject()(
     }
 
     // Create a full akka stream graph
-    recordsSource[QuotesQuery](quotesDAO.getRandomRecords(1)) // TODO: update with getAllQuotes
+    recordsSource[QuotesQuery](quotesDAO.getRandomRecords(500)) // TODO: update with getAllQuotes
       .via(addFlowPerRecord[QuotesQuery, QuoteWithAuthor](wikiMediaApi.getWikiResponse))
       .alsoTo(logElementsPerBlock)
       .runWith(esSink)

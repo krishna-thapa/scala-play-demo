@@ -75,7 +75,8 @@ object EsResponseHandler extends ResponseError {
 
     if (searchResponse.isEmpty) NotFound("Searched author not found")
     else {
-      val results: Seq[String] = searchResponse.map(_.text) // Need to sort in FE code as per input text
+      // Need to sort in FE code as per input text
+      val results: Seq[String] = searchResponse.map(_.text)
       Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results)))
     }
   }

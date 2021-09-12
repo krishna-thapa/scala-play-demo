@@ -50,8 +50,10 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   val mockQuotes: Seq[QuotesQuery] =
     Seq(
       baseQuote,
-      baseQuote.copy(id = 2, csvId = "csv102", author = Some("author2 Test"), quote = "Test quote 2"),
-      baseQuote.copy(id = 3, csvId = "csv103", author = Some("random author"), quote = "Random quote")
+      baseQuote
+        .copy(id = 2, csvId = "csv102", author = Some("author2 Test"), quote = "Test quote 2"),
+      baseQuote
+        .copy(id = 3, csvId = "csv103", author = Some("random author"), quote = "Random quote")
     )
 
   behavior of "SearchInEsDAO"
@@ -85,14 +87,22 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
-    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq("csv101", "csv102", "csv103")
+    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq(
+      "csv101",
+      "csv102",
+      "csv103"
+    )
   }
 
   it should "searched text case should not matter" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("QuOt")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
-    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq("csv101", "csv102", "csv103")
+    matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq(
+      "csv101",
+      "csv102",
+      "csv103"
+    )
   }
 
   it should "return empty if not found" in {
@@ -148,7 +158,8 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   private def checkAutoCompletion(searchedText: String): Seq[String] = {
     val getAuthorCompletion: Future[Response[SearchResponse]] =
       searchDao.completeAuthorNames(searchedText)
-    val autoCompletionAuthors: SearchResponse = Await.result(getAuthorCompletion, Duration.Inf).result
+    val autoCompletionAuthors: SearchResponse =
+      Await.result(getAuthorCompletion, Duration.Inf).result
     val result: Seq[CompletionSuggestionOption] = autoCompletionAuthors
       .suggestions(SuggestionName.completionAuthor.toString)
       .flatMap(_.toCompletion.options)
