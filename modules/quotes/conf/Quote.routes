@@ -47,8 +47,6 @@ GET      /quoteOfTheDay         controllers.quotes.QuoteController.getQuoteOfThe
 #      description: Not found. Database is empty.
 #    502:
 #      description: Bad Gateway.
-#  security:
-#    - TokenKey: []
 ###
 GET      /quotesOfTheDay         controllers.quotes.QuoteController.getCachedQuotes
 

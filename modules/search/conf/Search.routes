@@ -79,10 +79,10 @@ GET     /es/author        controllers.search.SearchController.getAuthorsAutoSugg
 #  security:
 #    - TokenKey: []
 ###
-POST    /quotes        controllers.search.SearchController.writeInEs(records: Int ?= 50)
+POST    /pg/migrate        controllers.search.SearchController.writeInEs(records: Int ?= 50)
 
 ###
-#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
+#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes" using Akka streams.
 #  description: "It will migrate all the quotes from Postgres table and store in ES and this can only be done by Admin role"
 #  tags:
 #    - Search
@@ -100,7 +100,7 @@ POST    /quotes        controllers.search.SearchController.writeInEs(records: In
 #  security:
 #    - TokenKey: []
 ###
-POST    /quotes/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
+POST    /akka/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
 
 ###
 #  summary: Delete the index quotes from ES - Should be used for the development purpose only.

@@ -6,6 +6,8 @@ import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson._
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.common.RefreshPolicy
+import com.sksamuel.elastic4s.requests.searches.sort.ScoreSort
+import com.sksamuel.elastic4s.requests.searches.sort.SortOrder.Desc
 import com.sksamuel.elastic4s.requests.searches.suggestion.CompletionSuggestion
 import com.sksamuel.elastic4s.requests.searches.suggestion.Fuzziness.Two
 import com.sksamuel.elastic4s.requests.searches.{ SearchRequest, SearchResponse }
@@ -73,15 +75,18 @@ class SearchInEsDAO @Inject()(
         searchRequest(text)
           .from(offset)
           .size(limit)
+          .sortBy(ScoreSort(Desc))
       )
   }
 
   /*
-    Use search API query to match phrase prefix
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
+    The match query is the standard query for performing a full-text search, including options for fuzzy matching.
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
    */
   private def searchRequest(text: String): SearchRequest = {
-    val query = matchPhrasePrefixQuery("quoteDetails.quote", s"$text")
+    val query = matchQuery("quoteDetails.quote", s"$text")
+      .fuzziness("AUTO")
+      .operator("AND")
     search(indexName).query(query)
   }
 

@@ -62,7 +62,7 @@ class AkkaService @Inject()(
         },
         errorFn = { (t: Throwable) =>
           log.error(
-            s"Error while running akk stream for uploading data from Postgres to ES, " +
+            s"Error while running akka stream for uploading data from Postgres to ES, " +
               s"error: ${t.getMessage}"
           )
           promise.failure(t); ()
