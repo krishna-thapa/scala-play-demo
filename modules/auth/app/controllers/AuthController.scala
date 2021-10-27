@@ -20,8 +20,7 @@ import scala.concurrent.ExecutionContext
 class AuthController @Inject()(
     scc: SecuredControllerComponents,
     authService: AuthService
-)(implicit executionContext: ExecutionContext, config: Configuration)
-    extends SecuredController(scc)
+) extends SecuredController(scc)
     with Logging
     with ResponseResult {
 

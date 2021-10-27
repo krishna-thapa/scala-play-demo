@@ -80,14 +80,16 @@ class CustomQuoteController @Inject()(
     log.info(s"Executing addCustomQuote")
 
     val addQuote = (user: UserDetail) => {
-      RequestForm.quotesQueryForm.bindFromRequest.fold(
-        formWithErrors => {
-          badRequest("error" + formWithErrors.errors)
-        },
-        customQuote => {
-          responseOk(customerQuotesDAO.createQuote(customQuote, user))
-        }
-      )
+      RequestForm.quotesQueryForm
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            badRequest("error" + formWithErrors.errors)
+          },
+          customQuote => {
+            responseOk(customerQuotesDAO.createQuote(customQuote, user))
+          }
+        )
     }
 
     getResultForCustomQuote(request, addQuote)
@@ -101,20 +103,22 @@ class CustomQuoteController @Inject()(
       log.info(s"Executing updateCustomQuote")
 
       val updateQuote = (user: UserDetail) => {
-        RequestForm.quotesQueryForm.bindFromRequest.fold(
-          formWithErrors => {
-            badRequest("error" + formWithErrors.errors)
-          },
-          customQuote => {
-            customerQuotesDAO.updateQuote(id, user.id, customQuote) match {
-              case Success(recordsUpdated) if recordsUpdated == 1 =>
-                responseOk(OkResponse(s"Successfully updated record with id: $id"))
-              case Success(recordsUpdated) if recordsUpdated != 1 =>
-                notFound(RecordNotFound(id))
-              case Failure(exception) => internalServerError(exception.getMessage)
+        RequestForm.quotesQueryForm
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              badRequest("error" + formWithErrors.errors)
+            },
+            customQuote => {
+              customerQuotesDAO.updateQuote(id, user.id, customQuote) match {
+                case Success(recordsUpdated) if recordsUpdated == 1 =>
+                  responseOk(OkResponse(s"Successfully updated record with id: $id"))
+                case Success(_) =>
+                  notFound(RecordNotFound(id))
+                case Failure(exception) => internalServerError(exception.getMessage)
+              }
             }
-          }
-        )
+          )
       }
 
       getResultForCustomQuote(request, updateQuote)

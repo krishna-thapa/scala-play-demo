@@ -61,7 +61,7 @@ GET         /:id            controllers.customQuote.CustomQuoteController.getSel
 #  security:
 #    - TokenKey: []
 ###
-POST        /               controllers.customQuote.CustomQuoteController.addCustomQuote
+POST        /               controllers.customQuote.CustomQuoteController.addCustomQuote()
 
 ###
 #  summary: Delete a selected quote from a custom build quote table

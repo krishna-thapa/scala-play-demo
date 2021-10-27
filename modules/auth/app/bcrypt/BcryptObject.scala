@@ -16,10 +16,10 @@ object BcryptObject {
     So with storing the hash-string you also store the salt.
    */
   def encryptPassword(password: String): Try[String] = {
-    password.bcryptSafe(5)
+    password.bcryptSafeBounded(5)
   }
 
   def validatePassword(password: String, encrypted: String): Try[Boolean] = {
-    password.isBcryptedSafe(encrypted)
+    password.isBcryptedSafeBounded(encrypted)
   }
 }

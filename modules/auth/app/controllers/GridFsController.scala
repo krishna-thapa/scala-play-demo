@@ -9,7 +9,7 @@ import depInject.{ SecuredController, SecuredControllerComponents }
 import play.api.Configuration
 import play.api.mvc.{ Action, AnyContent, MultipartFormData, Result }
 import play.modules.reactivemongo.{ ReactiveMongoApi, ReactiveMongoComponents }
-import reactivemongo.api.bson.{ BSONDocument, BSONObjectID, BSONValue }
+import reactivemongo.api.bson.{ BSONDocument, BSONValue }
 import reactivemongo.api.gridfs.ReadFile
 import service.GridFsAttachmentService
 

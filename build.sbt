@@ -1,5 +1,4 @@
 import Dependencies.Libraries._
-
 import scala.language.postfixOps
 
 name := """inspirational-quote-api"""
@@ -7,7 +6,7 @@ description := "Back-end project for Inspirational quotes"
 version := "1.0-SNAPSHOT"
 
 organization in ThisBuild := "com.krishna"
-scalaVersion in ThisBuild := "2.13.1"
+scalaVersion in ThisBuild := "2.13.6"
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -87,22 +86,20 @@ lazy val dockerTestKitWithMock = Seq(
   elasticSearchContainer
 )
 
-val AkkaVersion = "2.6.13"
 lazy val akka = Seq(
-  "com.typesafe.akka" %% "akka-stream"                % AkkaVersion,
-  "com.typesafe.akka" %% "akka-actor-typed"           % AkkaVersion,
-  "com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion,
-  "com.typesafe.akka" %% "akka-slf4j"                 % AkkaVersion
+  akkaStream,
+  akkaActor,
+  akkaJackson,
+  akkaSlf4j
 )
 
 lazy val commonDependencies = Seq(
   guice,
   scalaTest,
-  logbackEncoder intransitive ()
+  logbackEncoder
 )
 
 lazy val slickDatabaseDependencies = Seq(
-  //jdbc,
   postgres,
   playSlickEvolutions,
   playSlick
@@ -121,23 +118,28 @@ lazy val elastic4sDependencies = Seq(
 )
 
 lazy val mongoDependencies = Seq(
-  // Enable reactive mongo for Play 2.8
-  "org.reactivemongo" %% "play2-reactivemongo" % "1.0.4-play28",
-  // Provide JSON serialization for reactive mongo
-  "org.reactivemongo" %% "reactivemongo-play-json-compat" % "1.0.4-play28"
+  reactivemongo,
+  reactivemongoJson
 )
 
-// Creating a custom sbt task for the docker start-up
 // https://www.scala-sbt.org/1.x/docs/Tasks.html
+
+// Creating a custom sbt task for the docker start-up
 import scala.sys.process._
-lazy val localStart = taskKey[Unit]("Start the project using docker containers")
-localStart := {
-  "./scripts/start_project.sh" !
+lazy val sbtDockerStart = taskKey[Unit]("Start the docker containers")
+sbtDockerStart := {
+  "./scripts/docker_start.sh" !
+}
+
+// Creating a custom sbt task for running project using sbt run
+lazy val sbtLocalStart = taskKey[Unit]("Start the project using sbt shell")
+sbtLocalStart := {
+  "./scripts/sbt_start.sh" !
 }
 
 // Creating a custom sbt task for the csv migration to the docker container
-lazy val csvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
-csvMigrate := {
+lazy val sbtCsvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
+sbtCsvMigrate := {
   "./scripts/csv_migration.sh" !
 }
 
