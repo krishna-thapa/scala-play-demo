@@ -24,3 +24,8 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
 
 // https://github.com/DavidGregory084/sbt-tpolecat
 // addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.20")
+
+// https://github.com/scoverage/sbt-scoverage
+// https://github.com/scoverage/scalac-scoverage-plugin
+// sbt sbtScoverageDoc
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.1")

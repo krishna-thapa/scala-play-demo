@@ -80,48 +80,6 @@ lazy val common = project
         Seq(ws)
   )
 
-lazy val dockerTestKitWithMock = Seq(
-  mockito,
-  testContainers,
-  elasticSearchContainer
-)
-
-lazy val akka = Seq(
-  akkaStream,
-  akkaActor,
-  akkaJackson,
-  akkaSlf4j
-)
-
-lazy val commonDependencies = Seq(
-  guice,
-  scalaTest,
-  logbackEncoder
-)
-
-lazy val slickDatabaseDependencies = Seq(
-  postgres,
-  playSlickEvolutions,
-  playSlick
-)
-
-lazy val testContainerDependencies = Seq(
-  testContainers,
-  postgresContainer,
-  playScalaTest // Need this?
-)
-
-lazy val elastic4sDependencies = Seq(
-  elastic4s,
-  elastic4sJson,
-  elastic4sStreams
-)
-
-lazy val mongoDependencies = Seq(
-  reactivemongo,
-  reactivemongoJson
-)
-
 // https://www.scala-sbt.org/1.x/docs/Tasks.html
 
 // Creating a custom sbt task for the docker start-up
@@ -141,6 +99,12 @@ sbtLocalStart := {
 lazy val sbtCsvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
 sbtCsvMigrate := {
   "./scripts/csv_migration.sh" !
+}
+
+// Creating a custom sbt task for running project's test coverage and opening coverage report in google chrome
+lazy val sbtScoverageDoc = taskKey[Unit]("Get the project's scoverage report in html")
+sbtScoverageDoc := {
+  "./scripts/scoverage_html.sh" !
 }
 
 /*

@@ -1,3 +1,4 @@
+import play.sbt.PlayImport.guice
 import sbt._
 
 object Dependencies {
@@ -17,8 +18,7 @@ object Dependencies {
     val postgresql = "42.2.12"
 
     // tests
-    val scalaTest      = "3.2.0"
-    val playtest       = "5.0.0"
+    val scalaPlayTest  = "5.1.0"
     val testContainers = "0.38.8"
     val mockitoVer     = "1.13.0"
 
@@ -27,42 +27,63 @@ object Dependencies {
   }
 
   object Libraries {
-    val playSlick           = "com.typesafe.play" %% "play-slick"            % Versions.playSlick
-    val playSlickEvolutions = "com.typesafe.play" %% "play-slick-evolutions" % Versions.playSlick
-    val swaggerUi           = "org.webjars"       % "swagger-ui"             % Versions.swagger
-    val playJwt             = "com.pauldijou"     %% "jwt-play"              % Versions.playjwt
-    val scalaBcrypt         = "com.github.t3hnar" %% "scala-bcrypt"          % Versions.bcrypt
-    val quartzScheduler     = "com.enragedginger" %% "akka-quartz-scheduler" % Versions.quartzScheduler
+    val swaggerUi       = "org.webjars"       % "swagger-ui"             % Versions.swagger
+    val playJwt         = "com.pauldijou"     %% "jwt-play"              % Versions.playjwt
+    val scalaBcrypt     = "com.github.t3hnar" %% "scala-bcrypt"          % Versions.bcrypt
+    val quartzScheduler = "com.enragedginger" %% "akka-quartz-scheduler" % Versions.quartzScheduler
 
     // Akka
-    val akkaStream  = "com.typesafe.akka" %% "akka-stream"                % Versions.akkaVersion
-    val akkaActor   = "com.typesafe.akka" %% "akka-actor-typed"           % Versions.akkaVersion
-    val akkaJackson = "com.typesafe.akka" %% "akka-serialization-jackson" % Versions.akkaVersion
-    val akkaSlf4j   = "com.typesafe.akka" %% "akka-slf4j"                 % Versions.akkaVersion
+    lazy val akka = Seq(
+      "com.typesafe.akka" %% "akka-stream"                % Versions.akkaVersion,
+      "com.typesafe.akka" %% "akka-actor-typed"           % Versions.akkaVersion,
+      "com.typesafe.akka" %% "akka-serialization-jackson" % Versions.akkaVersion,
+      "com.typesafe.akka" %% "akka-slf4j"                 % Versions.akkaVersion
+    )
 
-    // Database
-    val reactivemongo     = "org.reactivemongo"      %% "play2-reactivemongo"            % Versions.monogoDb
-    val reactivemongoJson = "org.reactivemongo"      %% "reactivemongo-play-json-compat" % Versions.monogoDb
-    val elastic4s         = "com.sksamuel.elastic4s" %% "elastic4s-client-esjava"        % Versions.elastic4s
-    val elastic4sJson     = "com.sksamuel.elastic4s" %% "elastic4s-json-play"            % Versions.elastic4s
-    val elastic4sStreams  = "com.sksamuel.elastic4s" %% "elastic4s-http-streams"         % Versions.elastic4s
-    val playRedis         = "com.github.karelcemus"  %% "play-redis"                     % Versions.playRedis
-    val postgres          = "org.postgresql"         % "postgresql"                      % Versions.postgresql
+    // Reactive Mongo DB
+    lazy val mongoDependencies = Seq(
+      "org.reactivemongo" %% "play2-reactivemongo"            % Versions.monogoDb,
+      "org.reactivemongo" %% "reactivemongo-play-json-compat" % Versions.monogoDb
+    )
 
-    // logs
-    val logbackEncoder =
+    // Slick for the Postgres DB
+    lazy val slickDatabaseDependencies = Seq(
+      "org.postgresql"    % "postgresql"             % Versions.postgresql,
+      "com.typesafe.play" %% "play-slick"            % Versions.playSlick,
+      "com.typesafe.play" %% "play-slick-evolutions" % Versions.playSlick
+    )
+
+    // Elastic Search dependencies
+    lazy val elastic4sDependencies = Seq(
+      "com.sksamuel.elastic4s" %% "elastic4s-client-esjava" % Versions.elastic4s,
+      "com.sksamuel.elastic4s" %% "elastic4s-json-play"     % Versions.elastic4s,
+      "com.sksamuel.elastic4s" %% "elastic4s-http-streams"  % Versions.elastic4s
+    )
+
+    val playRedis     = "com.github.karelcemus"  %% "play-redis"                     % Versions.playRedis
+    val scalaTestPlus = "org.scalatestplus.play" %% "scalatestplus-play"             % Versions.scalaPlayTest
+    val testContainer = "com.dimafeng"           %% "testcontainers-scala-scalatest" % Versions.testContainers % "test"
+
+    // Docker test container
+    lazy val testContainerDependencies = Seq(
+      testContainer,
+      scalaTestPlus,
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers % "test"
+    )
+
+    // Docker test container test kits with Mockito
+    lazy val dockerTestKitWithMock = Seq(
+      testContainer,
+      "org.mockito"  %% "mockito-scala-scalatest"            % Versions.mockitoVer     % "test",
+      "com.dimafeng" %% "testcontainers-scala-elasticsearch" % Versions.testContainers % "test"
+    )
+
+    lazy val commonDependencies = Seq(
+      guice,
+      scalaTestPlus,
       "net.logstash.logback" % "logstash-logback-encoder" % Versions.logbackEncoder excludeAll ExclusionRule(
         organization = "com.fasterxml.jackson.core"
       )
-
-    // tests
-    val scalaTest              = "org.scalatest"          %% "scalatest"                          % Versions.scalaTest      % "test"
-    val playScalaTest          = "org.scalatestplus.play" %% "scalatestplus-play"                 % Versions.playtest       % "test"
-    val testContainers         = "com.dimafeng"           %% "testcontainers-scala-scalatest"     % Versions.testContainers % "test"
-    val postgresContainer      = "com.dimafeng"           %% "testcontainers-scala-postgresql"    % Versions.testContainers % "test"
-    val elasticSearchContainer = "com.dimafeng"           %% "testcontainers-scala-elasticsearch" % Versions.testContainers % "test"
-
-    // mock
-    val mockito = "org.mockito" %% "mockito-scala-scalatest" % Versions.mockitoVer % "test"
+    )
   }
 }
