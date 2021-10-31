@@ -5,7 +5,7 @@ import play.api.libs.json.{ Json, OFormat }
 
 object CompletionResponseType extends Enumeration {
   type CompletionResponseType = Value
-  val AutoCompletion, PhraseSuggestion = Value
+  val AutoCompletion, PrefixMatchCompletion = Value
 
   implicit val format = Json.formatEnum(this)
 }

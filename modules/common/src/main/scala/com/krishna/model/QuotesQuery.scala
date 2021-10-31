@@ -10,10 +10,8 @@ case class QuotesQuery(
     quote: String,
     author: Option[String],
     genre: Option[Genre] = None
-) extends WithCSCVIdResource
-    with QuotesTable
+) extends WithCSCVIdResource with QuotesTable
 
 object QuotesQuery {
-  implicit lazy val quotesFormat: OFormat[QuotesQuery] =
-    Json.format[QuotesQuery]
+  implicit lazy val quotesFormat: OFormat[QuotesQuery] = Json.format[QuotesQuery]
 }

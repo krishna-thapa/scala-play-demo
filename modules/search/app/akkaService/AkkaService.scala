@@ -8,7 +8,7 @@ import com.krishna.akkaStream.StreamsInit
 import com.krishna.model.QuotesQuery
 import com.sksamuel.elastic4s.ElasticApi.RichFuture
 import com.sksamuel.elastic4s.streams.ReactiveElastic.ReactiveElastic
-import config.ElasticsearchConfig
+import config.{ CompletionCustomSuggestion, ElasticsearchConfig, SearchSuggestion }
 import dao.CommonEsMethods
 import daos.QuoteQueryDAO
 import httpService.WikiMediaApi
@@ -35,6 +35,9 @@ class AkkaService @Inject()(
 
   implicit lazy val system: ActorSystem = ActorSystem()
 
+  // Use of custom search suggestion with completion field in ElasticSearch and custom name for it
+  override def searchSuggestion: SearchSuggestion = CompletionCustomSuggestion
+
   def createCompletionAndInsert: Future[Unit] = {
 
     // if the index exist, have to wait until the index is deleted without any error
@@ -47,7 +50,7 @@ class AkkaService @Inject()(
     }
   }
 
-  // Akk Stream to get the records from Postgres and Call WIKI Api and then store the results in ES
+  // Akka Stream to get the records from Postgres and Call WIKI Api and then store the results in ES
   def bulkInsertQuotesToES: Future[Unit] = {
     val promise = Promise[Unit]()
 

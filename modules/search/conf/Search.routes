@@ -1,5 +1,5 @@
 ###
-#  summary: Get an autocomplete list of authors with search query parameter from Postgres table using Postgres Like conmmand
+#  summary: Get an autocomplete list of authors with search query parameter from Postgres table using Postgres Like command
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
@@ -29,7 +29,7 @@
 GET     /pg/author        controllers.quotes.QuoteController.getAuthorsAutocomplete(author: String)
 
 ###
-#  summary:  Get an autocomplete and auto suggestion using elastic search completion and pharse suggestion API
+#  summary:  Get an autocomplete and auto suggestion using Elastic Search's completion suggestion and pharse suggestion API
 #  description: "This can only be done by the logged in user. Minimum required input parameter length is 3."
 #  tags:
 #    - Search
@@ -55,7 +55,7 @@ GET     /pg/author        controllers.quotes.QuoteController.getAuthorsAutocompl
 GET     /es/author        controllers.search.SearchController.getAuthorsAutoSuggestion(author: String)
 
 ###
-#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes".
+#  summary: Gets the random records from Postgres 'quotes' table and store in ElasticSearch Index under "quotes".
 #  description: "The size of the records has to be passed as path parameter and this can only be done by Admin role"
 #  tags:
 #    - Search
@@ -82,7 +82,7 @@ GET     /es/author        controllers.search.SearchController.getAuthorsAutoSugg
 POST    /pg/migrate        controllers.search.SearchController.writeInEs(records: Int ?= 50)
 
 ###
-#  summary: Reads the quote records from Postgres table and store in ElasticSearch Index under "quotes" using Akka streams.
+#  summary: Gets the all the records from Postgres quotes table and store in ElasticSearch Index under "quotes" using Akka streams.
 #  description: "It will migrate all the quotes from Postgres table and store in ES and this can only be done by Admin role"
 #  tags:
 #    - Search

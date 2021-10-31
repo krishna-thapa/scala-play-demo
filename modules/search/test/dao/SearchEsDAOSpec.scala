@@ -6,10 +6,10 @@ import com.krishna.model.{ Genre, QuotesQuery }
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
-import com.sksamuel.elastic4s.requests.searches.{ CompletionSuggestionOption, SearchResponse }
-import config.SuggestionName
+import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import config.CompletionCustomSuggestion
 import daos.QuoteQueryDAO
-import models.QuoteWithAuthor
+import models.{ AuthorSearchResponse, QuoteWithAuthor }
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
 import org.scalatest.flatspec.AnyFlatSpec
@@ -74,7 +74,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     searchDao.countDocsInIndex shouldBe 3
   }
 
-  it should "perform search query in elastic search" in {
+  it should "perform search query in elastic search using match prefix API" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("Test quote 2")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
@@ -83,7 +83,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     matchedQuote.to[QuoteWithAuthor].head shouldBe expected
   }
 
-  it should "perform search on all matched docs" in {
+  it should "perform search query using match query if match prefix return nil" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
@@ -94,7 +94,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     )
   }
 
-  it should "searched text case should not matter" in {
+  it should "perform search query using match query with fuzziness if match prefix return nil" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("QuOt")
     val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
 
@@ -113,26 +113,24 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   }
 
   it should "return result with correct limit" in {
-    val getMatchedQuote: Future[Response[SearchResponse]] =
-      searchDao.searchQuote("quote", limit = 1)
-    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
+    val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote", limit = 1)
+    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
     matchedQuote.hits.size shouldBe 1
   }
 
   it should "return result with correct offset" in {
-    val getMatchedQuote: Future[Response[SearchResponse]] =
-      searchDao.searchQuote("Test", offset = 1)
-    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
+    val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("Test", offset = 1)
+    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
     matchedQuote.hits.size shouldBe 1
   }
 
   it should "return auto completion for all the matched author names" in {
-    val result: Seq[String] = checkAutoCompletion("author")
-    result shouldBe Seq("author1 Test", "author2 Test")
+    val result: Seq[String] = checkAutoCompletion("author", isPrefixMatch = true)
+    result shouldBe Seq("author1 Test", "author2 Test", "random author")
   }
 
   it should "return auto completion for the exact match author name" in {
-    val result: Seq[String] = checkAutoCompletion("random")
+    val result: Seq[String] = checkAutoCompletion("random", isPrefixMatch = true)
     result shouldBe Seq("random author")
   }
 
@@ -155,14 +153,15 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     isDeleted shouldBe true
   }
 
-  private def checkAutoCompletion(searchedText: String): Seq[String] = {
-    val getAuthorCompletion: Future[Response[SearchResponse]] =
-      searchDao.completeAuthorNames(searchedText)
-    val autoCompletionAuthors: SearchResponse =
-      Await.result(getAuthorCompletion, Duration.Inf).result
-    val result: Seq[CompletionSuggestionOption] = autoCompletionAuthors
-      .suggestions(SuggestionName.completionAuthor.toString)
-      .flatMap(_.toCompletion.options)
-    result.map(_.text)
+  private def checkAutoCompletion(searchedText: String, isPrefixMatch: Boolean = false): Seq[String] = {
+    val getAuthorCompletion: Future[Response[SearchResponse]] = searchDao.completeAuthorNames(searchedText)
+    val autoCompletionAuthors: SearchResponse                 = Await.result(getAuthorCompletion, Duration.Inf).result
+
+    if (isPrefixMatch) autoCompletionAuthors.to[AuthorSearchResponse].toList.map(_.quoteDetails.author)
+    else
+      autoCompletionAuthors
+        .suggestions(CompletionCustomSuggestion.suggestionName)
+        .flatMap(_.toCompletion.options)
+        .map(_.text)
   }
 }

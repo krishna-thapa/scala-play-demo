@@ -63,6 +63,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
   def searchAuthors(parameter: String): Seq[String] = {
     // Left space is ignored and right space is used to search for next word
     val inputParam: String = parameter.replaceAll("^\\s+", "").toLowerCase
+    log.info(s"Searching authors in Postgres table quotes for the input parameter: $inputParam")
     runDbAction(
       QuoteQueriesTable.quoteQueries
         .groupBy(_.author)

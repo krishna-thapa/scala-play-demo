@@ -7,13 +7,14 @@ import com.sksamuel.elastic4s.playjson.playJsonHitReader
 import com.sksamuel.elastic4s.requests.bulk.BulkResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
 import com.sksamuel.elastic4s.requests.searches.{ CompletionSuggestionOption, SearchResponse }
-import config.SuggestionName
-import models.{ AuthorCompletion, CompletionResponseType, QuoteWithAuthor }
+import config.CompletionCustomSuggestion
+import models.{ AuthorCompletion, AuthorSearchResponse, CompletionResponseType, QuoteWithAuthor }
 import play.api.libs.json.{ JsResult, Json }
 import play.api.mvc.Result
-import play.api.mvc.Results.{ NotFound, Ok }
+import play.api.mvc.Results.Ok
 
 import scala.concurrent.Future
+import scala.util.{ Failure, Success, Try }
 
 object EsResponseHandler extends ResponseError {
 
@@ -44,10 +45,32 @@ object EsResponseHandler extends ResponseError {
   )(implicit indexName: String): Result = {
     if (isResponseResult) {
       log.info(s"Total hits for the searched text: ${response.size}")
-      val records = response.to[QuoteWithAuthor].toList
-      Ok(Json.toJson(records))
+      quoteAuthorSearchedResponse(response)
     } else {
       notFound(EsPlaceHolder(EmptyDbMsg.msg))
+    }
+  }
+
+  /*
+    Either Search Response is the list of QuoteWithAuthor that is the response when the user search for the full quote
+      using the quote as an input parameter for search
+    Else it will be the list of AuthorSearchResponse that is the response when the user search for the author and it
+      matched the response using prefix match ES API instead os using any Search Suggestion API
+   */
+  private def quoteAuthorSearchedResponse(response: SearchResponse) = {
+    val tryQuotesWithAuthor: Seq[Try[QuoteWithAuthor]] = response.safeTo[QuoteWithAuthor].toList
+    Try(tryQuotesWithAuthor.map(_.get)) match {
+      case Success(quotesWithAuthor) => Ok(Json.toJson(quotesWithAuthor))
+      case Failure(_) =>
+        val authorSearchResponse = response.to[AuthorSearchResponse].toList
+        Ok(
+          Json.toJson(
+            AuthorCompletion(
+              CompletionResponseType.PrefixMatchCompletion,
+              authorSearchResponse.map(_.quoteDetails.author).distinct
+            )
+          )
+        )
     }
   }
 
@@ -70,12 +93,11 @@ object EsResponseHandler extends ResponseError {
 
     val searchResponse: Seq[CompletionSuggestionOption] =
       response
-        .suggestions(SuggestionName.completionAuthor.toString)
+        .suggestions(CompletionCustomSuggestion.suggestionName)
         .flatMap(_.toCompletion.options)
 
-    if (searchResponse.isEmpty) NotFound("Searched author not found")
+    if (searchResponse.isEmpty) notFound(EsPlaceHolder("Searched author not found"))
     else {
-      // Need to sort in FE code as per input text
       val results: Seq[String] = searchResponse.map(_.text)
       Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results)))
     }
