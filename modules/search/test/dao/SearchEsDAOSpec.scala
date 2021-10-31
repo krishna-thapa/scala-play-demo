@@ -113,14 +113,16 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   }
 
   it should "return result with correct limit" in {
-    val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote", limit = 1)
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val getMatchedQuote: Future[Response[SearchResponse]] =
+      searchDao.searchQuote("quote", limit = 1)
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
     matchedQuote.hits.size shouldBe 1
   }
 
   it should "return result with correct offset" in {
-    val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("Test", offset = 1)
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val getMatchedQuote: Future[Response[SearchResponse]] =
+      searchDao.searchQuote("Test", offset = 1)
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
     matchedQuote.hits.size shouldBe 1
   }
 
@@ -153,11 +155,17 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     isDeleted shouldBe true
   }
 
-  private def checkAutoCompletion(searchedText: String, isPrefixMatch: Boolean = false): Seq[String] = {
-    val getAuthorCompletion: Future[Response[SearchResponse]] = searchDao.completeAuthorNames(searchedText)
-    val autoCompletionAuthors: SearchResponse                 = Await.result(getAuthorCompletion, Duration.Inf).result
+  private def checkAutoCompletion(
+      searchedText: String,
+      isPrefixMatch: Boolean = false
+  ): Seq[String] = {
+    val getAuthorCompletion: Future[Response[SearchResponse]] =
+      searchDao.completeAuthorNames(searchedText)
+    val autoCompletionAuthors: SearchResponse =
+      Await.result(getAuthorCompletion, Duration.Inf).result
 
-    if (isPrefixMatch) autoCompletionAuthors.to[AuthorSearchResponse].toList.map(_.quoteDetails.author)
+    if (isPrefixMatch)
+      autoCompletionAuthors.to[AuthorSearchResponse].toList.map(_.quoteDetails.author)
     else
       autoCompletionAuthors
         .suggestions(CompletionCustomSuggestion.suggestionName)

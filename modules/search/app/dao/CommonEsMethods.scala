@@ -5,7 +5,12 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.mappings.{ CompletionField, MappingDefinition, ObjectField, TextField }
+import com.sksamuel.elastic4s.requests.mappings.{
+  CompletionField,
+  MappingDefinition,
+  ObjectField,
+  TextField
+}
 import com.sksamuel.elastic4s.requests.searches.queries.matches.MatchPhrasePrefix
 import com.sksamuel.elastic4s.requests.searches.sort.ScoreSort
 import com.sksamuel.elastic4s.requests.searches.sort.SortOrder.Desc
@@ -90,7 +95,9 @@ trait CommonEsMethods extends InitEs with Logging {
       limit: Int = 10,
       isSourceInclude: Boolean = false
   ): Future[Response[SearchResponse]] = {
-    log.info(s"Searching match prefix in index: $indexName for searched text: $inputText in column field: $columnName")
+    log.info(
+      s"Searching match prefix in index: $indexName for searched text: $inputText in column field: $columnName"
+    )
 
     val query: MatchPhrasePrefix     = matchPhrasePrefixQuery(s"quoteDetails.$columnName", inputText)
     val searchRequest: SearchRequest = search(indexName).query(query)
