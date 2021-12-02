@@ -9,7 +9,7 @@ object Dependencies {
     val playjwt         = "5.0.0"
     val bcrypt          = "4.3.0"
     val quartzScheduler = "1.8.5-akka-2.6.x"
-    val akkaVersion     = "2.6.13"
+    val akkaVersion     = "2.6.17"
 
     // Database
     val monogoDb   = "1.0.4-play28"
@@ -34,10 +34,12 @@ object Dependencies {
 
     // Akka
     lazy val akka = Seq(
-      "com.typesafe.akka" %% "akka-stream"                % Versions.akkaVersion,
-      "com.typesafe.akka" %% "akka-actor-typed"           % Versions.akkaVersion,
-      "com.typesafe.akka" %% "akka-serialization-jackson" % Versions.akkaVersion,
-      "com.typesafe.akka" %% "akka-slf4j"                 % Versions.akkaVersion
+      "com.typesafe.akka"  %% "akka-stream"                % Versions.akkaVersion,
+      "com.typesafe.akka"  %% "akka-actor-typed"           % Versions.akkaVersion,
+      "com.typesafe.akka"  %% "akka-serialization-jackson" % Versions.akkaVersion,
+      "com.typesafe.akka"  %% "akka-slf4j"                 % Versions.akkaVersion,
+      "com.lightbend.akka" %% "akka-stream-alpakka-csv"    % "3.0.4",
+      "com.lightbend.akka" %% "akka-stream-alpakka-slick"  % "3.0.4"
     )
 
     // Reactive Mongo DB
