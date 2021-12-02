@@ -33,6 +33,7 @@ lazy val quotes = project
   .settings(
     libraryDependencies ++=
       commonDependencies ++
+        akka ++
         slickDatabaseDependencies ++
         testContainerDependencies ++
         Seq(
