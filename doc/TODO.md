@@ -8,10 +8,10 @@
 
 ### Update the Elastic search of the quotes with auto suggestion and completion
 
-- https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-suggesters.html#completion-suggester
-- https://dev.to/ankitutekar/series/12283
-- Use of CompletionSuggestion/PhraseSuggestion from elastic4s to do advance
+- [x] https://www.elastic.co/guide/en/elasticsearch/reference/7.12/search-suggesters.html#completion-suggester
+- [x] https://dev.to/ankitutekar/series/12283
+- [x] Use of CompletionSuggestion/PhraseSuggestion from elastic4s to do advance
 
 ### Update the Akka Stream with Alpakka
 
-- https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html
+- [x] https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html

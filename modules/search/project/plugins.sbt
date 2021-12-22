@@ -1,1 +1,2 @@
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.4")
+// The Play plugin
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.7")

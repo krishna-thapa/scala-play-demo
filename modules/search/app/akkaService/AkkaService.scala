@@ -28,8 +28,7 @@ class AkkaService @Inject()(
 
   override def batchSize: Int = config.get[Int]("wiki.batchSize")
 
-  override val esConfig: ElasticsearchConfig =
-    config.get[ElasticsearchConfig]("elasticsearch")
+  override val esConfig: ElasticsearchConfig = config.get[ElasticsearchConfig]("elasticsearch")
 
   override val dbConfig = quotesDAO.dbConfig
 
