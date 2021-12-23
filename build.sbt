@@ -129,6 +129,13 @@ swaggerDomainNameSpaces := Seq(
   "com.krishna.model"
 )
 
+// Configuration for sbt-dependency-check
+// https://github.com/albuch/sbt-dependency-check#configuration
+dependencyCheckFormats := Seq("JSON", "HTML")
+dependencyCheckSkipOptionalScope := true
+dependencyCheckSkipProvidedScope := true
+dependencyCheckSkipRuntimeScope := true
+
 scalacOptions ++= Seq(
   "-feature",
   "-deprecation",

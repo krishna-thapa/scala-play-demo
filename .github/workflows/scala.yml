@@ -20,3 +20,16 @@ jobs:
         run: |
           sbt clean compile
           sbt test
+      - name: Dependency Check
+        run: |
+          sbt -v -Dfile.encoding=UTF-8 dependencyCheck
+      - name: Print all the vulnerabilities
+        run: |
+          chmod +x ./.github/scripts/dependencyCheck.sh
+          ./.github/scripts/dependencyCheck.sh "target/scala-2.13/dependency-check-report.json" true
+        shell: bash
+      - name: HTML Preview for Dependency check report # Won't work if previous run doesn't create HTML file
+        id: html_preview
+        uses: pavi2410/html-preview-action@v2
+        with:
+          html_file: 'target/scala-2.13/dependency-check-report.html'

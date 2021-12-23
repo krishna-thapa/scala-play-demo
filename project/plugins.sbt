@@ -29,3 +29,6 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
 // https://github.com/scoverage/scalac-scoverage-plugin
 // sbt sbtScoverageDoc
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.1")
+
+// https://github.com/albuch/sbt-dependency-check
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.3.0")

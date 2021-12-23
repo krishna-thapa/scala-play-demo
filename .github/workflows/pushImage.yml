@@ -19,4 +19,3 @@ jobs:
           registry: ghcr.io
           repository: krishna-thapa/inspirational-quote-api/inspirational-quote-api
           tag_with_ref: true
-          # tags: foo
