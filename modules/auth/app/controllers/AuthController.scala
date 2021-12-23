@@ -97,7 +97,7 @@ class AuthController @Inject()(
   def getUserInfo(email: String): Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    val userInfo: Result = DecodeHeader().apply(request.headers) match {
+    val userInfo: Result = DecodeHeader(request.headers) match {
       case Right(user) =>
         authService.getUserInfoService(user, email)
       case Left(errorMsg) => responseErrorResult(errorMsg)
@@ -112,7 +112,7 @@ class AuthController @Inject()(
     */
   def updateUserInfo: Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing updateUserInfo Controller")
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         AuthForms.signUpForm
           .bindFromRequest()

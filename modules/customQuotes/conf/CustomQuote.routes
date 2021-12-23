@@ -48,7 +48,7 @@ GET         /:id            controllers.customQuotes.CustomQuoteController.getSe
 #      required: true
 #      description: Create a new Quote
 #      schema:
-#        $ref: '#/definitions/forms.CustomQuoteForm'
+#        $ref: '#/definitions/forms.RequestForm.CustomQuoteForm'
 #  responses:
 #    200:
 #      description: success
@@ -84,7 +84,7 @@ DELETE      /:id            controllers.customQuotes.CustomQuoteController.delet
 #      required: true
 #      description: Update a existing record
 #      schema:
-#        $ref: '#/definitions/forms.CustomQuoteForm'
+#        $ref: '#/definitions/forms.RequestForm.CustomQuoteForm'
 #  responses:
 #    200:
 #      description: success

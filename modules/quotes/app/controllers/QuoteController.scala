@@ -64,7 +64,7 @@ class QuoteController @Inject()(
     */
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing get last five quotes of the day")
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Left(_) =>
         log.info("Getting cached quotes for users that are not logged in")
         quoteService.cachedQuotesService(None)
@@ -98,7 +98,7 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action and should be stored to user's id only
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing favQuote by user: ${user.email}")
         quoteService.updateFavQuoteService(csvId: String, user)
@@ -112,7 +112,7 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action and should retrieve their own fav quotes only
     */
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing getFavQuotes by user: ${user.email}")
         quoteService.getFavQuotesService(user.id)

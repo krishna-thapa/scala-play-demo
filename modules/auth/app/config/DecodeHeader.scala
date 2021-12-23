@@ -9,9 +9,9 @@ import play.api.mvc.Headers
 
 import scala.util.{ Failure, Success }
 
-case class DecodeHeader()(implicit conf: Configuration) extends JwtKey {
+object DecodeHeader extends JwtKey {
 
-  def apply(headers: Headers): Either[ErrorMsg, UserDetail] = {
+  def apply(headers: Headers)(implicit conf: Configuration): Either[ErrorMsg, UserDetail] = {
     // check if the header has 'Authorization' field or not
     headers.get("Authorization") match {
       case Some(token) => getUserDetails(token)
@@ -19,7 +19,7 @@ case class DecodeHeader()(implicit conf: Configuration) extends JwtKey {
     }
   }
 
-  private def getUserDetails(token: String): Either[ErrorMsg, UserDetail] = {
+  private def getUserDetails(token: String)(implicit conf: Configuration): Either[ErrorMsg, UserDetail] = {
     // Default Signature algorithm, defined in app config under: play.http.session.algorithm
     JwtJson.decodeJson(token, secretKey, Seq(JwtAlgorithm.HS256)) match {
       case Success(value)     => Right((value \ jwtSessionKey).as[UserDetail])

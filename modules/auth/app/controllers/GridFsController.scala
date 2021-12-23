@@ -32,7 +32,7 @@ class GridFsController @Inject()(
   // Save the user profile picture in the mongo db with email as user id
   def saveUserPicture: Action[MultipartFormData[ReadFile[BSONValue, BSONDocument]]] =
     UserAction.async(gridFSBodyParser(gridFsAttachmentService.gridFS)) { request =>
-      DecodeHeader().apply(request.headers) match {
+      DecodeHeader(request.headers) match {
         case Right(user) =>
           log.info(s"Executing saveUserPicture for the request user email: ${user.email}")
           val fileOption: Option[MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]] =
@@ -49,7 +49,7 @@ class GridFsController @Inject()(
 
   // Returns a future Result that serves the first matched file, or a NotFound result.
   def getAttachedPicture: Action[AnyContent] = UserAction.async { request =>
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing getAttachedPicture for the request user email: ${user.email}")
         getAttachment(user.email)
@@ -59,7 +59,7 @@ class GridFsController @Inject()(
 
   // Removes a attachment picture from index store.
   def removeAttachedPicture: Action[AnyContent] = UserAction.async { request =>
-    DecodeHeader().apply(request.headers) match {
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         log.info(s"Executing removeAttachedPicture for the request user email: ${user.email}")
         gridFsAttachmentService

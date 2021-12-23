@@ -1,6 +1,6 @@
 package controllers.search
 
-import akkaService.AkkaService
+import akkaService.{ AkkaService, ExtendedAkkaService }
 import com.krishna.util.FutureErrorHandler.ErrorRecover
 import com.krishna.util.Logging
 import dao.SearchInEsDAO
@@ -16,7 +16,8 @@ import scala.concurrent.ExecutionContext
 class SearchController @Inject()(
     scc: SecuredControllerComponents,
     searchInEsDao: SearchInEsDAO,
-    akkaService: AkkaService
+    akkaService: AkkaService,
+    extendedAkkaService: ExtendedAkkaService
 )(implicit executionContext: ExecutionContext)
     extends SecuredController(scc)
     with Logging {
@@ -52,6 +53,21 @@ class SearchController @Inject()(
 
     akkaService.createCompletionAndInsert
       .map(_ => Ok("Success"))
+      .errorRecover
+  }
+
+  /**
+    * Akka Stream using Alpakka framework
+    * First reads and convert the CSV contents to Class objects and then runs the Wiki Media Service to get the
+    * author details and finally upload the records in Postgres Database using TS-Vector data type of Postgres
+    * for the full text service
+    * @return String to notify the response from Akka Stream
+    */
+  def migrateCSVRecordsToPostgres: Action[AnyContent] = AdminAction.async { implicit request =>
+    log.info("Executing migrateCSVRecordsToPostgres Controller")
+
+    extendedAkkaService.runCSVMigrationStream
+      .map(response => Ok(s"Response from Akka Stream: $response"))
       .errorRecover
   }
 

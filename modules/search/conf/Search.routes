@@ -79,7 +79,7 @@ GET     /es/author        controllers.search.SearchController.getAuthorsAutoSugg
 #  security:
 #    - TokenKey: []
 ###
-POST    /pg/migrate        controllers.search.SearchController.writeInEs(records: Int ?= 50)
+POST    /slick/pg/migrate        controllers.search.SearchController.writeInEs(records: Int ?= 50)
 
 ###
 #  summary: Gets the all the records from Postgres quotes table and store in ElasticSearch Index under "quotes" using Akka streams.
@@ -100,7 +100,28 @@ POST    /pg/migrate        controllers.search.SearchController.writeInEs(records
 #  security:
 #    - TokenKey: []
 ###
-POST    /akka/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
+POST    /akka/pg/es/migrate        controllers.search.SearchController.writeMigrateQuotesToEs
+
+###
+#  summary: Gets the all the records from CSV file and do data transformation and finally stores in Postgres quotes table using Akka streams.
+#  description: "It will migrate all the CSV contents to Postgres table and this can only be done by Admin role"
+#  tags:
+#    - Search
+#  responses:
+#    200:
+#      description: Success response after writing on Postgres Database table.
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden
+#    404:
+#      description: CSV file not found.
+#    502:
+#      description: Bad Gateway - Connection refused.
+#  security:
+#    - TokenKey: []
+###
+POST    /akka/csv/pg/migrate        controllers.search.SearchController.migrateCSVRecordsToPostgres
 
 ###
 #  summary: Delete the index quotes from ES - Should be used for the development purpose only.

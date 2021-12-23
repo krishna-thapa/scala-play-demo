@@ -125,6 +125,6 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(im
     * @return Either error message or User details
     */
   def decoderHeader(request: Request[AnyContent]): Either[ErrorMsg, UserDetail] = {
-    DecodeHeader().apply(request.headers)
+    DecodeHeader(request.headers)
   }
 }
