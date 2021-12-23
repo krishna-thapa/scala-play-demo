@@ -17,7 +17,7 @@ trait PostgresInstance extends GenericFlatSpec with GuiceOneAppPerSuite with Tes
   // Start the connection
   val container: PostgreSQLContainer = startContainers()
 
-  // Initialize the Database connection using PostgreSQLContainer
+  // Initialize the Database connection using PostgresSQLContainer
   override val dbConfig: JdbcBackend.DatabaseDef = {
     Database.forURL(
       url = container.jdbcUrl,

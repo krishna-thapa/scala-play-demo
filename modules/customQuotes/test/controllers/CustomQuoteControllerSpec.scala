@@ -49,7 +49,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
     "dummy Quote",
     None,
     Some(Genre.cool),
-    Date.valueOf("2015-03-31"),
+    Date.valueOf("2015-03-01"),
     ownQuote = false
   )
   when(mockCustomQuoteQueryDAO.decoderHeader(mockRequest)).thenReturn(Right(mockUserDetail))
@@ -61,7 +61,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
       val result: Future[Result] = customQuoteController.getCustomQuotes.apply(mockRequest)
       val bodyText: String       = contentAsString(result)
       bodyText mustBe
-        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}]""".stripMargin
+        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
 
     "getRandomCustomQuote should give random quote only" in {
@@ -70,7 +70,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
       val result: Future[Result] = customQuoteController.getRandomCustomQuote.apply(mockRequest)
       val bodyText: String       = contentAsString(result)
       bodyText mustBe
-        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}]""".stripMargin
+        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
 
     "getSelectedQuote should give selected quote only" in {
@@ -78,7 +78,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
       val result: Future[Result] = customQuoteController.getSelectedQuote(1).apply(mockRequest)
       val bodyText: String       = contentAsString(result)
       bodyText mustBe
-        """{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}""".stripMargin
+        """{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}""".stripMargin
     }
 
     "deleteCustomQuote should delete selected quote only" in {

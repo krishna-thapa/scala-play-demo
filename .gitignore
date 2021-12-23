@@ -7,3 +7,8 @@ target
 
 #Docker local mounted volume for the MacOS
 /pgdata/
+
+# Can't upload the Full quotes csv. Github has limit file size limit of 100 MB
+# and Full quotes has the size of 137.7 MB. Hence use script to download the file
+# from Google Drive which can be access by anyone
+/data/Full_Quotes.csv
