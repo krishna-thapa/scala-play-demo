@@ -85,8 +85,7 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
     import play.api.libs.streams.Accumulator
 
     parse.multipartFormData {
-      case PlaySupport.FileInfo(partName, filename, Some(contentType))
-          if contentType.startsWith("image") =>
+      case PlaySupport.FileInfo(partName, filename, Some(contentType)) if contentType.startsWith("image") =>
         Accumulator.flatten(gfs.map { gridFS =>
           val fileRef = gridFS.fileToSave( // see Api.scala
             filename = Some(filename),

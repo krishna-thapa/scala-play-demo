@@ -11,8 +11,7 @@ import play.api.libs.json.Json
 import javax.inject._
 import scala.concurrent.duration.DurationInt
 
-class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Configuration)
-    extends ResponseError {
+class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Configuration) extends ResponseError {
 
   /*
     A cache API that uses synchronous calls rather than async calls.

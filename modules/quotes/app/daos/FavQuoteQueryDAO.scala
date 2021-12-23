@@ -16,9 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
-    extends FavQuoteServices
-    with DbRunner {
+class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends FavQuoteServices with DbRunner {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 

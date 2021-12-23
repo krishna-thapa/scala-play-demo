@@ -17,8 +17,7 @@ object AuthorDetails {
       (JsPath \\ "imagerUrl").readNullable[String] and
       (JsPath \\ "description").readNullable[Seq[String]]
   ).apply(
-    (title, sourceUrl, imageUrl, description) =>
-      AuthorDetails(title, sourceUrl.orElse(imageUrl), description)
+    (title, sourceUrl, imageUrl, description) => AuthorDetails(title, sourceUrl.orElse(imageUrl), description)
   )
 
   implicit val writeJson: Writes[AuthorDetails] = Json.writes[AuthorDetails]

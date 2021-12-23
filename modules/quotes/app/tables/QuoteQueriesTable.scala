@@ -7,9 +7,7 @@ import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, Tag }
 import com.krishna.util.Implicits._
 
-class QuoteQueriesTable(tag: Tag)
-    extends Table[QuotesQuery](tag, "quotes")
-    with TableWithCSVId[QuotesQuery] {
+class QuoteQueriesTable(tag: Tag) extends Table[QuotesQuery](tag, "quotes") with TableWithCSVId[QuotesQuery] {
 
   def quote: Rep[String]          = column[String]("quote")
   def author: Rep[Option[String]] = column[Option[String]]("author")

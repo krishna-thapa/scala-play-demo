@@ -9,11 +9,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import slick.jdbc.JdbcBackend
 import slick.jdbc.JdbcBackend.Database
 
-trait PostgresInstance
-    extends GenericFlatSpec
-    with GuiceOneAppPerSuite
-    with TestContainerForAll
-    with LoadQueries {
+trait PostgresInstance extends GenericFlatSpec with GuiceOneAppPerSuite with TestContainerForAll with LoadQueries {
 
   // Define a Postgres Container for test docker
   override val containerDef: PostgreSQLContainer.Def = PostgreSQLContainer.Def()

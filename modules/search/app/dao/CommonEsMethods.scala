@@ -5,12 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.mappings.{
-  CompletionField,
-  MappingDefinition,
-  ObjectField,
-  TextField
-}
+import com.sksamuel.elastic4s.requests.mappings.{ CompletionField, MappingDefinition, ObjectField, TextField }
 import com.sksamuel.elastic4s.requests.searches.queries.matches.MatchPhrasePrefix
 import com.sksamuel.elastic4s.requests.searches.sort.ScoreSort
 import com.sksamuel.elastic4s.requests.searches.sort.SortOrder.Desc
