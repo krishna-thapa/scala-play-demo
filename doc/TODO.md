@@ -15,3 +15,8 @@
 ### Update the Akka Stream with Alpakka
 
 - [x] https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html
+
+### Store CSV file in public online cloud storage
+- S3
+- DropBox
+- Google Drive

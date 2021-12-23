@@ -1,11 +1,7 @@
-# An example controller showing how to use dependency injection
-# Protecting against Cross Site Request Forgery: https://www.playframework.com/documentation/2.8.x/ScalaCsrf
-# disable the CSRF filter for a specific route in the routes file. To do this, add the 'nocsrf' modifier tag before your route
-
 ###
 #  summary: Get all the quotes from a custom build quote table
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  responses:
 #    200:
 #      schema:
@@ -13,12 +9,12 @@
 #  security:
 #    - TokenKey: []
 ###
-GET         /all            controllers.customQuote.CustomQuoteController.getCustomQuotes
+GET         /all            controllers.customQuotes.CustomQuoteController.getCustomQuotes
 
 ###
 #  summary: Get a random quote from a custom build quote table
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  responses:
 #    200:
 #      schema:
@@ -26,12 +22,12 @@ GET         /all            controllers.customQuote.CustomQuoteController.getCus
 #  security:
 #    - TokenKey: []
 ###
-GET         /random         controllers.customQuote.CustomQuoteController.getRandomCustomQuote
+GET         /random         controllers.customQuotes.CustomQuoteController.getRandomCustomQuote
 
 ###
 #  summary: Get a selected quote from a custom build quote table
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  responses:
 #    200:
 #      schema:
@@ -39,13 +35,13 @@ GET         /random         controllers.customQuote.CustomQuoteController.getRan
 #  security:
 #    - TokenKey: []
 ###
-GET         /:id            controllers.customQuote.CustomQuoteController.getSelectedQuote(id: Int)
+GET         /:id            controllers.customQuotes.CustomQuoteController.getSelectedQuote(id: Int)
 
 ###
 #  summary: Create a new custom quote to the table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  parameters:
 #    - name: body
 #      in: body
@@ -61,13 +57,13 @@ GET         /:id            controllers.customQuote.CustomQuoteController.getSel
 #  security:
 #    - TokenKey: []
 ###
-POST        /               controllers.customQuote.CustomQuoteController.addCustomQuote()
+POST        /               controllers.customQuotes.CustomQuoteController.addCustomQuote()
 
 ###
 #  summary: Delete a selected quote from a custom build quote table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  responses:
 #    200:
 #      schema:
@@ -75,13 +71,13 @@ POST        /               controllers.customQuote.CustomQuoteController.addCus
 #  security:
 #    - TokenKey: []
 ###
-DELETE      /:id            controllers.customQuote.CustomQuoteController.deleteCustomQuote(id: Int)
+DELETE      /:id            controllers.customQuotes.CustomQuoteController.deleteCustomQuote(id: Int)
 
 ###
 #  summary: Update a existing custom quote record in the table
 #  description: "This can only be done by the logged in user."
 #  tags:
-#    - CustomQuoteQueryBuild
+#    - CustomQuote
 #  parameters:
 #    - name: body
 #      in: body
@@ -101,4 +97,4 @@ DELETE      /:id            controllers.customQuote.CustomQuoteController.delete
 #  security:
 #    - TokenKey: []
 ###
-PUT         /:id            controllers.customQuote.CustomQuoteController.updateCustomQuote(id: Int)
+PUT         /:id            controllers.customQuotes.CustomQuoteController.updateCustomQuote(id: Int)

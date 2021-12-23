@@ -17,7 +17,7 @@ object Genre extends GenericEnum {
   food, funny, future, gardening, god, government, great, graduation, history,
   health, imagination, inspirational, intelligence, jealousy, knowledge,
   leadership, learning, legal, marriage, men, medical, mom, money, morning,
-  motivational, movies, music, movingon, nature, parenting, patriotism, peace,
+  motivational, movies, music, movingon, nature, other, parenting, patriotism, peace,
   pet, positive, power, religion, respect, relationship, science, smile,
   success, romantic, sad, teacher, society, teen, thankful, sports, strength,
   sympathy, technology, travel, truth, wisdom, wedding, christmas, easter,

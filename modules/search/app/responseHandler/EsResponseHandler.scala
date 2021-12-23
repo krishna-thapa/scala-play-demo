@@ -57,7 +57,7 @@ object EsResponseHandler extends ResponseError {
     Else it will be the list of AuthorSearchResponse that is the response when the user search for the author and it
       matched the response using prefix match ES API instead os using any Search Suggestion API
    */
-  private def quoteAuthorSearchedResponse(response: SearchResponse) = {
+  private def quoteAuthorSearchedResponse(response: SearchResponse): Result = {
     val tryQuotesWithAuthor: Seq[Try[QuoteWithAuthor]] = response.safeTo[QuoteWithAuthor].toList
     Try(tryQuotesWithAuthor.map(_.get)) match {
       case Success(quotesWithAuthor) => Ok(Json.toJson(quotesWithAuthor))

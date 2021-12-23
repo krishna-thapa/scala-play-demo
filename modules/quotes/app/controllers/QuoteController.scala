@@ -5,11 +5,13 @@ import com.krishna.model.Genre.Genre
 import com.krishna.response.ResponseResult
 import com.krishna.util.Logging
 import depInject.{ SecuredController, SecuredControllerComponents }
+
 import javax.inject._
 import model.UserDetail
 import play.api.mvc._
 import service.QuoteQueryService
 import config.DecodeHeader
+import play.api.Configuration
 
 import scala.concurrent.ExecutionContext
 
@@ -21,7 +23,7 @@ import scala.concurrent.ExecutionContext
 class QuoteController @Inject()(
     quoteService: QuoteQueryService,
     scc: SecuredControllerComponents
-)(implicit executionContext: ExecutionContext)
+)(implicit executionContext: ExecutionContext, config: Configuration)
     extends SecuredController(scc)
     with ResponseResult
     with Logging {
@@ -62,7 +64,7 @@ class QuoteController @Inject()(
     */
   def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
     log.info("Executing get last five quotes of the day")
-    DecodeHeader(request.headers) match {
+    DecodeHeader().apply(request.headers) match {
       case Left(_) =>
         log.info("Getting cached quotes for users that are not logged in")
         quoteService.cachedQuotesService(None)
@@ -96,7 +98,7 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action and should be stored to user's id only
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
-    DecodeHeader(request.headers) match {
+    DecodeHeader().apply(request.headers) match {
       case Right(user) =>
         log.info(s"Executing favQuote by user: ${user.email}")
         quoteService.updateFavQuoteService(csvId: String, user)
@@ -110,7 +112,7 @@ class QuoteController @Inject()(
     * Only the logged user can perform this action and should retrieve their own fav quotes only
     */
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
-    DecodeHeader(request.headers) match {
+    DecodeHeader().apply(request.headers) match {
       case Right(user) =>
         log.info(s"Executing getFavQuotes by user: ${user.email}")
         quoteService.getFavQuotesService(user.id)
@@ -131,10 +133,9 @@ class QuoteController @Inject()(
   /**
     * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
     */
-  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
-    implicit request =>
-      log.info("Executing getAuthorsAutocomplete")
-      responseSeqString(quoteService.searchAuthorsSql(parameter))
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction { implicit request =>
+    log.info("Executing getAuthorsAutocomplete")
+    responseSeqString(quoteService.searchAuthorsSql(parameter))
   }
 
 }

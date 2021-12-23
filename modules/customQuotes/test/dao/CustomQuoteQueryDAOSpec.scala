@@ -16,8 +16,7 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
   loadQueries("customQuoteTestQueries")
 
   // Initialize the customQuoteQueryDAO class
-  val customQuoteQueryDAO: CustomQuoteQueryDAO =
-    Application.instanceCache[CustomQuoteQueryDAO].apply(app)
+  val customQuoteQueryDAO: CustomQuoteQueryDAO = Application.instanceCache[CustomQuoteQueryDAO].apply(app)
 
   val customQuoteForm: CustomQuoteForm = CustomQuoteForm(
     quote = "Demo quote1",

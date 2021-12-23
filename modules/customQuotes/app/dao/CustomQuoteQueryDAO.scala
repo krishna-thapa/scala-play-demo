@@ -1,12 +1,16 @@
 package dao
 
+import com.krishna.response.ErrorMsg
 import com.krishna.services.RepositoryUserMethods
+import com.krishna.util.DbRunner
 import com.krishna.util.Implicits.genreEnumMapper
-import com.krishna.util.{ DbRunner, Logging }
+import config.DecodeHeader
 import forms.CustomQuoteForm
 import model.UserDetail
 import models.CustomQuotesQuery
+import play.api.Configuration
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.mvc.{ AnyContent, Request }
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import table.CustomQuotesQueriesTable
@@ -24,10 +28,9 @@ import scala.util.Try
   */
 
 @Singleton
-class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit config: Configuration)
     extends RepositoryUserMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
-    with DbRunner
-    with Logging {
+    with DbRunner {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
@@ -35,32 +38,28 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     CustomQuotesQueriesTable.customQuoteQueries
 
   /**
-    * List all the records from the table
+    * List all the CustomQuotesQuery records from the table
     * @param userId: Logged in user id
     * @return sequence of the CustomQuotesQuery records
     */
-  def listAllQuotes(userId: Int): Seq[CustomQuotesQuery] =
-    runDbAction(getAllQuotesForUser(userId))
+  def listAllQuotes(userId: Int): Seq[CustomQuotesQuery] = runDbAction(getAllQuotesForUser(userId))
 
   /**
-    * List the JSON format of the selected record from the table for logged in user
+    * List the selected CustomQuotesQuery record from the table
     * @param id quote id
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = {
-    runDbAction(getSelectedQuote(id, userId))
-  }
+  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = runDbAction(getSelectedQuote(id, userId))
 
   /**
-    * Return a random custom inserted query for a logged in user specific
+    * Return a random CustomQuotesQuery record for a logged in user
     * @param records number of random records to return
     * @param userId logged in user id
-    * @return Option of CustomQuotesQuery
+    * @return Option of the CustomQuotesQuery record
     */
-  def listRandomQuote(records: Int, userId: Int): Seq[CustomQuotesQuery] = {
+  def listRandomQuote(records: Int, userId: Int): Seq[CustomQuotesQuery] =
     runDbAction(getRandomRecords(records, userId))
-  }
 
   /**
     * Create a customQuotes in the table.
@@ -77,8 +76,7 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
         ) => fields.copy(id = id)
     )
     // If the ownQuote flag is false, use provided author name, else use user full name
-    val author: String =
-      if (customQuoteForm.ownQuote) user.name else customQuoteForm.author.getOrElse(user.name)
+    val author: String = if (customQuoteForm.ownQuote) user.name else customQuoteForm.author.getOrElse(user.name)
 
     val action = insertQuery += CustomQuotesQuery(
       0,
@@ -121,4 +119,12 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     runDbAction(deleteCustomQuote(id, userId))
   }
 
+  /**
+    * Decode Header that returns User details id request has right Auth token
+    * @param request With header contents
+    * @return Either error message or User details
+    */
+  def decoderHeader(request: Request[AnyContent]): Either[ErrorMsg, UserDetail] = {
+    DecodeHeader().apply(request.headers)
+  }
 }

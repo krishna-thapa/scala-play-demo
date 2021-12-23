@@ -19,6 +19,5 @@ final case class CustomQuotesQuery(
     with WithUserIdResource
 
 object CustomQuotesQuery {
-  implicit lazy val customerQuotesFormat: OFormat[CustomQuotesQuery] =
-    Json.format[CustomQuotesQuery]
+  implicit lazy val customerQuotesFormat: OFormat[CustomQuotesQuery] = Json.format[CustomQuotesQuery]
 }

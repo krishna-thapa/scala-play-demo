@@ -1,19 +1,15 @@
 package config
 
-import com.krishna.conf.AppConfig
 import com.krishna.response.ErrorMsg
 import com.krishna.response.ErrorMsg.{ NoAuthorizationField, TokenDecodeFailure }
 import model.UserDetail
 import pdi.jwt.{ JwtAlgorithm, JwtJson }
+import play.api.Configuration
 import play.api.mvc.Headers
 
 import scala.util.{ Failure, Success }
 
-object DecodeHeader extends AppConfig with JwtKey {
-
-  // Get the play secret key defined in the app config file.
-  // Have to be pass as an environment variable during production
-  private val secretKey: String = config.getString("play.http.secret.key")
+case class DecodeHeader()(implicit conf: Configuration) extends JwtKey {
 
   def apply(headers: Headers): Either[ErrorMsg, UserDetail] = {
     // check if the header has 'Authorization' field or not

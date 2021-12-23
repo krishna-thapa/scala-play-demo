@@ -19,8 +19,8 @@ object Dependencies {
 
     // tests
     val scalaPlayTest  = "5.1.0"
-    val testContainers = "0.38.8"
-    val mockitoVer     = "1.13.0"
+    val testContainers = "0.39.12"
+    val mockitoVer     = "1.16.49"
 
     // logs
     val logbackEncoder = "6.6"
@@ -63,20 +63,22 @@ object Dependencies {
     )
 
     val playRedis     = "com.github.karelcemus"  %% "play-redis"                     % Versions.playRedis
-    val scalaTestPlus = "org.scalatestplus.play" %% "scalatestplus-play"             % Versions.scalaPlayTest
+    val scalaTestPlus = "org.scalatestplus.play" %% "scalatestplus-play"             % Versions.scalaPlayTest % "test"
     val testContainer = "com.dimafeng"           %% "testcontainers-scala-scalatest" % Versions.testContainers % "test"
+    val mockitoSugar  = "org.mockito"            %% "mockito-scala-scalatest"        % Versions.mockitoVer % "test"
 
     // Docker test container
     lazy val testContainerDependencies = Seq(
       testContainer,
       scalaTestPlus,
+      mockitoSugar,
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers % "test"
     )
 
     // Docker test container test kits with Mockito
     lazy val dockerTestKitWithMock = Seq(
       testContainer,
-      "org.mockito"  %% "mockito-scala-scalatest"            % Versions.mockitoVer     % "test",
+      mockitoSugar,
       "com.dimafeng" %% "testcontainers-scala-elasticsearch" % Versions.testContainers % "test"
     )
 

@@ -10,17 +10,17 @@ import depInject.{ SecuredController, SecuredControllerComponents }
 import form.{ AuthForms, SignInForm }
 
 import javax.inject.{ Inject, Singleton }
-import play.api.Configuration
 import play.api.mvc._
 import config.DecodeHeader
+import play.api.Configuration
 import service.AuthService
 
-import scala.concurrent.ExecutionContext
 @Singleton
 class AuthController @Inject()(
     scc: SecuredControllerComponents,
     authService: AuthService
-) extends SecuredController(scc)
+)(implicit conf: Configuration)
+    extends SecuredController(scc)
     with Logging
     with ResponseResult {
 
@@ -53,8 +53,7 @@ class AuthController @Inject()(
     AuthForms.signUpForm
       .bindFromRequest()
       .fold(
-        formWithErrors =>
-          badRequest(s"The signup From was not in the expected format: $formWithErrors"),
+        formWithErrors => badRequest(s"The signup From was not in the expected format: $formWithErrors"),
         signUpForm => authService.singUpService(signUpForm)
       )
       .toFuture
@@ -98,7 +97,7 @@ class AuthController @Inject()(
   def getUserInfo(email: String): Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing getUserInfo Controller")
 
-    val userInfo: Result = DecodeHeader(request.headers) match {
+    val userInfo: Result = DecodeHeader().apply(request.headers) match {
       case Right(user) =>
         authService.getUserInfoService(user, email)
       case Left(errorMsg) => responseErrorResult(errorMsg)
@@ -113,13 +112,12 @@ class AuthController @Inject()(
     */
   def updateUserInfo: Action[AnyContent] = UserAction.async { implicit request =>
     log.info("Executing updateUserInfo Controller")
-    DecodeHeader(request.headers) match {
+    DecodeHeader().apply(request.headers) match {
       case Right(user) =>
         AuthForms.signUpForm
           .bindFromRequest()
           .fold(
-            formWithErrors =>
-              badRequest(s"The update Form was not in the expected format: $formWithErrors").toFuture,
+            formWithErrors => badRequest(s"The update Form was not in the expected format: $formWithErrors").toFuture,
             userDetails => authService.updateUserInfoService(user.email, userDetails)
           )
       case Left(errorMsg) => responseErrorResult(errorMsg).toFuture

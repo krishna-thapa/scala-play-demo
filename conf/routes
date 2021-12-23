@@ -2,11 +2,11 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# CSV build endpoints for the table "quotes"
+#  API endpoints for the quote service
 ->      /quote                      Quote.Routes
 
-# CRUD operation endpoints for the custom table "custom_quotations"
-->      /customQuote                CustomQuoteQueryBuild.Routes
+# API endpoints for the CRUD operation endpoints in the custom table "custom_quotations"
+->      /customQuote                CustomQuote.Routes
 
 # API endpoints for the authService of user service
 ->      /auth                       Auth.Routes
