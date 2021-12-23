@@ -1,7 +1,7 @@
 package dao
 
 import com.krishna.model.Genre
-import forms.CustomQuoteForm
+import forms.RequestForm.CustomQuoteForm
 import helper.testContainers.PostgresInstance
 import model.UserDetail
 import models.CustomQuotesQuery

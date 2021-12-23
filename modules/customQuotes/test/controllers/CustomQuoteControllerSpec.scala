@@ -20,7 +20,7 @@ import java.sql.Date
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }
 
-class QuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
+class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
 
   implicit lazy val materializer: Materializer = app.materializer
 
@@ -32,7 +32,7 @@ class QuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPer
     mockCustomQuoteQueryDAO
   )
 
-  val parse: PlayBodyParsers             = PlayBodyParsers()
+  val parse: PlayBodyParsers             = stubPlayBodyParsers(materializer)
   val defaultParser: BodyParsers.Default = new BodyParsers.Default(parse)
   val config: Configuration              = Configuration.from(Map("play.http.session.jwtKey" -> "mockUser"))
 
@@ -55,7 +55,7 @@ class QuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPer
   when(mockCustomQuoteQueryDAO.decoderHeader(mockRequest)).thenReturn(Right(mockUserDetail))
 
   "CustomQuoteController" should {
-    "getCustomQuotes for given customer id" in {
+    "getCustomQuotes sgould give all the custom quotes only" in {
       when(mockCustomQuoteQueryDAO.listAllQuotes(1))
         .thenReturn(Seq(mockCustomQuote))
       val result: Future[Result] = customQuoteController.getCustomQuotes.apply(mockRequest)
@@ -63,5 +63,33 @@ class QuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPer
       bodyText mustBe
         """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}]""".stripMargin
     }
+
+    "getRandomCustomQuote should give random quote only" in {
+      when(mockCustomQuoteQueryDAO.listRandomQuote(1, 1))
+        .thenReturn(Seq(mockCustomQuote))
+      val result: Future[Result] = customQuoteController.getRandomCustomQuote.apply(mockRequest)
+      val bodyText: String       = contentAsString(result)
+      bodyText mustBe
+        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}]""".stripMargin
+    }
+
+    "getSelectedQuote should give selected quote only" in {
+      when(mockCustomQuoteQueryDAO.listSelectedQuote(1, 1)).thenReturn(Some(mockCustomQuote))
+      val result: Future[Result] = customQuoteController.getSelectedQuote(1).apply(mockRequest)
+      val bodyText: String       = contentAsString(result)
+      bodyText mustBe
+        """{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1427756400000,"ownQuote":false}""".stripMargin
+    }
+
+    "deleteCustomQuote should delete selected quote only" in {
+      when(mockCustomQuoteQueryDAO.deleteQuote(1, 1)).thenReturn(1)
+      val result: Future[Result] = customQuoteController.deleteCustomQuote(1).apply(mockRequest)
+      val bodyText: String       = contentAsString(result)
+      bodyText mustBe
+        """{"success":"Successfully delete quote with id: 1"}""".stripMargin
+    }
+
+    // TODO add more test for the Create and Update Controller methods
+    "addCustomQuote should insert a new quote" in {}
   }
 }

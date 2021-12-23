@@ -20,3 +20,5 @@
 - S3
 - DropBox
 - Google Drive
+
+### Add sbt dependency check 

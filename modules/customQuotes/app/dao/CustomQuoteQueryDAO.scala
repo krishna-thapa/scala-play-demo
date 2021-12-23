@@ -5,7 +5,7 @@ import com.krishna.services.RepositoryUserMethods
 import com.krishna.util.DbRunner
 import com.krishna.util.Implicits.genreEnumMapper
 import config.DecodeHeader
-import forms.CustomQuoteForm
+import forms.RequestForm.CustomQuoteForm
 import model.UserDetail
 import models.CustomQuotesQuery
 import play.api.Configuration

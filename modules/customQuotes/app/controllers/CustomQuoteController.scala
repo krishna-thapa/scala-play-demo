@@ -71,7 +71,7 @@ class CustomQuoteController @Inject()(
     */
   def addCustomQuote(): Action[AnyContent] = UserAction { implicit request =>
     log.info(s"Executing addCustomQuote from Custom quotes")
-
+    log.warn(s"Executing addCustomQuote from Custom quotes ${RequestForm.quotesQueryForm.bindFromRequest()}")
     val addQuote = (user: UserDetail) => {
       RequestForm.quotesQueryForm
         .bindFromRequest()
