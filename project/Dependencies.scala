@@ -12,7 +12,7 @@ object Dependencies {
     val akkaVersion     = "2.6.17"
 
     // Database
-    val monogoDb   = "1.0.4-play28"
+    val monogoDb   = "1.0.10-play28"
     val elastic4s  = "7.9.1"
     val playRedis  = "2.6.1"
     val postgresql = "42.2.12"
