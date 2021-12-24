@@ -12,7 +12,7 @@ if $run_check; then
 
   if [ -f "$json_path" ]; then
     declare -a vulnerabilities
-    readarray -t vulnerabilities < <( jq -c '.dependencies[] | select(.vulnerabilities | length > 0) | {
+    readarray -t vulnerabilities < <(jq -c -C '.dependencies[] | select(.vulnerabilities | length > 0) | {
       filename: .fileName,
       vulnerabilities: {
         name: ([.vulnerabilities[].name] | join(", ")),
@@ -43,6 +43,7 @@ if $run_check; then
 
   if [ -f "$html_path" ]; then
     echo "Opening HTML page in web browse."
+    xdg-settings set default-web-browser google-chrome.desktop
     xdg-open $html_path
     exit 1
   fi
