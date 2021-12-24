@@ -38,6 +38,14 @@ if $run_check; then
     echo "Error: JSON report path '${json_path}' not found"
     exit 1
   fi
+  replaceHtml="html"
+  html_path=${json_path//json/$replaceHtml}
+
+  if [ -f "$html_path" ]; then
+    echo "Opening HTML page in web browse."
+    xdg-open $html_path
+    exit 1
+  fi
 else
   echo "Decided not to run the dependency checks!"
 fi
