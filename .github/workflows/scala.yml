@@ -20,11 +20,3 @@ jobs:
         run: |
           sbt clean compile
           sbt test
-      - name: Dependency Check
-        run: |
-          sbt -v -Dfile.encoding=UTF-8 dependencyCheck
-      - name: Print all the vulnerabilities
-        run: |
-          chmod +x ./.github/scripts/dependencyCheck.sh
-          ./.github/scripts/dependencyCheck.sh "target/scala-2.13/dependency-check-report.json" true
-        shell: bash
