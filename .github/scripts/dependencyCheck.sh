@@ -42,10 +42,8 @@ if $run_check; then
   html_path=${json_path//json/$replaceHtml}
 
   if [ -f "$html_path" ]; then
-    echo "Opening HTML page in web browse."
-    xdg-settings set default-web-browser google-chrome.desktop
-    xdg-open $html_path
-    exit 1
+    echo "HTML version is also printed under the path: $html_path"
+    echo "TODO: This HTML can be send to the email or like slack/discord channel or can be send to some online centralized logging platforms."
   fi
 else
   echo "Decided not to run the dependency checks!"
