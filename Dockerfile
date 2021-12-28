@@ -1,5 +1,5 @@
 # Pull base image
-FROM openjdk:8
+FROM openjdk:11
 
 MAINTAINER krishna Thapa <krishna.thapa91@gmail.com>
 
@@ -10,17 +10,18 @@ RUN \
   apt-get install -y git && \
   rm -rf /var/lib/apt/lists/*
 
-# Any RUN command after an ARG is set has that value in it as an environment variable and thus
+# Any RUN command after any ARG is declared, it has that value in it as an environment variable and thus
 # invalidates layer cache, so only declaring these ARGs when they're used
 
-ARG SBT_VERSION=1.3.13
+ARG SBT_VERSION=1.6.0
 
-# Install sbt
 RUN \
-  curl -L "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar zxf - -C /usr/share  && \
-  cd /usr/share/sbt/bin && \
-  rm sbt.bat sbtn-x86_64-apple-darwin sbtn-x86_64-pc-linux sbtn-x86_64-pc-win32.exe && \
+  curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
+  chown -R root:root /usr/share/sbt && \
+  chmod -R 755 /usr/share/sbt && \
   ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
+
+# Do I need to install Scala also?
 
 # Define working directory and copy all the projects to the container
 WORKDIR /inspirational-quote-api
