@@ -27,4 +27,4 @@ jobs:
           context: .
           push: true
           # Note: tags has to be all lower-case
-          tags: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:2.0.0
+          tags: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:${{github.ref_name}}

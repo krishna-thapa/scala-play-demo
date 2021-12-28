@@ -2,6 +2,7 @@
 FROM openjdk:11
 
 MAINTAINER krishna Thapa <krishna.thapa91@gmail.com>
+LABEL org.opencontainers.image.description DESCRIPTION
 
 # Setup adapted from https://github.com/hseeberger/scala-sbt/blob/master/debian/Dockerfile
 RUN \
