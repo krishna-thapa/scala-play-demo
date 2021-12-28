@@ -28,6 +28,3 @@ jobs:
           # Note: tags has to be all lower-case
           tags: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:2.0.0
           push: ${{ github.ref == 'refs/heads/master' }}
-          tag_with_ref: true
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
