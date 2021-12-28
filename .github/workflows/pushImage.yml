@@ -25,6 +25,6 @@ jobs:
         uses: docker/build-push-action@v2.7.0
         with:
           context: .
+          push: true
           # Note: tags has to be all lower-case
           tags: ghcr.io/krishna-thapa/inspirational-quote-api/inspirational-quote-api:2.0.0
-          push: ${{ github.ref == 'refs/heads/master' }}
