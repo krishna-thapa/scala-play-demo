@@ -4,7 +4,7 @@ name: Check for the SBT dependency vulnerabilities and print them on console
 on:
   push:
     branches:
-      - master
+      - dependency-check
 
 jobs:
   build_compile_test:
@@ -21,5 +21,5 @@ jobs:
       - name: Print all the vulnerabilities
         run: |
           chmod +x ./.github/scripts/dependencyCheck.sh
-          ./.github/scripts/dependencyCheck.sh "target/scala-2.13/dependency-check-report.json" false
+          ./.github/scripts/dependencyCheck.sh "target/scala-2.13/dependency-check-report.json" true
         shell: bash
