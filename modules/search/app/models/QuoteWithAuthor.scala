@@ -12,8 +12,8 @@ trait QuoteAuthor[T] {
 }
 
 case class QuoteWithAuthor(
-    quoteDetails: QuotesQuery,
-    authorDetails: Option[AuthorDetails] = None
+  quoteDetails: QuotesQuery,
+  authorDetails: Option[AuthorDetails] = None
 ) extends QuoteAuthor[QuotesQuery]
 
 case class Author(author: String)
@@ -22,17 +22,22 @@ case class AuthorSearchResponse(quoteDetails: Author) extends QuoteAuthor[Author
 object QuoteAuthor {
 
   implicit lazy val authorFormat: OFormat[Author] = Json.format[Author]
+
   implicit lazy val authorSearchFormat: OFormat[AuthorSearchResponse] =
     Json.format[AuthorSearchResponse]
+
   implicit lazy val quoteWithAuthorFormat: OFormat[QuoteWithAuthor] =
     Json.format[QuoteWithAuthor]
+
 }
 
 object QuoteWithAuthor {
+
   /*
     An implementation of RequestBuilder to load stream in ElasticSearch
    */
   def builder(indexName: String): RequestBuilder[QuoteWithAuthor] = { (quote: QuoteWithAuthor) =>
     indexInto(indexName).id(quote.quoteDetails.csvId).doc(quote).refresh(RefreshPolicy.Immediate)
   }
+
 }

@@ -20,9 +20,9 @@ import scala.concurrent.ExecutionContext
   * application's quotes from 'quotes' table.
   */
 @Singleton
-class QuoteController @Inject()(
-    quoteService: QuoteQueryService,
-    scc: SecuredControllerComponents
+class QuoteController @Inject() (
+  quoteService: QuoteQueryService,
+  scc: SecuredControllerComponents
 )(implicit executionContext: ExecutionContext, config: Configuration)
     extends SecuredController(scc)
     with ResponseResult
@@ -100,7 +100,7 @@ class QuoteController @Inject()(
   def favQuote(csvId: String): Action[AnyContent] = UserAction { implicit request =>
     DecodeHeader(request.headers) match {
       case Right(user) =>
-        log.info(s"Executing favQuote by user: ${user.email}")
+        log.info(s"Executing favQuote by user: ${ user.email }")
         quoteService.updateFavQuoteService(csvId: String, user)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
@@ -114,7 +114,7 @@ class QuoteController @Inject()(
   def getFavQuotes: Action[AnyContent] = UserAction { implicit request =>
     DecodeHeader(request.headers) match {
       case Right(user) =>
-        log.info(s"Executing getFavQuotes by user: ${user.email}")
+        log.info(s"Executing getFavQuotes by user: ${ user.email }")
         quoteService.getFavQuotesService(user.id)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
@@ -133,9 +133,10 @@ class QuoteController @Inject()(
   /**
     * A REST endpoint that gets 10 matched autocomplete list from the searched parameter
     */
-  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction { implicit request =>
-    log.info("Executing getAuthorsAutocomplete")
-    responseSeqString(quoteService.searchAuthorsSql(parameter))
+  def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction {
+    implicit request =>
+      log.info("Executing getAuthorsAutocomplete")
+      responseSeqString(quoteService.searchAuthorsSql(parameter))
   }
 
 }

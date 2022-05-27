@@ -18,10 +18,10 @@ import play.api.Configuration
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future, Promise }
 
-class AkkaService @Inject()(
-    quotesDAO: QuoteQueryDAO,
-    wikiMediaApi: WikiMediaApi,
-    config: Configuration
+class AkkaService @Inject() (
+  quotesDAO: QuoteQueryDAO,
+  wikiMediaApi: WikiMediaApi,
+  config: Configuration
 )(implicit ec: ExecutionContext)
     extends CommonEsMethods
     with StreamsInit {
@@ -65,7 +65,7 @@ class AkkaService @Inject()(
         errorFn = { (t: Throwable) =>
           log.error(
             s"Error while running akka stream for uploading data from Postgres to ES, " +
-              s"error: ${t.getMessage}"
+              s"error: ${ t.getMessage }"
           )
           promise.failure(t); ()
         }
@@ -80,4 +80,5 @@ class AkkaService @Inject()(
 
     promise.future
   }
+
 }

@@ -28,8 +28,9 @@ import scala.util.Try
   */
 
 @Singleton
-class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit config: Configuration)
-    extends RepositoryUserMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
+class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit
+  config: Configuration
+) extends RepositoryUserMethods[CustomQuotesQuery, CustomQuotesQueriesTable]
     with DbRunner {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
@@ -50,7 +51,9 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(im
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = runDbAction(getSelectedQuote(id, userId))
+  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = runDbAction(
+    getSelectedQuote(id, userId)
+  )
 
   /**
     * Return a random CustomQuotesQuery record for a logged in user
@@ -69,14 +72,10 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(im
   def createQuote(customQuoteForm: CustomQuoteForm, user: UserDetail): CustomQuotesQuery = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
     val insertQuery = tables returning
-      tables.map(_.id) into (
-        (
-            fields,
-            id
-        ) => fields.copy(id = id)
-    )
+      tables.map(_.id) into ((fields, id) => fields.copy(id = id))
     // If the ownQuote flag is false, use provided author name, else use user full name
-    val author: String = if (customQuoteForm.ownQuote) user.name else customQuoteForm.author.getOrElse(user.name)
+    val author: String =
+      if (customQuoteForm.ownQuote) user.name else customQuoteForm.author.getOrElse(user.name)
 
     val action = insertQuery += CustomQuotesQuery(
       0,
@@ -127,4 +126,5 @@ class CustomQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(im
   def decoderHeader(request: Request[AnyContent]): Either[ErrorMsg, UserDetail] = {
     DecodeHeader(request.headers)
   }
+
 }

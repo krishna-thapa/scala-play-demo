@@ -11,10 +11,11 @@ import scala.concurrent.Future
   * Mock the response for Wiki Media API
   */
 class MockWikiMediaApi extends WebClient {
+
   override def getWebClientResponse(
-      url: String,
-      params: Seq[(String, String)],
-      headers: Seq[(String, String)]
+    url: String,
+    params: Seq[(String, String)],
+    headers: Seq[(String, String)]
   ): Future[WSResponse] = {
 
     val mockedURI: URI = new URI("mocked.url.wiki.api")
@@ -29,4 +30,5 @@ class MockWikiMediaApi extends WebClient {
 
     Future.successful(new MockedResponse(mockedURI, mockedResponse))
   }
+
 }

@@ -5,7 +5,12 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.DeleteIndexResponse
-import com.sksamuel.elastic4s.requests.mappings.{ CompletionField, MappingDefinition, ObjectField, TextField }
+import com.sksamuel.elastic4s.requests.mappings.{
+  CompletionField,
+  MappingDefinition,
+  ObjectField,
+  TextField
+}
 import com.sksamuel.elastic4s.requests.searches.queries.matches.MatchPhrasePrefix
 import com.sksamuel.elastic4s.requests.searches.sort.ScoreSort
 import com.sksamuel.elastic4s.requests.searches.sort.SortOrder.Desc
@@ -17,6 +22,7 @@ import scala.concurrent.Future
 trait CommonEsMethods extends InitEs with Logging {
 
   def searchSuggestion: SearchSuggestion
+
   /*
     Count the total docs inside the index, used for testing
    */
@@ -84,17 +90,17 @@ trait CommonEsMethods extends InitEs with Logging {
     only returns the matched data from the sources included column
    */
   def matchPrefixSearch(
-      inputText: String,
-      columnName: String,
-      offset: Int = 0,
-      limit: Int = 10,
-      isSourceInclude: Boolean = false
+    inputText: String,
+    columnName: String,
+    offset: Int = 0,
+    limit: Int = 10,
+    isSourceInclude: Boolean = false
   ): Future[Response[SearchResponse]] = {
     log.info(
       s"Searching match prefix in index: $indexName for searched text: $inputText in column field: $columnName"
     )
 
-    val query: MatchPhrasePrefix     = matchPhrasePrefixQuery(s"quoteDetails.$columnName", inputText)
+    val query: MatchPhrasePrefix = matchPhrasePrefixQuery(s"quoteDetails.$columnName", inputText)
     val searchRequest: SearchRequest = search(indexName).query(query)
 
     val updatedSearchRequest: SearchRequest = if (isSourceInclude) {
@@ -109,4 +115,5 @@ trait CommonEsMethods extends InitEs with Logging {
         .sortBy(ScoreSort(Desc))
     )
   }
+
 }

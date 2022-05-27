@@ -27,4 +27,5 @@ trait LoadQueries extends DbRunner {
     val dbSeq = DBIO.sequence(scripts.map(s => sqlu"#$s"))
     runDbActionCatchError(dbSeq)
   }
+
 }

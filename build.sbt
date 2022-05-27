@@ -5,8 +5,8 @@ name := """inspirational-quote-api"""
 description := "Back-end project for Inspirational quotes"
 version := "1.0-SNAPSHOT"
 
-organization in ThisBuild := "com.krishna"
-scalaVersion in ThisBuild := "2.13.6"
+ThisBuild / organization := "com.krishna"
+ThisBuild / scalaVersion := "2.13.8"
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -41,7 +41,6 @@ lazy val quotes = project
 lazy val customQuotes = project
   .in(file("modules/customQuotes"))
   .enablePlugins(PlayScala, SwaggerPlugin)
-  // https://stackoverflow.com/questions/8193904/sbt-test-dependencies-in-multiprojects-make-the-test-code-available-to-dependen
   .dependsOn(quotes % "compile->compile;test->test", common, auth)
   .settings(
     libraryDependencies ++=

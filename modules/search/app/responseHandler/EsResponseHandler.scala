@@ -40,11 +40,11 @@ object EsResponseHandler extends ResponseError {
   }
 
   private def sendSearchedResponse(
-      response: SearchResponse,
-      isResponseResult: Boolean
+    response: SearchResponse,
+    isResponseResult: Boolean
   )(implicit indexName: String): Result = {
     if (isResponseResult) {
-      log.info(s"Total hits for the searched text: ${response.size}")
+      log.info(s"Total hits for the searched text: ${ response.size }")
       quoteAuthorSearchedResponse(response)
     } else {
       notFound(EsPlaceHolder(EmptyDbMsg.msg))
@@ -75,14 +75,14 @@ object EsResponseHandler extends ResponseError {
   }
 
   private def checkResponse[T](
-      response: Response[T],
-      isResponseResult: Boolean
+    response: Response[T],
+    isResponseResult: Boolean
   )(implicit indexName: String): Result = {
     if (response.isSuccess && isResponseResult) {
       Ok(s"Success on performing action on index: $indexName")
     } else {
       log.error(
-        s"Error while performing action on index: $indexName with an error: ${response.error.reason}"
+        s"Error while performing action on index: $indexName with an error: ${ response.error.reason }"
       )
       notFound(EsPlaceHolder(response.error.reason))
     }
@@ -102,4 +102,5 @@ object EsResponseHandler extends ResponseError {
       Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results)))
     }
   }
+
 }

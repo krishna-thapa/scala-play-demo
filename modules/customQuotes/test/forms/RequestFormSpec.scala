@@ -8,8 +8,10 @@ import play.api.data.Form
 class RequestFormSpec extends AnyFlatSpec {
 
   behavior of "RequestForm"
+
   it should "accept quote as a string text" in {
-    val res: Form[CustomQuoteForm] = RequestForm.quotesQueryForm.bind(Map("quote" -> "Random quote"))
+    val res: Form[CustomQuoteForm] =
+      RequestForm.quotesQueryForm.bind(Map("quote" -> "Random quote"))
     res.hasErrors shouldBe false
   }
 
@@ -20,7 +22,8 @@ class RequestFormSpec extends AnyFlatSpec {
   }
 
   it should "author field can be optional" in {
-    val res: Form[CustomQuoteForm] = RequestForm.quotesQueryForm.bind(Map("quote" -> "Random quote", "author" -> ""))
+    val res: Form[CustomQuoteForm] =
+      RequestForm.quotesQueryForm.bind(Map("quote" -> "Random quote", "author" -> ""))
     res.hasErrors shouldBe false
     res.value.flatMap(_.author) shouldBe None
   }
@@ -31,4 +34,5 @@ class RequestFormSpec extends AnyFlatSpec {
     res.hasErrors shouldBe true
     res.errors("genre").head.message shouldBe "Database is empty with that genre: wrong}"
   }
+
 }

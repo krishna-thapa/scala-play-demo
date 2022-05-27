@@ -1,5 +1,4 @@
 # To prevent storing target and other directories
-logs
 target
 .idea
 .idea_modules

@@ -15,13 +15,13 @@ object QuoteOfTheDayActor {
 }
 
 //Implement task by extends Actor
-class QuoteOfTheDayActor @Inject()(cacheService: CacheService) extends Actor with Logging {
+class QuoteOfTheDayActor @Inject() (cacheService: CacheService) extends Actor with Logging {
 
   import QuoteOfTheDayActor._
 
-  override def receive: Receive = {
-    case GetQuoteOfTheDay(date: Date) =>
-      val foo = cacheService.cacheQuoteOfTheDay(dateFormatter(date))
-      println(foo)
+  override def receive: Receive = { case GetQuoteOfTheDay(date: Date) =>
+    val foo = cacheService.cacheQuoteOfTheDay(dateFormatter(date))
+    println(foo)
   }
+
 }

@@ -15,9 +15,9 @@ import config.JwtKey
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
-    implicit ec: ExecutionContext,
-    conf: Configuration
+class AdminActionBuilder @Inject() (parser: BodyParsers.Default)(implicit
+  ec: ExecutionContext,
+  conf: Configuration
 ) extends ActionBuilderImpl(parser)
     with ResponseResult
     with JwtKey {
@@ -25,8 +25,8 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
   implicit val clock: Clock = Clock.systemUTC
 
   override def invokeBlock[A](
-      request: Request[A],
-      block: Request[A] => Future[Result]
+    request: Request[A],
+    block: Request[A] => Future[Result]
   ): Future[Result] = {
     log.info("Executing the authService service for AdminActionBuilder")
     request.jwtSession.getAs[UserDetail](jwtSessionKey) match {
@@ -37,11 +37,12 @@ class AdminActionBuilder @Inject()(parser: BodyParsers.Default)(
       // If the logged in user doesn't have an admin role
       case Some(userDetail) =>
         Future(
-          responseErrorResult(AuthorizationForbidden(s"${userDetail.email}"))
+          responseErrorResult(AuthorizationForbidden(s"${ userDetail.email }"))
             .refreshJwtSession(request)
         )
       case _ =>
         Future(responseErrorResult(AuthenticationFailed))
     }
   }
+
 }

@@ -11,7 +11,8 @@ import play.api.libs.json.Json
 import javax.inject._
 import scala.concurrent.duration.DurationInt
 
-class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Configuration) extends ResponseError {
+class CacheDAO @Inject() (cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Configuration)
+    extends ResponseError {
 
   /*
     A cache API that uses synchronous calls rather than async calls.
@@ -42,8 +43,11 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Conf
           log.info("Storing today's quote in the cache storage")
           cache.set(
             key = contentDate,
-            value = Json.toJson(uniqueQuote.toOption.get).toString, // best way to get the right value from either
-            expiration = 5.days                                     // Key is only store for 5 days
+            value =
+              Json
+                .toJson(uniqueQuote.toOption.get)
+                .toString, // best way to get the right value from either
+            expiration = 5.days // Key is only store for 5 days
           )
         }
         uniqueQuote
@@ -62,10 +66,10 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Conf
     * @param cachedQuotes redis cache list that has all the past called quote csv ids
     * @return random quote that has not been called before
     */
-  //TODO: Convert this to tail recursive
+  // TODO: Convert this to tail recursive
   def getUniqueQuoteFromDB(
-      quote: QuotesQuery,
-      cachedQuotes: RedisList[String, SynchronousResult]
+    quote: QuotesQuery,
+    cachedQuotes: RedisList[String, SynchronousResult]
   ): Either[ErrorMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method
@@ -88,11 +92,12 @@ class CacheDAO @Inject()(cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Conf
     * @param csvId Unique id of the record
     */
   private def redisActions(
-      csvId: String,
-      cachedQuotes: RedisList[String, SynchronousResult]
+    csvId: String,
+    cachedQuotes: RedisList[String, SynchronousResult]
   ): Unit = {
     if (cachedQuotes.size >= maxListSize) cachedQuotes.headPop
     cachedQuotes.append(csvId)
     log.info("Ids in the Redis storage: " + cachedQuotes.toList)
   }
+
 }

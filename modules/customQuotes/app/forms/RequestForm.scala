@@ -12,17 +12,18 @@ object RequestForm {
     */
   val quotesQueryForm: Form[CustomQuoteForm] = Form {
     mapping(
-      "quote"    -> nonEmptyText.verifying(_.nonEmpty),
-      "author"   -> optional(text),
-      "genre"    -> optional(Forms.of[Genre]),
+      "quote" -> nonEmptyText.verifying(_.nonEmpty),
+      "author" -> optional(text),
+      "genre" -> optional(Forms.of[Genre]),
       "ownQuote" -> boolean
     )(CustomQuoteForm.apply)(CustomQuoteForm.unapply)
   }
 
   case class CustomQuoteForm(
-      quote: String,
-      author: Option[String],
-      genre: Option[Genre] = None,
-      ownQuote: Boolean = false
+    quote: String,
+    author: Option[String],
+    genre: Option[Genre] = None,
+    ownQuote: Boolean = false
   ) extends QuotesTable
+
 }

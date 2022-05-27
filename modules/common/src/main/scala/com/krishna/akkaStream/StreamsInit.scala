@@ -20,7 +20,7 @@ trait StreamsInit extends DbRunner {
     * Note: https://scala-slick.org/doc/3.2.0/dbio.html#streaming
     */
   def recordsSource[T](
-      getRecords: DBIOAction[Seq[T], Streaming[T], Effect.Read]
+    getRecords: DBIOAction[Seq[T], Streaming[T], Effect.Read]
   ): Source[T, NotUsed] = Source.fromPublisher {
     {
       dbConfig.stream {
@@ -42,7 +42,7 @@ trait StreamsInit extends DbRunner {
     * behind the Flow.
     */
   def addFlowPerRecord[R, T](
-      flowMethod: R => Future[T]
+    flowMethod: R => Future[T]
   ): Flow[R, T, NotUsed] = {
     Flow[R].mapAsync(parallelism = 5) { record =>
       flowMethod(record)

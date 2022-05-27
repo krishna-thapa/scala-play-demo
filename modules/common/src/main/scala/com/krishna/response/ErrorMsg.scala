@@ -6,7 +6,8 @@ trait ErrorMsg {
 }
 
 object ErrorMsg {
-  //TODO add more from auth and search modules
+
+  // TODO add more from auth and search modules
   case object EmptyDbMsg extends ErrorMsg {
     override val msg: String = "Database is empty!"
   }
@@ -58,4 +59,5 @@ object ErrorMsg {
   case class EsPlaceHolder(message: String) extends ErrorMsg {
     override val msg: String = s"Error in ES: $message"
   }
+
 }

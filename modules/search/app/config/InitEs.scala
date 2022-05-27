@@ -13,7 +13,7 @@ trait InitEs {
   // If ES is installed in local machine and want to run locally
   //  val props: ElasticProperties = ElasticProperties("http://localhost:9200")
 
-  def dockerUrl = s"http://${esConfig.ESHOST}:${esConfig.ESPORT}"
+  def dockerUrl = s"http://${ esConfig.ESHOST }:${ esConfig.ESPORT }"
 
   def props: ElasticProperties = ElasticProperties(dockerUrl)
 

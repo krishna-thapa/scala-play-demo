@@ -4,9 +4,9 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{ JsPath, Json, Reads, Writes }
 
 case class AuthorDetails(
-    title: String,
-    imagerUrl: Option[String],
-    description: Option[Seq[String]]
+  title: String,
+  imagerUrl: Option[String],
+  description: Option[Seq[String]]
 )
 
 object AuthorDetails {
@@ -16,8 +16,8 @@ object AuthorDetails {
       (JsPath \\ "source").readNullable[String] and
       (JsPath \\ "imagerUrl").readNullable[String] and
       (JsPath \\ "description").readNullable[Seq[String]]
-  ).apply(
-    (title, sourceUrl, imageUrl, description) => AuthorDetails(title, sourceUrl.orElse(imageUrl), description)
+  ).apply((title, sourceUrl, imageUrl, description) =>
+    AuthorDetails(title, sourceUrl.orElse(imageUrl), description)
   )
 
   implicit val writeJson: Writes[AuthorDetails] = Json.writes[AuthorDetails]

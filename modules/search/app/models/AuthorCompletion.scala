@@ -11,8 +11,8 @@ object CompletionResponseType extends Enumeration {
 }
 
 case class AuthorCompletion(
-    responseType: CompletionResponseType,
-    responseList: Seq[String]
+  responseType: CompletionResponseType,
+  responseList: Seq[String]
 )
 
 object AuthorCompletion {

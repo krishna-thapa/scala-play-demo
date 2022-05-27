@@ -17,7 +17,7 @@ import slick.jdbc.PostgresProfile.api._
 import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
+class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
@@ -40,7 +40,7 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
           encrypted,
           currentDate
         )
-        Right(OkResponse(s"${runDbAction(action)}"))
+        Right(OkResponse(s"${ runDbAction(action) }"))
       case Failure(exception) => Left(BcryptException(exception.getMessage))
     }
   }
@@ -140,4 +140,5 @@ class AuthDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Common
       case Failure(exception) => Left(BcryptException(exception.getMessage))
     }
   }
+
 }

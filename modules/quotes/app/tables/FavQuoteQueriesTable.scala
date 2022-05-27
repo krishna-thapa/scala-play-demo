@@ -14,6 +14,7 @@ class FavQuoteQueriesTable(tag: Tag)
 
   def * : ProvenShape[FavQuoteQuery] =
     (id, csvId, userId, favTag) <> ((FavQuoteQuery.apply _).tupled, FavQuoteQuery.unapply)
+
 }
 
 object FavQuoteQueriesTable {

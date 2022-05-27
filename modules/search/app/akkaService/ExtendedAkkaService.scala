@@ -16,10 +16,10 @@ import java.nio.file.Paths
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
-class ExtendedAkkaService @Inject()(
-    quotesDAO: QuoteQueryDAO,
-    wikiMediaApi: ExtendedWikiMediaApi,
-    config: Configuration
+class ExtendedAkkaService @Inject() (
+  quotesDAO: QuoteQueryDAO,
+  wikiMediaApi: ExtendedWikiMediaApi,
+  config: Configuration
 )(implicit ec: ExecutionContext)
     extends StreamsInit {
 
@@ -31,11 +31,14 @@ class ExtendedAkkaService @Inject()(
 
   def runCSVMigrationStream: Future[String] = {
 
-    log.info("Testing the CSV data migration to the Postgres Database using Akka stream with Alpakka")
+    log.info(
+      "Testing the CSV data migration to the Postgres Database using Akka stream with Alpakka"
+    )
 
     val quotesCsvFile: File = new File("data/New-Quotes.csv")
 
-    if (!quotesCsvFile.isFile) return Future.successful("Quotes.csv file not found under data directory")
+    if (!quotesCsvFile.isFile)
+      return Future.successful("Quotes.csv file not found under data directory")
 
     val csvFileName: String = quotesCsvFile.getName
     val csvFilePath: String = quotesCsvFile.getPath
@@ -68,14 +71,14 @@ class ExtendedAkkaService @Inject()(
         log.info(s"Successfully processed the file $csvFileName")
         "Success"
       }
-      .recover {
-        case e: Exception =>
-          log.error(s"Error in processing the file $csvFileName")
-          s"Failed with error: ${e.getMessage}"
+      .recover { case e: Exception =>
+        log.error(s"Error in processing the file $csvFileName")
+        s"Failed with error: ${ e.getMessage }"
       }
 
     // Await.result(result, Duration.Inf)
     // val runTimeDuration = (System.nanoTime - startTime) / 1e9d
     // log.info(s"Total run time duration for the Akka Stream $runTimeDuration")
   }
+
 }

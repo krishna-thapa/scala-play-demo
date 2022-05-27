@@ -5,6 +5,7 @@ import com.github.t3hnar.bcrypt._
 import scala.util.Try
 
 object BcryptObject {
+
   /*
     1. With "salt round" they actually mean the cost factor. The cost factor controls how much
     time is needed to calculate a single BCrypt hash. The higher the cost factor,
@@ -22,4 +23,5 @@ object BcryptObject {
   def validatePassword(password: String, encrypted: String): Try[Boolean] = {
     password.isBcryptedSafeBounded(encrypted)
   }
+
 }

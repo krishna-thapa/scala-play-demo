@@ -28,7 +28,7 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     // check if the account exists with that email
     checkValidEmail(email).headOption match {
       case Some(userInfo) =>
-        log.info(s"Account is already in the table with id: ${userInfo.id}")
+        log.info(s"Account is already in the table with id: ${ userInfo.id }")
         Right(fun(userInfo))
       case None =>
         Left(notFound(AccountNotFound(email)))
@@ -43,7 +43,7 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     * @return user account id with updated admin role
     */
   def alterAdminRole(id: Int, role: Boolean): Int = {
-    log.info(s"Changing the admin role status of: $id to ${!role}")
+    log.info(s"Changing the admin role status of: $id to ${ !role }")
     runDbAction(
       userInfo
         .filter(_.id === id)

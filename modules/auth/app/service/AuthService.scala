@@ -18,9 +18,10 @@ import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
-class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAttachmentService)(
-    implicit executionContext: ExecutionContext,
-    config: Configuration
+class AuthService @Inject() (authDAO: AuthDAO, gridFsAttachmentService: GridFsAttachmentService)(
+  implicit
+  executionContext: ExecutionContext,
+  config: Configuration
 ) extends JwtKey
     with ResponseResult
     with Logging {
@@ -33,7 +34,7 @@ class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAtt
       authDAO.isValidLogin(signInForm) match {
         case Right(validUser) =>
           val userDetail: UserDetail = UserDetail(validUser)
-          log.info(s"Success on authentication for user: ${userDetail.name}")
+          log.info(s"Success on authentication for user: ${ userDetail.name }")
           responseOk(userDetail).addingToJwtSession(
             jwtSessionKey,
             UserDetail(validUser)
@@ -51,7 +52,7 @@ class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAtt
         case Left(exception) =>
           bcryptValidationFailed(invalidBcryptValidation(exception.getMessage))
       }
-    } else notAcceptable(s"${signUpForm.email}")
+    } else notAcceptable(s"${ signUpForm.email }")
   }
 
   def getAllUserService: Result = responseSeqResult(authDAO.listAllUser())
@@ -67,7 +68,7 @@ class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAtt
   }
 
   def getUserInfoService(user: UserDetail, email: String): Result = {
-    val overrideEmail      = if (user.isAdmin) email else user.email
+    val overrideEmail = if (user.isAdmin) email else user.email
     val getUserInfoDetails = (overrideEmail: String) => authDAO.userAccount(overrideEmail)
     runApiAction(overrideEmail)(getUserInfoDetails)
   }
@@ -94,7 +95,7 @@ class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAtt
     * @return Result of the API response
     */
   def runApiAction[T](
-      email: String
+    email: String
   )(fun: String => Either[Result, T])(implicit conv: OFormat[T]): Result = {
     log.info(s"Checking the format of an email: $email")
     if (email.validEmail) {
@@ -104,4 +105,5 @@ class AuthService @Inject()(authDAO: AuthDAO, gridFsAttachmentService: GridFsAtt
       }
     } else badRequest(s"Email is in wrong format: $email")
   }
+
 }

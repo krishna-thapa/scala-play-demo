@@ -12,9 +12,9 @@ import reactivemongo.api.gridfs.ReadFile
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
-class GridFsAttachmentService @Inject()(
-    implicit val executionContext: ExecutionContext,
-    val reactiveMongoApi: ReactiveMongoApi
+class GridFsAttachmentService @Inject() (implicit
+  val executionContext: ExecutionContext,
+  val reactiveMongoApi: ReactiveMongoApi
 ) extends AttachmentDAO
     with Logging {
 
@@ -23,10 +23,11 @@ class GridFsAttachmentService @Inject()(
     by deleting the old one
    */
   def addImageAttachment(
-      emailId: String,
-      file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
+    emailId: String,
+    file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
   ): Future[Result] = {
-    file.contentType
+    file
+      .contentType
       .fold[Future[Result]](
         Future.successful(
           BadRequest(s"Couldn't find the content type of the attachment for the userId: $emailId")
@@ -37,7 +38,7 @@ class GridFsAttachmentService @Inject()(
             .flatMap(_ => addOrReplaceUserPicture(emailId, file))
         } else {
           val errorMessage: String =
-            s"Unsupported MediaType for userId: $emailId with MIME type of ${file.contentType}"
+            s"Unsupported MediaType for userId: $emailId with MIME type of ${ file.contentType }"
           log.error(errorMessage)
           Future.successful(
             UnsupportedMediaType(errorMessage)
@@ -51,8 +52,8 @@ class GridFsAttachmentService @Inject()(
     Add a new picture in the GridFS index or update the existing with a new picture
    */
   def addOrReplaceUserPicture(
-      emailId: String,
-      file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
+    emailId: String,
+    file: MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]
   ): Future[Result] = {
     for {
       gfs <- gridFS
@@ -103,4 +104,5 @@ class GridFsAttachmentService @Inject()(
       }
     }
   }
+
 }

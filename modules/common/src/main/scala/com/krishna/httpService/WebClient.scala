@@ -11,8 +11,9 @@ import scala.concurrent.Future
 trait WebClient extends Logging {
 
   def getWebClientResponse(
-      url: String,
-      params: Seq[(String, String)] = Nil,
-      headers: Seq[(String, String)] = Nil
+    url: String,
+    params: Seq[(String, String)] = Nil,
+    headers: Seq[(String, String)] = Nil
   ): Future[WSResponse]
+
 }

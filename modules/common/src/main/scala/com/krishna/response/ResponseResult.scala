@@ -26,7 +26,7 @@ trait ResponseResult extends ResponseError {
   }
 
   def responseOptionResult[T <: IdResource](
-      record: Option[T]
+    record: Option[T]
   )(implicit conv: OFormat[T]): Result = {
     record match {
       case Some(quote) => Ok(Json.toJson(quote))
@@ -43,7 +43,7 @@ trait ResponseResult extends ResponseError {
   }
 
   def responseEitherResult[T <: IdResource](
-      record: Either[ErrorMsg, T]
+    record: Either[ErrorMsg, T]
   )(implicit conv: OFormat[T]): Result = {
     record match {
       case Left(errorMsg) =>
@@ -66,4 +66,5 @@ trait ResponseResult extends ResponseError {
       case _                                              => badRequest("Something went wrong")
     }
   }
+
 }

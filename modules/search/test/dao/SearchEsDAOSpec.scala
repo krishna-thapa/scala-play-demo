@@ -31,14 +31,14 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
   val mockConfig: Configuration = Configuration.from(
     Map(
-      "elasticsearch.ESHOST"      -> s"${getHostAddress.head}",
-      "elasticsearch.ESPORT"      -> s"${getHostAddress(1)}",
+      "elasticsearch.ESHOST" -> s"${ getHostAddress.head }",
+      "elasticsearch.ESPORT" -> s"${ getHostAddress(1) }",
       "elasticsearch.ESINDEXNAME" -> "test"
     )
   )
 
   val mockQuoteQueryDAO: QuoteQueryDAO = mock[QuoteQueryDAO]
-  val searchDao: SearchInEsDAO         = new SearchInEsDAO(mockQuoteQueryDAO, mockConfig)
+  val searchDao: SearchInEsDAO = new SearchInEsDAO(mockQuoteQueryDAO, mockConfig)
 
   val baseQuote: QuotesQuery = QuotesQuery(
     id = 1,
@@ -47,6 +47,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     author = Some("author1 Test"),
     genre = Some(Genre.age)
   )
+
   val mockQuotes: Seq[QuotesQuery] =
     Seq(
       baseQuote,
@@ -57,6 +58,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
     )
 
   behavior of "SearchInEsDAO"
+
   it should "return check indication if the index exists" in {
     searchDao.doesIndexExists shouldBe false
   }
@@ -76,7 +78,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
   it should "perform search query in elastic search using match prefix API" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("Test quote 2")
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
 
     matchedQuote.ids shouldBe Seq("csv102")
     val expected: QuoteWithAuthor = QuoteWithAuthor(mockQuotes.tail.head, None)
@@ -85,7 +87,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
   it should "perform search query using match query if match prefix return nil" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("quote")
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
 
     matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq(
       "csv101",
@@ -96,7 +98,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
   it should "perform search query using match query with fuzziness if match prefix return nil" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("QuOt")
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
 
     matchedQuote.to[QuoteWithAuthor].toList.map(_.quoteDetails.csvId).sorted shouldBe Seq(
       "csv101",
@@ -107,7 +109,7 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
 
   it should "return empty if not found" in {
     val getMatchedQuote: Future[Response[SearchResponse]] = searchDao.searchQuote("wrong text")
-    val matchedQuote: SearchResponse                      = Await.result(getMatchedQuote, Duration.Inf).result
+    val matchedQuote: SearchResponse = Await.result(getMatchedQuote, Duration.Inf).result
 
     matchedQuote.to[QuotesQuery].toList shouldBe Seq.empty
   }
@@ -156,8 +158,8 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
   }
 
   private def checkAutoCompletion(
-      searchedText: String,
-      isPrefixMatch: Boolean = false
+    searchedText: String,
+    isPrefixMatch: Boolean = false
   ): Seq[String] = {
     val getAuthorCompletion: Future[Response[SearchResponse]] =
       searchDao.completeAuthorNames(searchedText)
@@ -172,4 +174,5 @@ class SearchEsDAOSpec extends AnyFlatSpec with TestContainerForAll {
         .flatMap(_.toCompletion.options)
         .map(_.text)
   }
+
 }

@@ -16,7 +16,8 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
   loadQueries("customQuoteTestQueries")
 
   // Initialize the customQuoteQueryDAO class
-  val customQuoteQueryDAO: CustomQuoteQueryDAO = Application.instanceCache[CustomQuoteQueryDAO].apply(app)
+  val customQuoteQueryDAO: CustomQuoteQueryDAO =
+    Application.instanceCache[CustomQuoteQueryDAO].apply(app)
 
   val customQuoteForm: CustomQuoteForm = CustomQuoteForm(
     quote = "Demo quote1",
@@ -24,6 +25,7 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
     genre = Some(Genre.age),
     ownQuote = true
   )
+
   val userInfo: UserDetail = UserDetail(
     id = 1,
     name = "User-1",
@@ -33,6 +35,7 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
   )
 
   behavior of "customQuoteQueryDAO"
+
   "listAllQuotes" should "return empty if the are no custom quotes for a user id" in {
     val resultFirstUser: Seq[CustomQuotesQuery] = customQuoteQueryDAO.listAllQuotes(1)
     resultFirstUser.length shouldBe 0
@@ -104,4 +107,5 @@ class CustomQuoteQueryDAOSpec extends PostgresInstance with Matchers {
     result.get.quote shouldBe "Updated quote"
     result.get.author.get shouldBe "Updated author"
   }
+
 }

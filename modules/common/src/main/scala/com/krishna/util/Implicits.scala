@@ -9,9 +9,13 @@ object Implicits extends Enumeration {
 
   // Slick mapping custom type enum in database column
   implicit val genreEnumMapper: BaseTypedType[Genre.Value] =
-    MappedColumnType.base[Genre, String]({ genre =>
-      genre.toString
-    }, { string =>
-      Genre.withName(string)
-    })
+    MappedColumnType.base[Genre, String](
+      { genre =>
+        genre.toString
+      },
+      { string =>
+        Genre.withName(string)
+      }
+    )
+
 }

@@ -16,11 +16,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends FavQuoteServices with DbRunner {
+class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
+    extends FavQuoteServices
+    with DbRunner {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
-  val quotesTable    = QuoteQueriesTable.quoteQueries
+  val quotesTable = QuoteQueriesTable.quoteQueries
   val favQuotesTable = FavQuoteQueriesTable.favQuoteQueries
 
   /*
@@ -50,7 +52,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) exten
   }
 
   // list all records from the fav_quotes table
-  //def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)
+  // def listAllFavQuotes(): Future[Seq[FavQuoteQuery]] = db.run(favQuoteQueries.sortBy(_.id).result)
 
   /**
     * @param userId primary id from user_details_table
@@ -65,10 +67,11 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) exten
       }.result
 
     val action =
-      favRecord.headOption
+      favRecord
+        .headOption
         .flatMap {
           case Some(favQuote) =>
-            log.info(s"Quote is already in the table with id: ${favQuote.id}")
+            log.info(s"Quote is already in the table with id: ${ favQuote.id }")
             alterFavTag(favQuote.id, favQuote.favTag)
             // get the updated record once the fav tag is altered
             favRecord.head
@@ -85,7 +88,7 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) exten
     * @return record with altered fav tag
     */
   private def alterFavTag(id: Int, tag: Boolean): Int = {
-    log.info(s"Changing the fav tag status of: $id to ${!tag}")
+    log.info(s"Changing the fav tag status of: $id to ${ !tag }")
     runDbAction(
       favQuotesTable
         .filter(_.id === id)
@@ -100,16 +103,11 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) exten
     * @return create a new record in the fav_quotes table with fav tag as true
     */
   private def createFavQuote(
-      userId: Int,
-      csvId: String
+    userId: Int,
+    csvId: String
   ): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {
     val insertFavQuote = FavQuoteQueriesTable.favQuoteQueries returning
-      favQuotesTable.map(_.id) into (
-        (
-            fields,
-            id
-        ) => fields.copy(id = id)
-    )
+      favQuotesTable.map(_.id) into ((fields, id) => fields.copy(id = id))
     insertFavQuote += FavQuoteQuery(
       0,
       userId = userId,
@@ -117,4 +115,5 @@ class FavQuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) exten
       favTag = true
     )
   }
+
 }

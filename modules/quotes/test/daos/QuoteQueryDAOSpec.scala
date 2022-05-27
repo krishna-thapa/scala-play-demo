@@ -15,6 +15,7 @@ class QuoteQueryDAOSpec extends PostgresInstance with Matchers {
   val quoteQueryDao: QuoteQueryDAO = Application.instanceCache[QuoteQueryDAO].apply(app)
 
   behavior of "QuoteQueryDAO"
+
   it should "list down all the quotes from database" in {
     val result: Seq[QuotesQuery] = quoteQueryDao.listAllQuotes
     result.length shouldBe 5

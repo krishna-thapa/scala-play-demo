@@ -14,10 +14,10 @@ import play.api.mvc.Result
 import scala.util.matching.Regex
 
 @Singleton
-class QuoteQueryService @Inject()(
-    quotesDAO: QuoteQueryDAO,
-    cacheService: CacheService,
-    favQuoteService: FavQuoteQueryService
+class QuoteQueryService @Inject() (
+  quotesDAO: QuoteQueryDAO,
+  cacheService: CacheService,
+  favQuoteService: FavQuoteQueryService
 ) extends ResponseResult
     with Logging {
 
@@ -53,7 +53,7 @@ class QuoteQueryService @Inject()(
   }
 
   def usersCachedQuotes(quotes: Seq[AllQuotesOfDay], user: UserDetail): Result = {
-    log.info(s"Executing usersCachedQuotes in Service for user: ${user.email}")
+    log.info(s"Executing usersCachedQuotes in Service for user: ${ user.email }")
     if (quotes.nonEmpty) {
       val cachedFavQuoteIds: Seq[String] =
         favQuoteService.getFavCachedQuotes(user.id).map(_.csvId)
@@ -71,7 +71,7 @@ class QuoteQueryService @Inject()(
   }
 
   def updateFavQuoteService(csvId: String, user: UserDetail): Result = {
-    log.info(s"Executing favQuoteService in Service for user: ${user.email}")
+    log.info(s"Executing favQuoteService in Service for user: ${ user.email }")
     if (csvIdPattern.matches(csvId)) {
       responseTryResult(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
     } else {
@@ -92,4 +92,5 @@ class QuoteQueryService @Inject()(
   def searchAuthorsSql(text: String): Seq[String] = {
     quotesDAO.searchAuthors(text)
   }
+
 }

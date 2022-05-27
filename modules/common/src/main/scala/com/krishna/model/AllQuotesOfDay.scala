@@ -4,13 +4,14 @@ import com.krishna.model.base.IdResource
 import play.api.libs.json.{ Json, OFormat }
 
 case class AllQuotesOfDay(
-    id: Int,
-    contentDate: String,
-    isFavQuote: Boolean = false,
-    quote: QuotesQuery
+  id: Int,
+  contentDate: String,
+  isFavQuote: Boolean = false,
+  quote: QuotesQuery
 ) extends IdResource
 
 object AllQuotesOfDay {
+
   implicit lazy val allQuotesOfDay: OFormat[AllQuotesOfDay] =
     Json.format[AllQuotesOfDay]
 
@@ -21,4 +22,5 @@ object AllQuotesOfDay {
       quote = Json.parse(quote).as[QuotesQuery]
     )
   }
+
 }

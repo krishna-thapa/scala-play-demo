@@ -8,7 +8,7 @@ import javax.inject.{ Inject, Singleton }
 import scala.util.Try
 
 @Singleton
-class FavQuoteQueryService @Inject()(favQuote: FavQuoteQueryDAO) extends Logging {
+class FavQuoteQueryService @Inject() (favQuote: FavQuoteQueryDAO) extends Logging {
 
   def listAllQuotes(userId: Int): Seq[QuotesQuery] = {
     favQuote.listFavQuotes[QuotesQuery](userId)
@@ -21,4 +21,5 @@ class FavQuoteQueryService @Inject()(favQuote: FavQuoteQueryDAO) extends Logging
   def getFavCachedQuotes(userId: Int): Seq[FavQuoteQuery] = {
     favQuote.listCachedFavQuotes[FavQuoteQuery](userId)
   }
+
 }

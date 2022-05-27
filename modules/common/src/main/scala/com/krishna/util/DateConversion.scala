@@ -7,7 +7,7 @@ import scala.util.{ Failure, Success, Try }
 
 object DateConversion extends Logging {
 
-  val now: Date                     = Calendar.getInstance().getTime
+  val now: Date = Calendar.getInstance().getTime
   val dateFormatter: Date => String = value => new SimpleDateFormat("yyyy-MM-dd").format(value)
 
   def getCurrentDate: String = dateFormatter(now)
@@ -26,4 +26,5 @@ object DateConversion extends Logging {
       case Success(value) => dateFormatter(value)
     }
   }
+
 }

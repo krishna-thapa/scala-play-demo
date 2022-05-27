@@ -15,7 +15,7 @@ import javax.inject.{ Inject, Singleton }
   * A repository for Quotes stored in quotes table.
   */
 @Singleton
-class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
+class QuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
     extends DbRunner
     with RepositoryQuoteMethods[QuotesQuery, QuoteQueriesTable] {
 
@@ -45,7 +45,7 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     * @return Random quote that matches input genre
     */
   def listGenreQuote(genre: Genre): Option[QuotesQuery] = {
-    log.info(s"Getting random quote from the table with genre: ${genre.value}")
+    log.info(s"Getting random quote from the table with genre: ${ genre.value }")
     runDbAction(
       tables
         .filter(_.genre === genre)
@@ -65,13 +65,17 @@ class QuoteQueryDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)
     val inputParam: String = parameter.replaceAll("^\\s+", "").toLowerCase
     log.info(s"Searching authors in Postgres table quotes for the input parameter: $inputParam")
     runDbAction(
-      QuoteQueriesTable.quoteQueries
+      QuoteQueriesTable
+        .quoteQueries
         .groupBy(_.author)
         .map { case (author, _) => author }
         .filter(_.toLowerCase like s"%$inputParam%")
         .result
     ).flatten
-      .sortBy(!_.startsWith(inputParam.take(1).capitalize)) //Sorted by the first letter of parameter
+      .sortBy(
+        !_.startsWith(inputParam.take(1).capitalize)
+      ) // Sorted by the first letter of parameter
       .take(10)
   }
+
 }

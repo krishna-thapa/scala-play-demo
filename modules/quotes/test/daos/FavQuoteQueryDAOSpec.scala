@@ -20,6 +20,7 @@ class FavQuoteQueryDAOSpec extends PostgresInstance with Matchers {
   val favQuoteQueryDAO: FavQuoteQueryDAO = Application.instanceCache[FavQuoteQueryDAO].apply(app)
 
   behavior of "FavQuoteQueryDAO"
+
   it should "return empty if the are no fav quotes for a user id" in {
     val resultFirstUser: Seq[QuotesQuery] = favQuoteQueryDAO.listFavQuotes(1)
     resultFirstUser.length shouldBe 0
@@ -48,4 +49,5 @@ class FavQuoteQueryDAOSpec extends PostgresInstance with Matchers {
     val allFavQuotes: Seq[QuotesQuery] = favQuoteQueryDAO.listFavQuotes(1)
     allFavQuotes.length shouldBe 1
   }
+
 }

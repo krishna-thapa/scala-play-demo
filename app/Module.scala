@@ -19,7 +19,7 @@ import java.util.{ Calendar, Date }
 class Module extends AbstractModule with Logging {
 
   val projectEnv: String = sys.env.getOrElse("PROJECT_ENV", "local")
-  val now: Date          = Calendar.getInstance().getTime
+  val now: Date = Calendar.getInstance().getTime
 
   log.info(s"Project is started in $projectEnv environment at $now")
 
@@ -32,4 +32,5 @@ class Module extends AbstractModule with Logging {
       bind(classOf[WebClient]).to(classOf[HttpService])
     }
   }
+
 }

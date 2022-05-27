@@ -6,11 +6,11 @@ import java.sql.Date
 import play.api.libs.json.{ Json, OFormat }
 
 case class UserDetail(
-    id: Int,
-    name: String,
-    email: String,
-    joinedDate: Date,
-    isAdmin: Boolean
+  id: Int,
+  name: String,
+  email: String,
+  joinedDate: Date,
+  isAdmin: Boolean
 ) extends IdResource
 
 object UserDetail {
@@ -19,9 +19,10 @@ object UserDetail {
   def apply(userInfo: UserInfo): UserDetail =
     new UserDetail(
       userInfo.id,
-      s"${userInfo.firstName} ${userInfo.lastName}",
+      s"${ userInfo.firstName } ${ userInfo.lastName }",
       userInfo.email,
       userInfo.createdDate,
       userInfo.isAdmin
     )
+
 }

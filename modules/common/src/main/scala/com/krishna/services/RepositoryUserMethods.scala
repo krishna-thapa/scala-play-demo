@@ -30,4 +30,5 @@ trait RepositoryUserMethods[T <: IdResource, QuoteTable <: Table[T] with TableWi
       .take(records)
       .result
   }
+
 }

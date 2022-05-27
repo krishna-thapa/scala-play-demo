@@ -24,7 +24,7 @@ trait ResponseError extends Logging {
   }
 
   def notFound(errorMsg: ErrorMsg): Result = {
-    log.error(s"Not Found error: ${errorMsg.msg}")
+    log.error(s"Not Found error: ${ errorMsg.msg }")
     NotFound(Json.toJson(ResponseErrorMsg(errorMsg.msg)))
   }
 
@@ -34,12 +34,12 @@ trait ResponseError extends Logging {
   }
 
   def unauthorized(errorMsg: ErrorMsg): Result = {
-    log.error(s"Unauthorized with reason: ${errorMsg.msg}")
+    log.error(s"Unauthorized with reason: ${ errorMsg.msg }")
     Unauthorized(Json.toJson(ResponseErrorMsg(errorMsg.msg)))
   }
 
   def forbidden(errorMsg: ErrorMsg): Result = {
-    log.error(s"Forbidden request: ${errorMsg.msg}")
+    log.error(s"Forbidden request: ${ errorMsg.msg }")
     Forbidden(Json.toJson(ResponseErrorMsg(errorMsg.msg)))
   }
 

@@ -23,13 +23,13 @@ trait AttachmentDAO extends ReactiveMongoComponents with Logging {
         // let's build an index on our gridfs chunks collection if none
         log.info(s"Checked if index is already created, result is $index")
       }
-    } yield attachments).recover {
-      case NonFatal(error) =>
-        println("Error while creating index for GridFS: " + error.getMessage)
-        throw error
+    } yield attachments).recover { case NonFatal(error) =>
+      println("Error while creating index for GridFS: " + error.getMessage)
+      throw error
     }
 
   def existUserPicture(emailId: String) = {
     gridFS.flatMap(_.find(BSONDocument("emailId" -> emailId)).headOption)
   }
+
 }

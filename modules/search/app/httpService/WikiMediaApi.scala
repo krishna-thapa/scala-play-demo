@@ -12,8 +12,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Failure
 
 @Singleton
-class WikiMediaApi @Inject()(httpService: WebClient, config: Configuration)(
-    implicit executionContext: ExecutionContext
+class WikiMediaApi @Inject() (httpService: WebClient, config: Configuration)(implicit
+  executionContext: ExecutionContext
 ) extends Logging {
   private val wikiMediaApiUrl: String = config.get[String]("wiki.apiUrl")
 
@@ -35,9 +35,9 @@ class WikiMediaApi @Inject()(httpService: WebClient, config: Configuration)(
 
       futureResponse.andThen {
         case Failure(exception: NoSuchElementException) =>
-          log.error(s"Error occurred while json parsing: ${exception.getMessage}")
+          log.error(s"Error occurred while json parsing: ${ exception.getMessage }")
         case Failure(exception) =>
-          log.error(s"Error occurred: ${exception.getMessage}")
+          log.error(s"Error occurred: ${ exception.getMessage }")
       }
     }
   }
@@ -46,4 +46,5 @@ class WikiMediaApi @Inject()(httpService: WebClient, config: Configuration)(
   private def handleAuthorStr(author: String): String = {
     author.split(" ").map(_.capitalize).mkString(" ")
   }
+
 }

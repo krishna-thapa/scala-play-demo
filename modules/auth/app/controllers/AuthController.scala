@@ -16,9 +16,9 @@ import play.api.Configuration
 import service.AuthService
 
 @Singleton
-class AuthController @Inject()(
-    scc: SecuredControllerComponents,
-    authService: AuthService
+class AuthController @Inject() (
+  scc: SecuredControllerComponents,
+  authService: AuthService
 )(implicit conf: Configuration)
     extends SecuredController(scc)
     with Logging
@@ -34,7 +34,8 @@ class AuthController @Inject()(
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     log.info("Executing signIn Controller")
     // Add request validation
-    AuthForms.signInForm
+    AuthForms
+      .signInForm
       .bindFromRequest()
       .fold(
         formWithErrors => invalidForm[SignInForm](formWithErrors, InvalidFormFormat("Login")),
@@ -50,10 +51,12 @@ class AuthController @Inject()(
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing signUp Controller")
     // Add request validation
-    AuthForms.signUpForm
+    AuthForms
+      .signUpForm
       .bindFromRequest()
       .fold(
-        formWithErrors => badRequest(s"The signup From was not in the expected format: $formWithErrors"),
+        formWithErrors =>
+          badRequest(s"The signup From was not in the expected format: $formWithErrors"),
         signUpForm => authService.singUpService(signUpForm)
       )
       .toFuture
@@ -114,10 +117,14 @@ class AuthController @Inject()(
     log.info("Executing updateUserInfo Controller")
     DecodeHeader(request.headers) match {
       case Right(user) =>
-        AuthForms.signUpForm
+        AuthForms
+          .signUpForm
           .bindFromRequest()
           .fold(
-            formWithErrors => badRequest(s"The update Form was not in the expected format: $formWithErrors").toFuture,
+            formWithErrors =>
+              badRequest(
+                s"The update Form was not in the expected format: $formWithErrors"
+              ).toFuture,
             userDetails => authService.updateUserInfoService(user.email, userDetails)
           )
       case Left(errorMsg) => responseErrorResult(errorMsg).toFuture

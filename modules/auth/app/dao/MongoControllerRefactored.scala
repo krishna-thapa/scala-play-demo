@@ -44,18 +44,18 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
   /** Returns a future Result that serves the first matched file, or a `NotFound` result.
     */
   protected final def serve[Id <: BSONValue](gfs: GridFS, emailId: String)(
-      foundFile: Cursor[gfs.ReadFile[Id]],
-      dispositionMode: String = CONTENT_DISPOSITION_INLINE
+    foundFile: Cursor[gfs.ReadFile[Id]],
+    dispositionMode: String = CONTENT_DISPOSITION_INLINE
   )(implicit materializer: Materializer): Future[Result] = {
     implicit def ec: ExecutionContext = materializer.executionContext
 
-    foundFile.headOption
-      .collect {
-        case Some(file) =>
-          file
+    foundFile
+      .headOption
+      .collect { case Some(file) =>
+        file
       }
       .map { file =>
-        def filename    = file.filename.getOrElse("file.bin")
+        def filename = file.filename.getOrElse("file.bin")
         def contentType = file.contentType.getOrElse("application/octet-stream")
 
         def chunks = GridFSStreams(gfs).source(file).map(HttpChunk.Chunk)
@@ -66,26 +66,28 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
         ).as(contentType)
           .withHeaders(
             CONTENT_LENGTH -> file.length.toString,
-            CONTENT_DISPOSITION -> (s"""$dispositionMode; filename="$filename"; filename*="UTF-8''""" + java.net.URLEncoder
+            CONTENT_DISPOSITION -> (s"""$dispositionMode; filename="$filename"; filename*="UTF-8''""" + java
+              .net
+              .URLEncoder
               .encode(filename, "UTF-8")
               .replace("+", "%20") + '"')
           )
 
       }
-      .recover {
-        case _ =>
-          NotFound(s"Picture is not found in the database for the user: $emailId")
+      .recover { case _ =>
+        NotFound(s"Picture is not found in the database for the user: $emailId")
       }
   }
 
   protected final def gridFSBodyParser(
-      gfs: Future[GridFS]
+    gfs: Future[GridFS]
   )(implicit materializer: Materializer): GridFSBodyParser[BSONValue] = {
     implicit def ec: ExecutionContext = materializer.executionContext
     import play.api.libs.streams.Accumulator
 
     parse.multipartFormData {
-      case PlaySupport.FileInfo(partName, filename, Some(contentType)) if contentType.startsWith("image") =>
+      case PlaySupport.FileInfo(partName, filename, Some(contentType))
+          if contentType.startsWith("image") =>
         Accumulator.flatten(gfs.map { gridFS =>
           val fileRef = gridFS.fileToSave( // see Api.scala
             filename = Some(filename),
@@ -101,9 +103,10 @@ trait MongoControllerRefactored extends PlaySupport.Controller with Logging {
 
       case info =>
         val errorMessage: String =
-          s"Unsupported: ${info.contentType} for the uploaded file ${info.fileName}"
+          s"Unsupported: ${ info.contentType } for the uploaded file ${ info.fileName }"
         log.error(errorMessage)
         sys.error(errorMessage)
     }
   }
+
 }

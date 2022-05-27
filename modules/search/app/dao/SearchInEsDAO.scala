@@ -19,9 +19,9 @@ import play.api.Configuration
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
-class SearchInEsDAO @Inject()(
-    quotesDAO: QuoteQueryDAO,
-    config: Configuration
+class SearchInEsDAO @Inject() (
+  quotesDAO: QuoteQueryDAO,
+  config: Configuration
 )(implicit ec: ExecutionContext)
     extends CommonEsMethods {
 
@@ -69,9 +69,9 @@ class SearchInEsDAO @Inject()(
     *         then it will use match query with fuzziness for typo fix search
     */
   def searchQuote(
-      text: String,
-      offset: Int = 0,
-      limit: Int = 10
+    text: String,
+    offset: Int = 0,
+    limit: Int = 10
   ): Future[Response[SearchResponse]] = {
     log.info(s"Searching text : $text in the index: $indexName")
     matchPrefixSearch(text, "quote", offset, limit).flatMap { response =>
@@ -132,4 +132,5 @@ class SearchInEsDAO @Inject()(
       }
     }
   }
+
 }

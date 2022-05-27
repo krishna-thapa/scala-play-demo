@@ -17,11 +17,11 @@ import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class GridFsController @Inject()(
-    scc: SecuredControllerComponents,
-    implicit val materializer: akka.stream.Materializer,
-    val reactiveMongoApi: ReactiveMongoApi,
-    gridFsAttachmentService: GridFsAttachmentService
+class GridFsController @Inject() (
+  scc: SecuredControllerComponents,
+  implicit val materializer: akka.stream.Materializer,
+  val reactiveMongoApi: ReactiveMongoApi,
+  gridFsAttachmentService: GridFsAttachmentService
 )(implicit executionContext: ExecutionContext, config: Configuration)
     extends SecuredController(scc)
     with MongoControllerRefactored
@@ -34,12 +34,14 @@ class GridFsController @Inject()(
     UserAction.async(gridFSBodyParser(gridFsAttachmentService.gridFS)) { request =>
       DecodeHeader(request.headers) match {
         case Right(user) =>
-          log.info(s"Executing saveUserPicture for the request user email: ${user.email}")
+          log.info(s"Executing saveUserPicture for the request user email: ${ user.email }")
           val fileOption: Option[MultipartFormData.FilePart[ReadFile[BSONValue, BSONDocument]]] =
             request.body.files.headOption
           fileOption match {
             case Some(file) =>
-              log.info(s"Received file: ${file.filename} with content type of: ${file.contentType}")
+              log.info(
+                s"Received file: ${ file.filename } with content type of: ${ file.contentType }"
+              )
               gridFsAttachmentService.addImageAttachment(user.email, file)
             case _ => NotFound("Select the picture to upload").toFuture
           }
@@ -51,7 +53,7 @@ class GridFsController @Inject()(
   def getAttachedPicture: Action[AnyContent] = UserAction.async { request =>
     DecodeHeader(request.headers) match {
       case Right(user) =>
-        log.info(s"Executing getAttachedPicture for the request user email: ${user.email}")
+        log.info(s"Executing getAttachedPicture for the request user email: ${ user.email }")
         getAttachment(user.email)
       case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
     }
@@ -61,7 +63,7 @@ class GridFsController @Inject()(
   def removeAttachedPicture: Action[AnyContent] = UserAction.async { request =>
     DecodeHeader(request.headers) match {
       case Right(user) =>
-        log.info(s"Executing removeAttachedPicture for the request user email: ${user.email}")
+        log.info(s"Executing removeAttachedPicture for the request user email: ${ user.email }")
         gridFsAttachmentService
           .removeUserPicture(user.email)
           .map(_ => Ok("Success on removing the profile picture"))

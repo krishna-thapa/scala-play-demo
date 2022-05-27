@@ -13,11 +13,11 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SearchController @Inject()(
-    scc: SecuredControllerComponents,
-    searchInEsDao: SearchInEsDAO,
-    akkaService: AkkaService,
-    extendedAkkaService: ExtendedAkkaService
+class SearchController @Inject() (
+  scc: SecuredControllerComponents,
+  searchInEsDao: SearchInEsDAO,
+  akkaService: AkkaService,
+  extendedAkkaService: ExtendedAkkaService
 )(implicit executionContext: ExecutionContext)
     extends SecuredController(scc)
     with Logging {
@@ -51,7 +51,8 @@ class SearchController @Inject()(
   def writeMigrateQuotesToEs: Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing writeMigrateQuotesToEs Controller")
 
-    akkaService.createCompletionAndInsert
+    akkaService
+      .createCompletionAndInsert
       .map(_ => Ok("Success"))
       .errorRecover
   }
@@ -66,7 +67,8 @@ class SearchController @Inject()(
   def migrateCSVRecordsToPostgres: Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing migrateCSVRecordsToPostgres Controller")
 
-    extendedAkkaService.runCSVMigrationStream
+    extendedAkkaService
+      .runCSVMigrationStream
       .map(response => Ok(s"Response from Akka Stream: $response"))
       .errorRecover
   }
@@ -122,4 +124,5 @@ class SearchController @Inject()(
       .map(responseEsResult)
       .errorRecover
   }
+
 }

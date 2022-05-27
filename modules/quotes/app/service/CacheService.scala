@@ -9,9 +9,9 @@ import play.api.cache.redis.{ CacheApi, SynchronousResult }
 import play.api.libs.json.Json
 import javax.inject.Inject
 
-class CacheService @Inject()(
-    cache: CacheApi,
-    cacheDao: CacheDAO
+class CacheService @Inject() (
+  cache: CacheApi,
+  cacheDao: CacheDAO
 ) extends Logging {
 
   def cacheQuoteOfTheDay(contentDate: String): Either[ErrorMsg, QuotesQuery] = {
@@ -41,9 +41,12 @@ class CacheService @Inject()(
       log.info("Getting cached quotes from the Redis")
       val quotesOfDay = for {
         (key, index) <- allCachedKeys.zipWithIndex
-        quote        <- cache.get[String](key) // Get the stored value for that key from Redis cached storage
+        quote <- cache.get[String](
+          key
+        ) // Get the stored value for that key from Redis cached storage
       } yield AllQuotesOfDay(key, quote, index)
       Right(quotesOfDay)
     }
   }
+
 }

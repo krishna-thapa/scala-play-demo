@@ -24,25 +24,31 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
 
   implicit lazy val materializer: Materializer = app.materializer
 
-  val mockCustomQuoteQueryDAO: CustomQuoteQueryDAO                 = mock[CustomQuoteQueryDAO]
-  val mockSecuredControlledComponents: SecuredControllerComponents = mock[SecuredControllerComponents]
+  val mockCustomQuoteQueryDAO: CustomQuoteQueryDAO = mock[CustomQuoteQueryDAO]
+
+  val mockSecuredControlledComponents: SecuredControllerComponents =
+    mock[SecuredControllerComponents]
 
   val customQuoteController: CustomQuoteController = new CustomQuoteController(
     mockSecuredControlledComponents,
     mockCustomQuoteQueryDAO
   )
 
-  val parse: PlayBodyParsers             = stubPlayBodyParsers(materializer)
+  val parse: PlayBodyParsers = stubPlayBodyParsers(materializer)
   val defaultParser: BodyParsers.Default = new BodyParsers.Default(parse)
-  val config: Configuration              = Configuration.from(Map("play.http.session.jwtKey" -> "mockUser"))
+  val config: Configuration = Configuration.from(Map("play.http.session.jwtKey" -> "mockUser"))
 
   val mockUserActionBuilder: UserActionBuilder =
     new UserActionBuilder(defaultParser)(ExecutionContext.global, config)
+
   when(mockSecuredControlledComponents.userActionBuilder).thenReturn(mockUserActionBuilder)
 
-  val mockRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(("Authorization", "1"))
+  val mockRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withHeaders(("Authorization", "1"))
+
   val mockUserDetail: UserDetail =
     UserDetail(1, "name", "email@com", new Date(System.currentTimeMillis()), isAdmin = false)
+
   val mockCustomQuote: CustomQuotesQuery = CustomQuotesQuery(
     1,
     1,
@@ -52,6 +58,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
     Date.valueOf("2015-03-01"),
     ownQuote = false
   )
+
   when(mockCustomQuoteQueryDAO.decoderHeader(mockRequest)).thenReturn(Right(mockUserDetail))
 
   "CustomQuoteController" should {
@@ -59,7 +66,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
       when(mockCustomQuoteQueryDAO.listAllQuotes(1))
         .thenReturn(Seq(mockCustomQuote))
       val result: Future[Result] = customQuoteController.getCustomQuotes.apply(mockRequest)
-      val bodyText: String       = contentAsString(result)
+      val bodyText: String = contentAsString(result)
       bodyText mustBe
         """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
@@ -68,7 +75,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
       when(mockCustomQuoteQueryDAO.listRandomQuote(1, 1))
         .thenReturn(Seq(mockCustomQuote))
       val result: Future[Result] = customQuoteController.getRandomCustomQuote.apply(mockRequest)
-      val bodyText: String       = contentAsString(result)
+      val bodyText: String = contentAsString(result)
       bodyText mustBe
         """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
@@ -76,7 +83,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
     "getSelectedQuote should give selected quote only" in {
       when(mockCustomQuoteQueryDAO.listSelectedQuote(1, 1)).thenReturn(Some(mockCustomQuote))
       val result: Future[Result] = customQuoteController.getSelectedQuote(1).apply(mockRequest)
-      val bodyText: String       = contentAsString(result)
+      val bodyText: String = contentAsString(result)
       bodyText mustBe
         """{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}""".stripMargin
     }
@@ -84,7 +91,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
     "deleteCustomQuote should delete selected quote only" in {
       when(mockCustomQuoteQueryDAO.deleteQuote(1, 1)).thenReturn(1)
       val result: Future[Result] = customQuoteController.deleteCustomQuote(1).apply(mockRequest)
-      val bodyText: String       = contentAsString(result)
+      val bodyText: String = contentAsString(result)
       bodyText mustBe
         """{"success":"Successfully delete quote with id: 1"}""".stripMargin
     }
@@ -92,4 +99,5 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
     // TODO add more test for the Create and Update Controller methods
     "addCustomQuote should insert a new quote" in {}
   }
+
 }

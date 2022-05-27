@@ -3,6 +3,7 @@ package com.krishna.util
 import play.api.libs.json.{ JsError, JsSuccess, Json, Reads }
 
 object Parser extends Logging {
+
   def parseJson[T](json: String)(implicit reads: Reads[T]): T = {
     Json.parse(json).validate[T] match {
       case JsSuccess(result, _) => result
@@ -11,4 +12,5 @@ object Parser extends Logging {
         throw new Exception("Parsing message error")
     }
   }
+
 }

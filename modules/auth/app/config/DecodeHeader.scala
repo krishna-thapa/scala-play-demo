@@ -19,11 +19,14 @@ object DecodeHeader extends JwtKey {
     }
   }
 
-  private def getUserDetails(token: String)(implicit conf: Configuration): Either[ErrorMsg, UserDetail] = {
+  private def getUserDetails(
+    token: String
+  )(implicit conf: Configuration): Either[ErrorMsg, UserDetail] = {
     // Default Signature algorithm, defined in app config under: play.http.session.algorithm
     JwtJson.decodeJson(token, secretKey, Seq(JwtAlgorithm.HS256)) match {
       case Success(value)     => Right((value \ jwtSessionKey).as[UserDetail])
       case Failure(exception) => Left(TokenDecodeFailure(exception.getMessage))
     }
   }
+
 }

@@ -15,8 +15,10 @@ trait DbRunner extends Logging {
 
   // return result from future
   implicit class FutureResult[T](future: Future[T]) {
+
     def andGetResult(timeout: Option[Int] = None): T =
       Await.result(future, timeout.getOrElse(60).seconds)
+
   }
 
   /* Run and get the result from the future*/
@@ -26,8 +28,8 @@ trait DbRunner extends Logging {
 
   /* Run and get the result from the future or catch any error*/
   def runDbActionCatchError[T](
-      action: DBIOAction[T, NoStream, All],
-      timeout: Option[Int] = None
+    action: DBIOAction[T, NoStream, All],
+    timeout: Option[Int] = None
   ): Try[T] = {
     try {
       Success(runDbAction(action, timeout))
@@ -37,4 +39,5 @@ trait DbRunner extends Logging {
         Failure(ex)
     }
   }
+
 }
