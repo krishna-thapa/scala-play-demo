@@ -1,8 +1,6 @@
 <!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
 <configuration>
-
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
-
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>${application.home:-.}/logs/application.log</file>
     <encoder>
@@ -11,21 +9,22 @@
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <withJansi>true</withJansi>
     <!-- Only use for the local console logging -->
-    <!--        <encoder>-->
-    <!--          <pattern>%d - %coloredLevel - [%thread] - %logger %X{method} - %message%n%xException</pattern>-->
-    <!--        </encoder>-->
-    <!-- Console output log as Json so that Kibana can convert to indices and use for filter and sorting -->
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-      <fieldNames>
-        <timestamp>timestamp</timestamp>
-        <message>message</message>
-        <thread>[ignore]</thread>
-        <levelValue>[ignore]</levelValue>
-        <logger>logger</logger>
-        <version>[ignore]</version>
-      </fieldNames>
+    <encoder>
+      <pattern>%cyan(%d{HH:mm:ss.SSS}) %green([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
     </encoder>
+    <!-- Console output log as Json so that Kibana can convert to indices and use for filter and sorting -->
+    <!--    <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+    <!--      <fieldNames>-->
+    <!--        <timestamp>timestamp</timestamp>-->
+    <!--        <message>message</message>-->
+    <!--        <thread>[ignore]</thread>-->
+    <!--        <levelValue>[ignore]</levelValue>-->
+    <!--        <logger>logger</logger>-->
+    <!--        <version>[ignore]</version>-->
+    <!--      </fieldNames>-->
+    <!--    </encoder>-->
   </appender>
 
   <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">

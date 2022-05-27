@@ -9,17 +9,17 @@ object Dependencies {
     val playjwt         = "5.0.0"
     val bcrypt          = "4.3.0"
     val quartzScheduler = "1.8.5-akka-2.6.x"
-    val akkaVersion     = "2.6.17"
+    val akkaVersion     = "2.6.19"
 
     // Database
     val monogoDb   = "1.0.10-play28"
     val elastic4s  = "7.9.1"
     val playRedis  = "2.6.1"
-    val postgresql = "42.2.12"
+    val postgresql = "42.3.4"
 
     // tests
     val scalaPlayTest  = "5.1.0"
-    val testContainers = "0.39.12"
+    val testContainers = "0.40.7"
     val mockitoVer     = "1.16.49"
 
     // logs

@@ -30,9 +30,7 @@ class QuoteController @Inject() (
 
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
-    *
     * Anyone can call this API endpoint.
-    *
     * This API endpoint is not used in mobile app
     */
   def getRandomQuote: Action[AnyContent] = Action { implicit request =>
@@ -41,16 +39,13 @@ class QuoteController @Inject() (
   }
 
   /**
-    *  A REST endpoint that gets a quote of the day as JSON from quotes table.
-    *  It should be trigger after midnight on every day using cron job.
-    *  It should stores the past 5 quotes of the day in the Redis cache storage.
-    *
-    *  Anyone can call this API endpoint.
-    *
-    *  This API endpoint is not used in mobile app
-    *
-    *  @param date: Can take milliseconds date format as a path parameter to gets the
-    *  previous 5 days quote of the day
+    * A REST endpoint that gets a quote of the day as JSON from quotes table.
+    * It should be trigger after midnight on every day using cron job.
+    * It should stores the past 5 quotes of the day in the Redis cache storage.
+    * Anyone can call this API endpoint.
+    * This API endpoint is not used in mobile app
+    * @param date : Can take milliseconds date format as a path parameter to gets the
+    *             previous 5 days quote of the day
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action { implicit request =>
     log.info("Executing getQuoteOfTheDay")
@@ -85,7 +80,6 @@ class QuoteController @Inject() (
 
   /**
     * A REST endpoint that gets random 10 quotes as JSON from quotes table.
-    *
     *  Anyone can call this API endpoint.
     */
   def getFirst10Quotes: Action[AnyContent] = Action { implicit request =>
