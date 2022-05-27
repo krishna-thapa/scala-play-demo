@@ -43,10 +43,9 @@ class CacheDAO @Inject() (cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Con
           log.info("Storing today's quote in the cache storage")
           cache.set(
             key = contentDate,
-            value =
-              Json
-                .toJson(uniqueQuote.toOption.get)
-                .toString, // best way to get the right value from either
+            value = Json
+              .toJson(uniqueQuote.toOption.get)
+              .toString, // best way to get the right value from either
             expiration = 5.days // Key is only store for 5 days
           )
         }
