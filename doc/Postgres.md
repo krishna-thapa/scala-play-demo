@@ -43,7 +43,7 @@ CREATE DATABASE inspiration_db;
 - Connect to the right database
 `\c inspiration_db`
 - See all the tables 
-`\c dt`
+`\dt`
 
 
 ### How to import CSV into the Docker Postgres database

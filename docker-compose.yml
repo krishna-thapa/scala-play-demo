@@ -21,6 +21,22 @@ services:
 #      - postgres
 #      - kibana
 #      - filebeat
+
+  # https://www.portainer.io/
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - "9004:9000"
+
+  # https://www.elastic.co/
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     container_name: elasticsearch
@@ -29,11 +45,12 @@ services:
       network.host: 0.0.0.0
       path.repo: /tmp/elastic4s
     ports:
-      - 9200:9200
+      - "9200:9200"
     volumes:
       - "./conf/docker/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "es-data:/usr/share/elasticsearch/data:rw"
     restart: unless-stopped
+
 #  kibana:
 #    image: docker.elastic.co/kibana/kibana:7.10.2
 #    container_name: kibana
@@ -53,11 +70,13 @@ services:
 #    - "./conf/docker/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
 #    - "/var/lib/docker:/var/lib/docker:ro"
 #    - "/var/run/docker.sock:/var/run/docker.sock"
+
+  # https://redis.io/
   redis:
     image: redis:latest
     container_name: redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     volumes:
       - "./conf/docker/redis.conf:/redis.conf"
       - "redis-data:/data:rw"
@@ -65,6 +84,7 @@ services:
       bash -c "redis-server --appendonly yes
       && redis-server /redis.conf"
     restart: always
+
   postgres:
     image: postgres:latest
     container_name: pg-docker
@@ -81,14 +101,14 @@ services:
       # for debian system use: /var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata
       # for mac OS: ./pgdata/:/var/lib/postgresql/data/pgdata and copy the CSV files under pgdata
       # which will be under the project level directory, not the root level
-      - "./pgdata/:/var/lib/postgresql/data/pgdata"
+      - "/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata"
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
   mongodb:
     image: mongo
     container_name: mongodb-quotes
     restart: always
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - data:/data
     #    environment:
@@ -99,7 +119,7 @@ services:
     container_name: mongo-express-quotes
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       #      - ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser
       #      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
@@ -111,6 +131,6 @@ volumes:
   redis-data:
     driver: local
 
-networks:
-  default:
-    name: mongodb_network
+#networks:
+#  default:
+#    name: mongodb_network

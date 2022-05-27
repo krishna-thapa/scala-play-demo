@@ -11,12 +11,14 @@
 ### Steps to run the project locally using sbt run
 1. Git clone or download the project from [github](https://github.com/krishna-thapa/inspirational-quote-api)
 2. Import the sbt project using your choice of IDEA
-3. Uncomment section for Docker services host name in `.env` under local env and comment for the container env with PROJECT_ENV
+3. Go inside the root `.env` and uncomment for the local env and comment out for the container env
 4. Comment out `inspirationa-quote-api` from line 5-23 in `docker-compose.yml` file, this is the docker image of the project itself
 5. Make changes volume local for Postgres container as per the operating system - is explained in comment under Postgres volume in `docker-compose.yml`
-6. Run the sbt command that will start the docker and sbt run in different terminal: `sbt localStart`
-7. Run the script to migrate the CSV file: `sbt csvMigrate`, make sure you have psql command tool installed
-8. Goto localhost 9000 to see swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
+6. Run the docker-compose up by running the sbt task: `sbt sbtDockerStart`
+7. Run the sbt run by running the sbt task in different terminal: `sbt sbtLocalStart`
+8. Run the script to migrate the CSV file: `sbt sbtCsvMigrate`, make sure you have psql command tool installed. You need to add the password for the admin database for your Postgres database which is `admin`
+9. Run `http://localhost:9004/` to connect to Portainer and manage all the running containers
+10. Goto localhost 9000 to see swagger API management: `http://localhost:9000/docs/swagger-ui/index.html?url=/assets/swagger.json`
 
 ### Steps to run the project locally using docker containers
 1. Download `docker-compose.yml` file only from the repo
