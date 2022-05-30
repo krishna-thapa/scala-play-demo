@@ -5,27 +5,33 @@ import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidDate }
 import com.krishna.response.{ ErrorMsg, ResponseError }
 import com.krishna.util.DateConversion.getCurrentDate
 import play.api.Configuration
-import play.api.cache.redis.{ CacheApi, RedisList, SynchronousResult }
+import play.api.cache.redis.{ AsynchronousResult, CacheAsyncApi, RedisList, SynchronousResult }
 import play.api.libs.json.Json
 
 import javax.inject._
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration.DurationInt
 
-class CacheDAO @Inject() (cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Configuration)
-    extends ResponseError {
+class CacheDAO @Inject() (
+  cache: CacheAsyncApi,
+  quotesDAO: QuoteQueryDAO,
+  config: Configuration,
+  implicit val ec: ExecutionContext
+) extends ResponseError {
 
   /*
     A cache API that uses synchronous calls rather than async calls.
     Useful when you know you have a fast in-memory cache.
    */
-  protected lazy val quoteOfTheDayCacheList: RedisList[String, SynchronousResult] =
+  protected lazy val quoteOfTheDayCacheList: RedisList[String, AsynchronousResult] =
     cache.list[String]("cache-quoteOfTheDay")
 
   // TODO: make the max list size to 500
   protected lazy val maxListSize: Int = config.get[Int]("play.cache.storeQuotesSize")
 
   // Gets a single random quote from the `quotes` table
-  private def randomQuote: Option[QuotesQuery] = quotesDAO.listRandomQuote(1).headOption
+  private def randomQuote: Future[Option[QuotesQuery]] =
+    quotesDAO.listRandomQuote(1).map(_.headOption)
 
   /**
     * Cache previous 5 days of quote of the day in the Redis storage
@@ -68,7 +74,7 @@ class CacheDAO @Inject() (cache: CacheApi, quotesDAO: QuoteQueryDAO, config: Con
   // TODO: Convert this to tail recursive
   def getUniqueQuoteFromDB(
     quote: QuotesQuery,
-    cachedQuotes: RedisList[String, SynchronousResult]
+    cachedQuotes: RedisList[String, AsynchronousResult]
   ): Either[ErrorMsg, QuotesQuery] = {
 
     // Have to covert Redis list to Scala list to use contains method

@@ -1,5 +1,6 @@
 package com.krishna.util
 
+import com.krishna.model.exception.ParseException
 import play.api.libs.json.{ JsError, JsSuccess, Json, Reads }
 
 object Parser extends Logging {
@@ -9,7 +10,7 @@ object Parser extends Logging {
       case JsSuccess(result, _) => result
       case JsError(errors) =>
         log.error(s"Encountered errors parsing $json: $errors")
-        throw new Exception("Parsing message error")
+        throw ParseException("Parsing message error")
     }
   }
 

@@ -5,20 +5,20 @@ import com.krishna.util.Logging
 import daos.FavQuoteQueryDAO
 
 import javax.inject.{ Inject, Singleton }
-import scala.util.Try
+import scala.concurrent.Future
 
 @Singleton
 class FavQuoteQueryService @Inject() (favQuote: FavQuoteQueryDAO) extends Logging {
 
-  def listAllQuotes(userId: Int): Seq[QuotesQuery] = {
+  def listAllQuotes(userId: Int): Future[Seq[QuotesQuery]] = {
     favQuote.listFavQuotes[QuotesQuery](userId)
   }
 
-  def createOrUpdateFavQuote(userId: Int, csvId: String): Try[FavQuoteQuery] = {
+  def createOrUpdateFavQuote(userId: Int, csvId: String): Future[FavQuoteQuery] = {
     favQuote.modifyFavQuote[FavQuoteQuery](userId, csvId)
   }
 
-  def getFavCachedQuotes(userId: Int): Seq[FavQuoteQuery] = {
+  def getFavCachedQuotes(userId: Int): Future[Seq[FavQuoteQuery]] = {
     favQuote.listCachedFavQuotes[FavQuoteQuery](userId)
   }
 

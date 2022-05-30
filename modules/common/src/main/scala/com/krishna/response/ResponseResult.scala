@@ -6,12 +6,17 @@ import play.api.libs.json.{ Json, OFormat }
 import play.api.mvc.Result
 import play.api.mvc.Results.Ok
 
-import scala.util.{ Failure, Success, Try }
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait ResponseResult extends ResponseError {
 
-  def responseOk[T](result: T)(implicit conv: OFormat[T]): Result = {
-    Ok(Json.toJson(result))
+  def responseOk[T](result: T)(implicit conv: OFormat[T]): Future[Result] = {
+    Future.successful(Ok(Json.toJson(result)))
+  }
+
+  def responseFuture[T](futureRecord: Future[T])(implicit conv: OFormat[T]): Future[Result] = {
+    futureRecord.map(record => Ok(Json.toJson(record)))
   }
 
   def responseSeqResult[T <: IdResource](records: Seq[T])(implicit conv: OFormat[T]): Result = {
@@ -19,42 +24,52 @@ trait ResponseResult extends ResponseError {
     else notFound(EmptyDbMsg)
   }
 
-  // TODO have to remove it
-  def responseSeqString(records: Seq[String]): Result = {
-    if (records.nonEmpty) Ok(Json.toJson(records))
-    else notFound(EmptyDbMsg)
+  def responseSeqResultAsync[T <: IdResource](
+    futureRecords: Future[Seq[T]]
+  )(implicit conv: OFormat[T]): Future[Result] = {
+    futureRecords.map { records =>
+      if (records.nonEmpty) Ok(Json.toJson(records))
+      else notFound(EmptyDbMsg)
+    }
+  }
+
+  def responseSeqString(futureRecords: Future[Seq[String]]): Future[Result] = {
+    futureRecords.map { records =>
+      if (records.nonEmpty) Ok(Json.toJson(records))
+      else notFound(EmptyDbMsg)
+    }
   }
 
   def responseOptionResult[T <: IdResource](
-    record: Option[T]
-  )(implicit conv: OFormat[T]): Result = {
-    record match {
+    futureRecord: Future[Option[T]]
+  )(implicit conv: OFormat[T]): Future[Result] = {
+    futureRecord.map {
       case Some(quote) => Ok(Json.toJson(quote))
       case None =>
         notFound(EmptyDbMsg)
     }
   }
 
-  def responseTryResult[T <: IdResource](record: Try[T])(implicit conv: OFormat[T]): Result = {
-    record match {
-      case Success(quote)     => Ok(Json.toJson(quote))
-      case Failure(exception) => internalServerError(exception.getMessage)
-    }
-  }
+//  def responseTryResult[T <: IdResource](record: Try[T])(implicit conv: OFormat[T]): Result = {
+//    record match {
+//      case Success(quote)     => Ok(Json.toJson(quote))
+//      case Failure(exception) => internalServerError(exception.getMessage)
+//    }
+//  }
 
   def responseEitherResult[T <: IdResource](
-    record: Either[ErrorMsg, T]
-  )(implicit conv: OFormat[T]): Result = {
-    record match {
+    futureRecord: Future[Either[ErrorMsg, T]]
+  )(implicit conv: OFormat[T]): Future[Result] = {
+    futureRecord.flatMap {
       case Left(errorMsg) =>
         responseErrorResult(errorMsg)
-      case Right(quote) => Ok(Json.toJson(quote))
+      case Right(quote) => responseOk(quote)
     }
   }
 
   // Use this method on each response error
-  def responseErrorResult(errorMsg: ErrorMsg): Result = {
-    errorMsg match {
+  def responseErrorResult(errorMsg: ErrorMsg): Future[Result] = {
+    val result: Result = errorMsg match {
       case EmptyDbMsg                                     => notFound(EmptyDbMsg)
       case invalidDate: InvalidDate                       => badRequest(invalidDate.msg)
       case invalidCsvId: InvalidCsvId                     => badRequest(invalidCsvId.msg)
@@ -65,6 +80,7 @@ trait ResponseResult extends ResponseError {
       case accountNotFound: AccountNotFound               => notFound(accountNotFound)
       case _                                              => badRequest("Something went wrong")
     }
+    Future.successful(result)
   }
 
 }

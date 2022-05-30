@@ -100,10 +100,13 @@ Have implemented [play cache](https://www.playframework.com/documentation/2.8.x/
 
 ## Further improvements on
 
-- Add paginiation using the offset value for getting all the records instead
+- Add pagination using the offset and limit value for getting all the record
 - Use of Postgres Full-Text search to enable the Search service from Postgres instead of using ElasticSearch
 - Make use of extended Slick pg library to add the array of string in terms of genres
 - Fix the cron schedule job
+- Add the Akka Kafka to add the systtem for notification:
+  - Check this:
+- Add new module for the load testing using Akka Gatling library
 - Run evolution sql scripts for test container (find out how the copy can be differed with test and actual project)
 
 ## Actor inject dependency
