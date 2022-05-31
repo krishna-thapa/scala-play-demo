@@ -20,10 +20,10 @@ class CacheService @Inject() (
   def cacheQuoteOfTheDay(contentDate: String): Future[Either[ErrorMsg, QuotesQuery]] = {
 
     // Get the quote from the content date key from global cache storage in Redis
-    cache.get[String](contentDate).map {
+    cache.get[String](contentDate).flatMap {
       case Some(quote: String) =>
         log.info("Content date found in the cache storage")
-        Right(Json.parse(quote).as[QuotesQuery])
+        Future(Right(Json.parse(quote).as[QuotesQuery]))
       case None =>
         log.info("Content date is not found in the cache storage")
         cacheDao.cacheQuoteOfTheDay(contentDate)
@@ -34,21 +34,22 @@ class CacheService @Inject() (
     // Get all the cached keys(max 5) and will be in date format
     val allCachedKeys: AsynchronousResult[Seq[String]] = cache.matching("20*")
 
-    allCachedKeys.map { cachedKeys =>
+    allCachedKeys.flatMap { cachedKeys =>
       if (cachedKeys.isEmpty) {
         log.warn("Redis cache is empty, getting quote of the day")
-        cacheDao.cacheQuoteOfTheDay(getCurrentDate) match {
-          case Left(errorMsg) => Left(errorMsg)
+        cacheDao.cacheQuoteOfTheDay(getCurrentDate).flatMap {
+          case Left(errorMsg) => Future(Left(errorMsg))
           case Right(_)       => getAllCachedQuotes
         }
       } else {
         log.info("Getting cached quotes from the Redis")
-        val quotesOfDay: Seq[Nothing] = for {
-          (key, index) <- cachedKeys.zipWithIndex
-          // Get the stored value for that key from Redis cached storage
-          quote <- cache.get[String](key)
-        } yield AllQuotesOfDay(key, quote, index)
-        Right(quotesOfDay)
+        val futureAllQuotes: Seq[Future[AllQuotesOfDay]] =
+          cachedKeys.zipWithIndex.map { case (key, index) =>
+            cache.get[String](key).map { quote =>
+              AllQuotesOfDay(key, quote, index)
+            }
+          }
+        Future.sequence(futureAllQuotes).map(Right(_))
       }
     }
   }

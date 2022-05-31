@@ -48,10 +48,11 @@ class QuoteQueryService @Inject() (
 
   def cachedQuotesService(user: Option[UserDetail]): Future[Result] = {
     log.info("Executing cachedQuotesService in QuoteQueryService")
-    cacheService.getAllCachedQuotes match {
+    cacheService.getAllCachedQuotes.flatMap {
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(quotes) =>
-        if (user.isEmpty) responseSeqResult(quotes) else usersCachedQuotes(quotes, user.get)
+        if (user.isEmpty) Future(responseSeqResult(quotes))
+        else usersCachedQuotes(quotes, user.get)
     }
   }
 
@@ -62,11 +63,13 @@ class QuoteQueryService @Inject() (
     if (quotes.nonEmpty) {
       val cachedFavQuoteIds: Future[Seq[String]] =
         favQuoteService.getFavCachedQuotes(user.id).map(_.map(_.csvId))
-      responseSeqResult(quotes.map { cachedQuote =>
-        if (cachedFavQuoteIds.contains(cachedQuote.quote.csvId))
-          cachedQuote.copy(isFavQuote = true)
-        else cachedQuote
-      })
+      val futureCachedQuotes: Future[Seq[AllQuotesOfDay]] = cachedFavQuoteIds.map { ids =>
+        quotes.map { cachedQuote =>
+          if (ids.contains(cachedQuote.quote.csvId)) cachedQuote.copy(isFavQuote = true)
+          else cachedQuote
+        }
+      }
+      responseSeqResultAsync(futureCachedQuotes)
     } else responseErrorResult(EmptyDbMsg)
   }
 

@@ -58,7 +58,7 @@ class QuoteController @Inject() (
     * All of the quotes csv id are stored in the Redis storage
     * @return last 5 quote of the day
     */
-  def getCachedQuotes: Action[AnyContent] = Action { implicit request =>
+  def getCachedQuotes: Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing get last five quotes of the day in QuoteController.")
     DecodeHeader(request.headers) match {
       case Left(_) =>

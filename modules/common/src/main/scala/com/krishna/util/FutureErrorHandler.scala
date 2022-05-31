@@ -33,9 +33,7 @@ object FutureErrorHandler extends Logging {
   // An implicit class to apply for validating email address on String
   implicit class ValidEmail(email: String) {
 
-    def validEmail: Boolean = {
-      if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
-    }
+    def validEmail: Boolean = """(?=\S+)(?=(\w+)@([\w.]+))""".r.matches(email)
 
   }
 

@@ -36,12 +36,10 @@ class AdminActionBuilder @Inject() (parser: BodyParsers.Default)(implicit
           .errorRecover
       // If the logged in user doesn't have an admin role
       case Some(userDetail) =>
-        Future(
-          responseErrorResult(AuthorizationForbidden(s"${ userDetail.email }"))
-            .refreshJwtSession(request)
-        )
+        responseErrorResult(AuthorizationForbidden(s"${ userDetail.email }"))
+          .map(_.refreshJwtSession(request))
       case _ =>
-        Future(responseErrorResult(AuthenticationFailed))
+        responseErrorResult(AuthenticationFailed)
     }
   }
 

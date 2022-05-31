@@ -38,28 +38,32 @@ class CacheDAO @Inject() (
     * @param contentDate: To check the date as a key in the Redis
     * @return Response Quote in the JSON
     */
-  def cacheQuoteOfTheDay(contentDate: String): Either[ErrorMsg, QuotesQuery] = {
+  def cacheQuoteOfTheDay(contentDate: String): Future[Either[ErrorMsg, QuotesQuery]] = {
     if (contentDate.contentEquals(getCurrentDate)) {
-      randomQuote.fold[Either[ErrorMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
-        val uniqueQuote: Either[ErrorMsg, QuotesQuery] =
-          getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
+      randomQuote.flatMap(
+        _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future(Left(EmptyDbMsg)))(
+          (quote: QuotesQuery) => {
+            val uniqueQuote: Future[Either[ErrorMsg, QuotesQuery]] =
+              getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
 
-        // Side effect to store the cache storage
-        if (uniqueQuote.isRight) {
-          log.info("Storing today's quote in the cache storage")
-          cache.set(
-            key = contentDate,
-            value = Json
-              .toJson(uniqueQuote.toOption.get)
-              .toString, // best way to get the right value from either
-            expiration = 5.days // Key is only store for 5 days
-          )
-        }
-        uniqueQuote
-      })
+            // Side effect to store the cache storage
+            uniqueQuote.foreach { case Right(quote) =>
+              log.info("Storing today's quote in the cache storage")
+              cache.set(
+                key = contentDate,
+                value = Json
+                  .toJson(quote)
+                  .toString, // best way to get the right value from either
+                expiration = 5.days // Key is only store for 5 days
+              )
+            }
+            uniqueQuote
+          }
+        )
+      )
     } else {
       log.warn(s"Date has to be within last 5 days: $contentDate")
-      Left(InvalidDate(contentDate))
+      Future(Left(InvalidDate(contentDate)))
     }
   }
 
@@ -75,19 +79,25 @@ class CacheDAO @Inject() (
   def getUniqueQuoteFromDB(
     quote: QuotesQuery,
     cachedQuotes: RedisList[String, AsynchronousResult]
-  ): Either[ErrorMsg, QuotesQuery] = {
+  ): Future[Either[ErrorMsg, QuotesQuery]] = {
 
     // Have to covert Redis list to Scala list to use contains method
     // Use of List instead of Set since redis-play has no many wrapper methods for Set and no sorted Set
-    if (cachedQuotes.toList.toList.contains(quote.csvId)) {
-      log.warn("Duplicate record has been called with id: " + quote.csvId)
-      randomQuote
-        .fold[Either[ErrorMsg, QuotesQuery]](Left(EmptyDbMsg))((quote: QuotesQuery) => {
-          getUniqueQuoteFromDB(quote, cachedQuotes)
-        })
-    } else {
-      redisActions(quote.csvId, cachedQuotes)
-      Right(quote)
+    cachedQuotes.toList.flatMap { quotes =>
+      if (quotes.contains(quote.csvId)) {
+        log.warn("Duplicate record has been called with id: " + quote.csvId)
+        randomQuote
+          .flatMap(
+            _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future(Left(EmptyDbMsg)))(
+              (quote: QuotesQuery) => {
+                getUniqueQuoteFromDB(quote, cachedQuotes)
+              }
+            )
+          )
+      } else {
+        redisActions(quote.csvId, cachedQuotes)
+        Future(Right(quote))
+      }
     }
   }
 
@@ -98,11 +108,13 @@ class CacheDAO @Inject() (
     */
   private def redisActions(
     csvId: String,
-    cachedQuotes: RedisList[String, SynchronousResult]
+    cachedQuotes: RedisList[String, AsynchronousResult]
   ): Unit = {
-    if (cachedQuotes.size >= maxListSize) cachedQuotes.headPop
-    cachedQuotes.append(csvId)
-    log.info("Ids in the Redis storage: " + cachedQuotes.toList)
+    cachedQuotes.size.foreach { quotesSize =>
+      if (quotesSize >= maxListSize) cachedQuotes.headPop
+      cachedQuotes.append(csvId)
+      log.info("Ids in the Redis storage: " + cachedQuotes.toList)
+    }
   }
 
 }
