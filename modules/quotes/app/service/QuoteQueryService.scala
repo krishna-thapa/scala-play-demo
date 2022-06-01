@@ -28,7 +28,6 @@ class QuoteQueryService @Inject() (
   private lazy val csvIdPattern: Regex = "CSV\\d+$".r
 
   def randomQuoteService(records: Int): Future[Result] = {
-    log.info("Executing randomQuoteService in QuoteQueryService")
     responseOptionResult(quotesDAO.listRandomQuote(records).map(_.headOption))
   }
 
@@ -38,10 +37,9 @@ class QuoteQueryService @Inject() (
   }
 
   def quoteOfTheDayService(date: Option[String]): Future[Result] = {
-    log.info("Executing quoteOfTheDayService in QuoteQueryService")
     val contentDate: String =
       date.fold[String](getCurrentDate)((strDate: String) => convertToDate(strDate))
-    log.info("Content Date from the API call: " + contentDate)
+    log.info("Executing quoteOfTheDay for Content Date: " + contentDate)
 
     responseEitherResult(cacheService.cacheQuoteOfTheDay(contentDate))
   }

@@ -79,7 +79,7 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
             log.info("Inserting new record in the fav quotes table")
             createFavQuote(userId, csvId)
         }
-    runDbActionCatchError(action).map(_.asInstanceOf[T])
+    runDbAsyncAction(action).map(_.asInstanceOf[T])
   }
 
   /**

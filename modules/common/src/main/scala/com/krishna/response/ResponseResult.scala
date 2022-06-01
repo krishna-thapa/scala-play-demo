@@ -45,25 +45,16 @@ trait ResponseResult extends ResponseError {
   )(implicit conv: OFormat[T]): Future[Result] = {
     futureRecord.map {
       case Some(quote) => Ok(Json.toJson(quote))
-      case None =>
-        notFound(EmptyDbMsg)
+      case None        => notFound(EmptyDbMsg)
     }
   }
-
-//  def responseTryResult[T <: IdResource](record: Try[T])(implicit conv: OFormat[T]): Result = {
-//    record match {
-//      case Success(quote)     => Ok(Json.toJson(quote))
-//      case Failure(exception) => internalServerError(exception.getMessage)
-//    }
-//  }
 
   def responseEitherResult[T <: IdResource](
     futureRecord: Future[Either[ErrorMsg, T]]
   )(implicit conv: OFormat[T]): Future[Result] = {
     futureRecord.flatMap {
-      case Left(errorMsg) =>
-        responseErrorResult(errorMsg)
-      case Right(quote) => responseOk(quote)
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+      case Right(quote)   => responseOk(quote)
     }
   }
 

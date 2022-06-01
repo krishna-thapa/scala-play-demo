@@ -32,7 +32,7 @@ class AuthController @Inject() (
     *  Returns response error if the sign in is not success
     */
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    log.info("Executing signIn Controller")
+    log.info("Executing signIn in AuthController")
     // Add request validation
     AuthForms
       .signInForm

@@ -46,7 +46,7 @@ class CacheDAO @Inject() (
             val uniqueQuote: Future[Either[ErrorMsg, QuotesQuery]] =
               getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
 
-            // Side effect to store the cache storage
+            // Side effect to store record in the cache storage
             uniqueQuote.foreach { case Right(quote) =>
               log.info("Storing today's quote in the cache storage")
               cache.set(

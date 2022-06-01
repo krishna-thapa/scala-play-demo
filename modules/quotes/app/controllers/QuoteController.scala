@@ -31,7 +31,6 @@ class QuoteController @Inject() (
   /**
     * A REST endpoint that gets a random quote as a JSON from quotes table.
     * Anyone can call this API endpoint.
-    * This API endpoint is not used in mobile app
     */
   def getRandomQuote: Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing getRandomQuote in QuoteController.")
@@ -43,7 +42,6 @@ class QuoteController @Inject() (
     * It should be trigger after midnight on every day using cron job.
     * It should stores the past 5 quotes of the day in the Redis cache storage.
     * Anyone can call this API endpoint.
-    * This API endpoint is not used in mobile app
     * @param date : Can take milliseconds date format as a path parameter to gets the
     *             previous 5 days quote of the day
     */
