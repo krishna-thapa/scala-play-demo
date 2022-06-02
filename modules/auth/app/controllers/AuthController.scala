@@ -4,7 +4,7 @@ package controllers.auth
 import java.time.Clock
 import com.krishna.response.ErrorMsg.InvalidFormFormat
 import com.krishna.response.ResponseResult
-import com.krishna.util.FutureErrorHandler.ToFuture
+import com.krishna.util.UtilImplicits.ToFuture
 import com.krishna.util.Logging
 import depInject.{ SecuredController, SecuredControllerComponents }
 import form.{ AuthForms, SignInForm }

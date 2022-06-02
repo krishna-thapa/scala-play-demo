@@ -49,7 +49,7 @@ class QuoteQueryService @Inject() (
     cacheService.getAllCachedQuotes.flatMap {
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(quotes) =>
-        if (user.isEmpty) Future(responseSeqResult(quotes))
+        if (user.isEmpty) Future.successful(responseSeqResult(quotes))
         else usersCachedQuotes(quotes, user.get)
     }
   }

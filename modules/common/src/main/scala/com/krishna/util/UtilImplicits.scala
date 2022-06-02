@@ -5,7 +5,7 @@ import play.api.mvc.Results.InternalServerError
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object FutureErrorHandler extends Logging {
+object UtilImplicits extends Logging {
 
   // An implicit class to apply future recover method for any time of Future[Result] response
   implicit class ErrorRecover(futureResult: Future[Result])(implicit

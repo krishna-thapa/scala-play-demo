@@ -1,7 +1,7 @@
 package controllers.search
 
 import akkaService.{ AkkaService, ExtendedAkkaService }
-import com.krishna.util.FutureErrorHandler.ErrorRecover
+import com.krishna.util.UtilImplicits.ErrorRecover
 import com.krishna.util.Logging
 import dao.SearchInEsDAO
 import depInject.{ SecuredController, SecuredControllerComponents }

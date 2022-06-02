@@ -2,7 +2,7 @@ package service
 
 import com.krishna.response.ErrorMsg.{ AccountNotFound, invalidBcryptValidation }
 import com.krishna.response.ResponseResult
-import com.krishna.util.FutureErrorHandler.{ ToFuture, ValidEmail }
+import com.krishna.util.UtilImplicits.{ ToFuture, ValidEmail }
 import com.krishna.util.Logging
 import config.JwtKey
 import dao.AuthDAO

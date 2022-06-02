@@ -23,7 +23,7 @@ class CacheService @Inject() (
     cache.get[String](contentDate).flatMap {
       case Some(quote: String) =>
         log.info("Content date found in the cache storage")
-        Future(Right(Json.parse(quote).as[QuotesQuery]))
+        Future.successful(Right(Json.parse(quote).as[QuotesQuery]))
       case None =>
         log.info("Content date is not found in the cache storage")
         cacheDao.cacheQuoteOfTheDay(contentDate)
@@ -38,7 +38,7 @@ class CacheService @Inject() (
       if (cachedKeys.isEmpty) {
         log.warn("Redis cache is empty, getting quote of the day")
         cacheDao.cacheQuoteOfTheDay(getCurrentDate).flatMap {
-          case Left(errorMsg) => Future(Left(errorMsg))
+          case Left(errorMsg) => Future.successful(Left(errorMsg))
           case Right(_)       => getAllCachedQuotes
         }
       } else {

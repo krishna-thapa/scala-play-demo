@@ -3,7 +3,7 @@ package service
 import java.time.Clock
 import com.krishna.response.ErrorMsg.AuthenticationFailed
 import com.krishna.response.ResponseResult
-import com.krishna.util.FutureErrorHandler.ErrorRecover
+import com.krishna.util.UtilImplicits.ErrorRecover
 import config.JwtKey
 
 import javax.inject.Inject

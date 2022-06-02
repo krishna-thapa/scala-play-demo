@@ -5,7 +5,7 @@ import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidDate }
 import com.krishna.response.{ ErrorMsg, ResponseError }
 import com.krishna.util.DateConversion.getCurrentDate
 import play.api.Configuration
-import play.api.cache.redis.{ AsynchronousResult, CacheAsyncApi, RedisList, SynchronousResult }
+import play.api.cache.redis.{ AsynchronousResult, CacheAsyncApi, RedisList }
 import play.api.libs.json.Json
 
 import javax.inject._
@@ -41,7 +41,7 @@ class CacheDAO @Inject() (
   def cacheQuoteOfTheDay(contentDate: String): Future[Either[ErrorMsg, QuotesQuery]] = {
     if (contentDate.contentEquals(getCurrentDate)) {
       randomQuote.flatMap(
-        _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future(Left(EmptyDbMsg)))(
+        _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future.successful(Left(EmptyDbMsg)))(
           (quote: QuotesQuery) => {
             val uniqueQuote: Future[Either[ErrorMsg, QuotesQuery]] =
               getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
@@ -63,7 +63,7 @@ class CacheDAO @Inject() (
       )
     } else {
       log.warn(s"Date has to be within last 5 days: $contentDate")
-      Future(Left(InvalidDate(contentDate)))
+      Future.successful(Left(InvalidDate(contentDate)))
     }
   }
 
@@ -88,7 +88,7 @@ class CacheDAO @Inject() (
         log.warn("Duplicate record has been called with id: " + quote.csvId)
         randomQuote
           .flatMap(
-            _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future(Left(EmptyDbMsg)))(
+            _.fold[Future[Either[ErrorMsg, QuotesQuery]]](Future.successful(Left(EmptyDbMsg)))(
               (quote: QuotesQuery) => {
                 getUniqueQuoteFromDB(quote, cachedQuotes)
               }
@@ -96,7 +96,7 @@ class CacheDAO @Inject() (
           )
       } else {
         redisActions(quote.csvId, cachedQuotes)
-        Future(Right(quote))
+        Future.successful(Right(quote))
       }
     }
   }

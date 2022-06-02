@@ -2,6 +2,7 @@ package controllers.customQuotes
 
 import com.krishna.response.ErrorMsg.RecordNotFound
 import com.krishna.response.{ OkResponse, ResponseResult }
+import com.krishna.util.UtilImplicits.{ ErrorRecover, ToFuture }
 import dao.CustomQuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import forms.RequestForm
@@ -63,7 +64,7 @@ class CustomQuoteController @Inject() (
             log.warn(s"Successfully deleted custom quote with id: $id")
             responseOk(OkResponse(s"Successfully delete quote with id: $id"))
           } else {
-            Future(badRequest(s"Error on request with quote id: $id"))
+            badRequest(s"Error on request with quote id: $id").toFuture
           }
         }
       }
@@ -86,7 +87,7 @@ class CustomQuoteController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            Future(badRequest("error" + formWithErrors.errors))
+            badRequest("error" + formWithErrors.errors).toFuture
           },
           customQuote => {
             responseFuture(customerQuotesDAO.createQuote(customQuote, user))
@@ -110,14 +111,14 @@ class CustomQuoteController @Inject() (
           .bindFromRequest()
           .fold(
             formWithErrors => {
-              Future(badRequest("error" + formWithErrors.errors))
+              badRequest("error" + formWithErrors.errors).toFuture
             },
             customQuote => {
               customerQuotesDAO.updateQuote(id, user.id, customQuote).flatMap { recordsUpdated =>
                 if (recordsUpdated == 1)
                   responseOk(OkResponse(s"Successfully updated record with id: $id"))
                 else
-                  Future(notFound(RecordNotFound(id)))
+                  notFound(RecordNotFound(id)).toFuture
               }
             }
           )
@@ -134,9 +135,7 @@ class CustomQuoteController @Inject() (
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(user) =>
         log.info(s"Executing CustomQuoteController for user: ${ user.email }")
-        customRunResult(user).recover { case exception: Exception =>
-          internalServerError(exception.getMessage)
-        }
+        customRunResult(user).errorRecover
     }
   }
 
