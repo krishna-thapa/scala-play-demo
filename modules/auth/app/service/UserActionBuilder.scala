@@ -41,7 +41,7 @@ class UserActionBuilder @Inject() (parser: BodyParsers.Default)(implicit
             .map(_.refreshJwtSession(request))
             .errorRecover
         case _ =>
-          Future(responseErrorResult(AuthenticationFailed))
+          responseErrorResult(AuthenticationFailed)
       }
     }
   }

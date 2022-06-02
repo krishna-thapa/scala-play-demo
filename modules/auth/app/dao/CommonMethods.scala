@@ -9,13 +9,16 @@ import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
 import table.UserTable
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 trait CommonMethods extends DbRunner with ResponseError with Logging {
 
   val userInfo: TableQuery[UserTable] = UserTable.userTableQueries
 
   // Common anonymous method to check if the selected email exists in the database
-  val checkValidEmail: String => Seq[UserInfo] = (email: String) =>
-    runDbAction(userInfo.filter(_.email === email).result)
+  val checkValidEmail: String => Future[Seq[UserInfo]] = (email: String) =>
+    runDbAsyncAction(userInfo.filter(_.email === email).result)
 
   /**
     * Checks if the email exist in the database and perform the action on the account
@@ -24,14 +27,16 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     * @param fun   function to be apply in the account
     * @return Either exception or success record id
     */
-  def findValidEmail[T](email: String)(fun: UserInfo => T): Either[Result, T] = {
+  def findValidEmail[T](email: String)(fun: UserInfo => T): Future[Either[Result, T]] = {
     // check if the account exists with that email
-    checkValidEmail(email).headOption match {
-      case Some(userInfo) =>
-        log.info(s"Account is already in the table with id: ${ userInfo.id }")
-        Right(fun(userInfo))
-      case None =>
-        Left(notFound(AccountNotFound(email)))
+    checkValidEmail(email).map {
+      _.headOption match {
+        case Some(userInfo) =>
+          log.info(s"Account is already in the table with id: ${ userInfo.id }")
+          Right(fun(userInfo))
+        case None =>
+          Left(notFound(AccountNotFound(email)))
+      }
     }
   }
 
@@ -42,9 +47,9 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     * @param role boolean tag to alter the admin role
     * @return user account id with updated admin role
     */
-  def alterAdminRole(id: Int, role: Boolean): Int = {
+  def alterAdminRole(id: Int, role: Boolean): Future[Int] = {
     log.info(s"Changing the admin role status of: $id to ${ !role }")
-    runDbAction(
+    runDbAsyncAction(
       userInfo
         .filter(_.id === id)
         .map(account => account.isAdmin)

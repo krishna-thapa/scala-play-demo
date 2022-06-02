@@ -1,5 +1,6 @@
 package controllers.auth
 
+import com.krishna.response.ErrorMsg.EmptyDbMsg
 import com.krishna.response.ResponseResult
 import com.krishna.util.UtilImplicits.ErrorRecover
 import com.krishna.util.Logging

@@ -28,7 +28,7 @@ class AuthService @Inject() (authDAO: AuthDAO, gridFsAttachmentService: GridFsAt
 
   implicit val clock: Clock = Clock.systemUTC
 
-  def signInService(signInForm: SignInForm)(implicit request: RequestHeader): Result = {
+  def signInService(signInForm: SignInForm)(implicit request: RequestHeader): Future[Result] = {
     // Need to check if the user has enter wrong password but has an account already
     if (authDAO.isAccountExist(signInForm.email)) {
       authDAO.isValidLogin(signInForm) match {

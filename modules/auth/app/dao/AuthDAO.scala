@@ -1,12 +1,12 @@
 package dao
 
 import java.sql.Date
-
 import bcrypt.BcryptException
 import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
 import com.krishna.response.ErrorMsg.{ InvalidPassword, invalidBcryptValidation }
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
+
 import javax.inject.{ Inject, Singleton }
 import model.{ UserDetail, UserInfo }
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,10 +14,14 @@ import play.api.mvc.Result
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
 
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends CommonMethods {
+class AuthDAO @Inject() (implicit
+  executionContext: ExecutionContext,
+  dbConfigProvider: DatabaseConfigProvider
+) extends CommonMethods {
 
   override val dbConfig: JdbcBackend#DatabaseDef = dbConfigProvider.get[JdbcProfile].db
 
@@ -51,8 +55,8 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
     * @param email user email
     * @return boolean representation
     */
-  def isAccountExist(email: String): Boolean = {
-    checkValidEmail(email).nonEmpty
+  def isAccountExist(email: String): Future[Boolean] = {
+    checkValidEmail(email).map(_.nonEmpty)
   }
 
   /**
@@ -77,9 +81,9 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
     * List all the users from the database: Only Admin can perform this action
     * @return list of existing users
     */
-  def listAllUser(): Seq[UserDetail] = {
-    val result = runDbAction(userInfo.sortBy(_.email).result)
-    result.map(UserDetail(_))
+  def listAllUser(): Future[Seq[UserDetail]] = {
+    val result = runDbAsyncAction(userInfo.sortBy(_.email).result)
+    result.map(_.map(UserDetail(_)))
   }
 
   /**
@@ -87,10 +91,10 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
     * @param email to select the account
     * @return Either exception or success record id
     */
-  def toggleAdmin(email: String): Either[Result, UserDetail] = {
+  def toggleAdmin(email: String): Future[Either[Result, Future[UserDetail]]] = {
     val toggleRole = (user: UserInfo) => {
       alterAdminRole(user.id, user.isAdmin) // Side-effect method
-      UserDetail(checkValidEmail(email).head)
+      checkValidEmail(email).map(usersInfo => UserDetail(usersInfo.head))
     }
     findValidEmail(email)(toggleRole)
   }
@@ -100,7 +104,7 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
     * @param email to select the account
     * @return Either exception or success record id
     */
-  def removeUserAccount(email: String): Either[Result, OkResponse] = {
+  def removeUserAccount(email: String): Future[Either[Result, OkResponse]] = {
     val removeUser = (user: UserInfo) => {
       val result = runDbAction(userInfo.filter(_.id === user.id).delete)
       OkResponse(s"Successfully delete entry $result")
@@ -113,18 +117,18 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
     * @param email to select the account
     * @return Either exception or success record details of the user
     */
-  def userAccount(email: String): Either[Result, UserDetail] = {
+  def userAccount(email: String): Future[Either[Result, UserDetail]] = {
     val getUser = (user: UserInfo) => UserDetail(user)
     findValidEmail(email)(getUser)
   }
 
   /**
-    * Update the user info details: Only the logged in user can
+    * Update the user info details: Only the logged in user can perform this
     * @param id to select the account
     * @param details Update details searchForm
     * @return Either exception or success id of the updated record
     */
-  def updateUserInfo(oldEmail: String, details: SignUpForm): Either[Throwable, Try[Int]] = {
+  def updateUserInfo(oldEmail: String, details: SignUpForm): Future[Either[Throwable, Int]] = {
     encryptPassword(details.password) match {
       case Success(encrypted) =>
         val action = userInfo
@@ -136,8 +140,8 @@ class AuthDAO @Inject() (dbConfigProvider: DatabaseConfigProvider) extends Commo
             details.email,
             encrypted
           )
-        Right(runDbActionCatchError(action))
-      case Failure(exception) => Left(BcryptException(exception.getMessage))
+        Right(runDbAsyncAction(action))
+      case Failure(exception) => Future.successful(Left(BcryptException(exception.getMessage)))
     }
   }
 
