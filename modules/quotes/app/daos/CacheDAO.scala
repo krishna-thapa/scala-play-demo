@@ -47,15 +47,20 @@ class CacheDAO @Inject() (
               getUniqueQuoteFromDB(quote, quoteOfTheDayCacheList)
 
             // Side effect to store record in the cache storage
-            uniqueQuote.foreach { case Right(quote) =>
-              log.info("Storing today's quote in the cache storage")
-              cache.set(
-                key = contentDate,
-                value = Json
-                  .toJson(quote)
-                  .toString, // best way to get the right value from either
-                expiration = 5.days // Key is only store for 5 days
-              )
+            uniqueQuote.foreach {
+              case Right(quote) =>
+                log.info("Storing today's quote in the cache storage")
+                cache.set(
+                  key = contentDate,
+                  value = Json
+                    .toJson(quote)
+                    .toString, // best way to get the right value from either
+                  expiration = 5.days // Key is only store for 5 days
+                )
+              case Left(exception) =>
+                throw new Exception(
+                  s"Error while retrieving unique quote from database, error: ${ exception.msg }"
+                )
             }
             uniqueQuote
           }

@@ -49,7 +49,7 @@ class QuoteQueryService @Inject() (
     cacheService.getAllCachedQuotes.flatMap {
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(quotes) =>
-        if (user.isEmpty) Future.successful(responseSeqResult(quotes))
+        if (user.isEmpty) responseSeqResult(quotes)
         else usersCachedQuotes(quotes, user.get)
     }
   }
@@ -79,7 +79,7 @@ class QuoteQueryService @Inject() (
   def updateFavQuoteService(csvId: String, user: UserDetail): Future[Result] = {
     log.info(s"Executing favQuoteService in Service for user: ${ user.email }")
     if (csvIdPattern.matches(csvId)) {
-      responseFuture(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
+      responseOkAsync(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
     } else {
       responseErrorResult(InvalidCsvId(csvId))
     }

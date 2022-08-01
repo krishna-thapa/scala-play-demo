@@ -44,7 +44,7 @@ class GridFsController @Inject() (
                 s"Received file: ${ file.filename } with content type of: ${ file.contentType }"
               )
               gridFsAttachmentService.addImageAttachment(user.email, file)
-            case _ => Future.successful(notFound(EmptyDbMsg)("Select the picture to upload"))
+            case _ => badRequest("Invalid image format")
           }
         case Left(errorMsg) => responseErrorResult(errorMsg)
       }

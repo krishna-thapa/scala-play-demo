@@ -17,8 +17,8 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
   val userInfo: TableQuery[UserTable] = UserTable.userTableQueries
 
   // Common anonymous method to check if the selected email exists in the database
-  val checkValidEmail: String => Future[Seq[UserInfo]] = (email: String) =>
-    runDbAsyncAction(userInfo.filter(_.email === email).result)
+  val isAccountExist: String => Future[Option[UserInfo]] = (email: String) =>
+    runDbAsyncAction(userInfo.filter(_.email === email).result.headOption)
 
   /**
     * Checks if the email exist in the database and perform the action on the account
@@ -27,16 +27,16 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     * @param fun   function to be apply in the account
     * @return Either exception or success record id
     */
-  def findValidEmail[T](email: String)(fun: UserInfo => T): Future[Either[Result, T]] = {
+  def findValidEmail[T](
+    email: String
+  )(fun: UserInfo => Future[T]): Future[Either[Result, T]] = {
     // check if the account exists with that email
-    checkValidEmail(email).map {
-      _.headOption match {
-        case Some(userInfo) =>
-          log.info(s"Account is already in the table with id: ${ userInfo.id }")
-          Right(fun(userInfo))
-        case None =>
-          Left(notFound(AccountNotFound(email)))
-      }
+    isAccountExist(email).flatMap {
+      case Some(userInfo) =>
+        log.info(s"Account is already in the table with id: ${ userInfo.id }")
+        fun(userInfo).map(Right(_))
+      case None =>
+        notFound(AccountNotFound(email)).map(Left(_))
     }
   }
 

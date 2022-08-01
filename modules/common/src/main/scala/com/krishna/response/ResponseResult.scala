@@ -11,31 +11,31 @@ import scala.concurrent.Future
 
 trait ResponseResult extends ResponseError {
 
-  def responseOk[T](result: T)(implicit conv: OFormat[T]): Future[Result] = {
-    Future.successful(Ok(Json.toJson(result)))
+  def responseOk[T](record: T)(implicit conv: OFormat[T]): Future[Result] = {
+    Future.successful(Ok(Json.toJson(record)))
   }
 
-  def responseFuture[T](futureRecord: Future[T])(implicit conv: OFormat[T]): Future[Result] = {
+  def responseOkAsync[T](futureRecord: Future[T])(implicit conv: OFormat[T]): Future[Result] = {
     futureRecord.map(record => Ok(Json.toJson(record)))
   }
 
-  def responseSeqResult[T <: IdResource](records: Seq[T])(implicit conv: OFormat[T]): Result = {
-    if (records.nonEmpty) Ok(Json.toJson(records))
+  def responseSeqResult[T <: IdResource](
+    records: Seq[T]
+  )(implicit conv: OFormat[T]): Future[Result] = {
+    if (records.nonEmpty) Future.successful(Ok(Json.toJson(records)))
     else notFound(EmptyDbMsg)
   }
 
   def responseSeqResultAsync[T <: IdResource](
     futureRecords: Future[Seq[T]]
   )(implicit conv: OFormat[T]): Future[Result] = {
-    futureRecords.map { records =>
-      if (records.nonEmpty) Ok(Json.toJson(records))
-      else notFound(EmptyDbMsg)
-    }
+    futureRecords.flatMap(responseSeqResult(_))
   }
 
+  // TODO : Find a better solution
   def responseSeqString(futureRecords: Future[Seq[String]]): Future[Result] = {
-    futureRecords.map { records =>
-      if (records.nonEmpty) Ok(Json.toJson(records))
+    futureRecords.flatMap { records =>
+      if (records.nonEmpty) Future.successful(Ok(Json.toJson(records)))
       else notFound(EmptyDbMsg)
     }
   }
@@ -43,8 +43,8 @@ trait ResponseResult extends ResponseError {
   def responseOptionResult[T <: IdResource](
     futureRecord: Future[Option[T]]
   )(implicit conv: OFormat[T]): Future[Result] = {
-    futureRecord.map {
-      case Some(quote) => Ok(Json.toJson(quote))
+    futureRecord.flatMap {
+      case Some(quote) => responseOk(quote)
       case None        => notFound(EmptyDbMsg)
     }
   }
@@ -60,7 +60,7 @@ trait ResponseResult extends ResponseError {
 
   // Use this method on each response error
   def responseErrorResult(errorMsg: ErrorMsg): Future[Result] = {
-    val result: Result = errorMsg match {
+    errorMsg match {
       case EmptyDbMsg                                     => notFound(EmptyDbMsg)
       case invalidDate: InvalidDate                       => badRequest(invalidDate.msg)
       case invalidCsvId: InvalidCsvId                     => badRequest(invalidCsvId.msg)
@@ -71,7 +71,6 @@ trait ResponseResult extends ResponseError {
       case accountNotFound: AccountNotFound               => notFound(accountNotFound)
       case _                                              => badRequest("Something went wrong")
     }
-    Future.successful(result)
   }
 
 }

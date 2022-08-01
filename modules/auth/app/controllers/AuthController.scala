@@ -4,10 +4,9 @@ package controllers.auth
 import java.time.Clock
 import com.krishna.response.ErrorMsg.InvalidFormFormat
 import com.krishna.response.ResponseResult
-import com.krishna.util.UtilImplicits.ToFuture
 import com.krishna.util.Logging
 import depInject.{ SecuredController, SecuredControllerComponents }
-import form.{ AuthForms, SignInForm }
+import form.{ AuthForms, SignInForm, SignUpForm }
 
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
@@ -27,21 +26,19 @@ class AuthController @Inject() (
   implicit val clock: Clock = Clock.systemUTC
 
   /**
-    * Sign In the existing user using sing in form
+    * Sign In the existing user
     * @return Auth JWT token in the header if success with response body of user details
     *  Returns response error if the sign in is not success
     */
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    log.info("Executing signIn in AuthController.")
-    // Add request validation
+    log.info("Executing signIn method in AuthController.")
     AuthForms
       .signInForm
       .bindFromRequest()
       .fold(
-        formWithErrors => invalidForm[SignInForm](formWithErrors, InvalidFormFormat("Login")),
+        formWithErrors => invalidForm[SignInForm](formWithErrors, InvalidFormFormat("SignInForm")),
         signInForm => authService.signInService(signInForm)
       )
-      .toFuture
   }
 
   /**
@@ -49,17 +46,14 @@ class AuthController @Inject() (
     * @return Record id or an exception
     */
   def signUp: Action[AnyContent] = Action.async { implicit request =>
-    log.info("Executing signUp Controller")
-    // Add request validation
+    log.info("Executing signUp method in AuthController.")
     AuthForms
       .signUpForm
       .bindFromRequest()
       .fold(
-        formWithErrors =>
-          badRequest(s"The signup From was not in the expected format: $formWithErrors"),
+        formWithErrors => invalidForm[SignUpForm](formWithErrors, InvalidFormFormat("SignUpForm")),
         signUpForm => authService.singUpService(signUpForm)
       )
-      .toFuture
   }
 
   /**
@@ -67,18 +61,18 @@ class AuthController @Inject() (
     * @return Seq of users
     */
   def getAllUser: Action[AnyContent] = AdminAction.async { implicit request =>
-    log.info("Executing getAllUser Controller")
-    authService.getAllUserService.toFuture
+    log.info("Executing getAllUser method AuthController.")
+    authService.getAllUserService
   }
 
   /**
-    * Alter the admin role to the selected user: Only the Admin can
+    * Alter the admin role of the selected user: Only the Admin can
     * @param email to select the user's account
     * @return Record id or an exception
     */
   def toggleAdminRole(email: String): Action[AnyContent] = AdminAction.async { implicit request =>
-    log.info("Executing toggleAdminRole Controller")
-    authService.toggleAdminRoleService(email).toFuture
+    log.info("Executing toggleAdminRole method in AuthController.")
+    authService.toggleAdminRoleService(email)
   }
 
   /**
@@ -88,7 +82,7 @@ class AuthController @Inject() (
     */
   def removeUser(email: String): Action[AnyContent] = AdminAction.async { implicit request =>
     log.info("Executing removeUser Controller")
-    authService.removeUserService(email).toFuture
+    authService.removeUserService(email)
   }
 
   /**
@@ -98,14 +92,12 @@ class AuthController @Inject() (
     * @return Record details or an exception
     */
   def getUserInfo(email: String): Action[AnyContent] = UserAction.async { implicit request =>
-    log.info("Executing getUserInfo Controller")
-
-    val userInfo: Result = DecodeHeader(request.headers) match {
+    log.info("Executing getUserInfo method in AuthController.")
+    DecodeHeader(request.headers) match {
       case Right(user) =>
         authService.getUserInfoService(user, email)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
-    userInfo.toFuture
   }
 
   /**
@@ -114,7 +106,7 @@ class AuthController @Inject() (
     * TODO: Updating the email have to update jwt token, might need to refresh and update in front-end
     */
   def updateUserInfo: Action[AnyContent] = UserAction.async { implicit request =>
-    log.info("Executing updateUserInfo Controller")
+    log.info("Executing updateUserInfo method in AuthController.")
     DecodeHeader(request.headers) match {
       case Right(user) =>
         AuthForms
@@ -122,12 +114,10 @@ class AuthController @Inject() (
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              badRequest(
-                s"The update Form was not in the expected format: $formWithErrors"
-              ).toFuture,
+              invalidForm[SignUpForm](formWithErrors, InvalidFormFormat("UpdateSignUpForm")),
             userDetails => authService.updateUserInfoService(user.email, userDetails)
           )
-      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+      case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }
 

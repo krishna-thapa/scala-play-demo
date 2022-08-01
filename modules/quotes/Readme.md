@@ -12,7 +12,7 @@ POSTGRES_USER: admin
 POSTGRES_PASSWORD: admin
 ```
 
-These environment variables are passed to docker container that will create a database with named: `inspiration_db` and crete a user `admin` with password of `admin`.
+These environment variables are passed to docker container that will create a database with name: `inspiration_db` and crete a user `admin` with password of `admin`.
 
 All the environment variables are declared in the `.env` file that is present under the root folder of the project. These environment variables has to be passed from main application docker container using the docker-compose file. When the docker-compose file is loaded, it will read all the environment variables from `.env` file and pass those variables to the respective docker services, that can be read in the project.
 

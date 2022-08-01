@@ -1,6 +1,9 @@
 ## TODO in coming days
 
 * [ ]  Complete the refactoring with Future use for all the modules
+* [ ]  Update the Scala, sbt and dependences versions
+* [ ]  Add the GitHub actions for checking dependence’s security vulnerabilities
+* [ ]  Add the configuration for the CORS disable in play
 * [ ]  Update the Slickpg: https://github.com/tminglei/slick-pg
   * [ ]  Use of Postgres Full-Text search to enable the Search service from Postgres instead of using ElasticSearch
   * [ ]  Make use of extended Slick pg library to add the array of string in terms of genres

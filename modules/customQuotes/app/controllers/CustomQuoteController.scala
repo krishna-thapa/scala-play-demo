@@ -64,7 +64,7 @@ class CustomQuoteController @Inject() (
             log.warn(s"Successfully deleted custom quote with id: $id")
             responseOk(OkResponse(s"Successfully delete quote with id: $id"))
           } else {
-            badRequest(s"Error on request with quote id: $id").toFuture
+            badRequest(s"Error on request with quote id: $id")
           }
         }
       }
@@ -87,10 +87,10 @@ class CustomQuoteController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            badRequest("error" + formWithErrors.errors).toFuture
+            badRequest("error" + formWithErrors.errors)
           },
           customQuote => {
-            responseFuture(customerQuotesDAO.createQuote(customQuote, user))
+            responseOkAsync(customerQuotesDAO.createQuote(customQuote, user))
           }
         )
     }
@@ -111,14 +111,14 @@ class CustomQuoteController @Inject() (
           .bindFromRequest()
           .fold(
             formWithErrors => {
-              badRequest("error" + formWithErrors.errors).toFuture
+              badRequest("error" + formWithErrors.errors)
             },
             customQuote => {
               customerQuotesDAO.updateQuote(id, user.id, customQuote).flatMap { recordsUpdated =>
                 if (recordsUpdated == 1)
                   responseOk(OkResponse(s"Successfully updated record with id: $id"))
                 else
-                  notFound(RecordNotFound(id)).toFuture
+                  notFound(RecordNotFound(id))
               }
             }
           )
