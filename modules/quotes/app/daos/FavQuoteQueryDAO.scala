@@ -86,6 +86,7 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
     * @param id id from fav_quotations table
     * @param tag boolean tag to specify favorite quote
     * @return record with altered fav tag
+    * Wait until the fav tag is modified hence use of Await instead of future response  
     */
   private def alterFavTag(id: Int, tag: Boolean): Int = {
     log.info(s"Changing the fav tag status of: $id to ${ !tag }")

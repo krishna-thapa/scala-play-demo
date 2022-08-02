@@ -22,7 +22,6 @@ trait DbRunner extends Logging {
   }
 
   /* Run and get the result from the future */
-  // TODO: REMOVE THIS METHOD
   def runDbAction[T](action: DBIOAction[T, NoStream, All], timeout: Option[Int] = None): T = {
     dbConfig.run(action.transactionally).andGetResult(timeout)
   }
@@ -33,7 +32,6 @@ trait DbRunner extends Logging {
   }
 
   /* Run and get the result from the future or catch any error*/
-  // TODO: REMOVE THIS METHOD
   def runDbActionCatchError[T](
     action: DBIOAction[T, NoStream, All]
   ): Future[T] = {

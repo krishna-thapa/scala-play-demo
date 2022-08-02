@@ -62,7 +62,7 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
   when(mockCustomQuoteQueryDAO.decoderHeader(mockRequest)).thenReturn(Right(mockUserDetail))
 
   "CustomQuoteController" should {
-    "getCustomQuotes sgould give all the custom quotes only" in {
+    "getCustomQuotes should give all the custom quotes only" in {
       when(mockCustomQuoteQueryDAO.listAllQuotes(1))
         .thenReturn(Seq(mockCustomQuote))
       val result: Future[Result] = customQuoteController.getCustomQuotes.apply(mockRequest)

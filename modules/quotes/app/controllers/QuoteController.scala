@@ -33,7 +33,7 @@ class QuoteController @Inject() (
     * Anyone can call this API endpoint.
     */
   def getRandomQuote: Action[AnyContent] = Action.async { implicit request =>
-    log.info("Executing getRandomQuote in QuoteController.")
+    log.info("Executing getRandomQuote method in QuoteController.")
     quoteService.randomQuoteService(1)
   }
 
@@ -47,7 +47,7 @@ class QuoteController @Inject() (
     */
   def getQuoteOfTheDay(date: Option[String]): Action[AnyContent] = Action.async {
     implicit request =>
-      log.info("Executing getQuoteOfTheDay in QuoteController.")
+      log.info("Executing getQuoteOfTheDay method in QuoteController.")
       quoteService.quoteOfTheDayService(date)
   }
 
@@ -58,7 +58,7 @@ class QuoteController @Inject() (
     */
   def getCachedQuotes: Action[AnyContent] = Action.async { implicit request =>
     log.info("Executing get last five quotes of the day in QuoteController.")
-    DecodeHeader(request.headers) match {
+    quoteService.decoderHeader(request) match {
       case Left(_) =>
         log.info("Getting cached quotes for users that are not logged in")
         quoteService.cachedQuotesService(None)
@@ -74,7 +74,7 @@ class QuoteController @Inject() (
     * Only Admin can perform this action.
     */
   def getAllQuotes: Action[AnyContent] = AdminAction.async { implicit request =>
-    log.info("Executing getAllQuotes in QuoteController.")
+    log.info("Executing getAllQuotes method in QuoteController.")
 
     val limit: Int =
       request.getQueryString("limit").map(_.toInt).getOrElse(100)
@@ -89,7 +89,7 @@ class QuoteController @Inject() (
     *  Anyone can call this API endpoint.
     */
   def getFirst10Quotes: Action[AnyContent] = Action.async { implicit request =>
-    log.info("Executing getFirst10Quotes in QuoteController.")
+    log.info("Executing getFirst10Quotes mehod in QuoteController.")
     quoteService.random10QuoteService(10)
   }
 
@@ -98,7 +98,7 @@ class QuoteController @Inject() (
     * Only the logged user can perform this action and should be stored to user's id only
     */
   def favQuote(csvId: String): Action[AnyContent] = UserAction.async { implicit request =>
-    DecodeHeader(request.headers) match {
+    quoteService.decoderHeader(request) match {
       case Right(user) =>
         log.info(s"Executing favQuote by user: ${ user.email } in QuoteController.")
         quoteService.updateFavQuoteService(csvId: String, user)
@@ -112,7 +112,7 @@ class QuoteController @Inject() (
     * Only the logged user can perform this action and should retrieve their own fav quotes only
     */
   def getFavQuotes: Action[AnyContent] = UserAction.async { implicit request =>
-    DecodeHeader(request.headers) match {
+    quoteService.decoderHeader(request) match {
       case Right(user) =>
         log.info(s"Executing getFavQuotes by user: ${ user.email } in QuoteController.")
         quoteService.getFavQuotesService(user.id)
@@ -135,7 +135,7 @@ class QuoteController @Inject() (
     */
   def getAuthorsAutocomplete(parameter: String): Action[AnyContent] = UserAction.async {
     implicit request =>
-      log.info("Executing getAuthorsAutocomplete in QuoteController.")
+      log.info("Executing getAuthorsAutocomplete method in QuoteController.")
       responseSeqString(quoteService.searchAuthorsSql(parameter))
   }
 

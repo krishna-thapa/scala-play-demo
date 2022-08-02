@@ -3,14 +3,16 @@ package service
 import com.krishna.model.AllQuotesOfDay
 import com.krishna.model.Genre.Genre
 import com.krishna.response.ErrorMsg.{ EmptyDbMsg, InvalidCsvId }
-import com.krishna.response.ResponseResult
+import com.krishna.response.{ ErrorMsg, ResponseResult }
 import com.krishna.util.DateConversion.{ convertToDate, getCurrentDate }
 import com.krishna.util.Logging
+import config.DecodeHeader
 import daos.QuoteQueryDAO
 
 import javax.inject.{ Inject, Singleton }
 import model.UserDetail
-import play.api.mvc.Result
+import play.api.Configuration
+import play.api.mvc.{ AnyContent, Request, Result }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.matching.Regex
@@ -19,9 +21,9 @@ import scala.util.matching.Regex
 class QuoteQueryService @Inject() (
   quotesDAO: QuoteQueryDAO,
   cacheService: CacheService,
-  favQuoteService: FavQuoteQueryService,
-  implicit val ec: ExecutionContext
-) extends ResponseResult
+  favQuoteService: FavQuoteQueryService
+)(implicit val ec: ExecutionContext, config: Configuration)
+    extends ResponseResult
     with Logging {
 
   // CsvId should start with "CSV" prefix
@@ -45,7 +47,7 @@ class QuoteQueryService @Inject() (
   }
 
   def cachedQuotesService(user: Option[UserDetail]): Future[Result] = {
-    log.info("Executing cachedQuotesService in QuoteQueryService")
+    log.info("Executing cachedQuotesService method in QuoteQueryService.")
     cacheService.getAllCachedQuotes.flatMap {
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(quotes) =>
@@ -56,7 +58,7 @@ class QuoteQueryService @Inject() (
 
   def usersCachedQuotes(quotes: Seq[AllQuotesOfDay], user: UserDetail): Future[Result] = {
     log.info(
-      s"Executing usersCachedQuotes in Service for user: ${ user.email } in QuoteQueryService"
+      s"Executing usersCachedQuotes in Service for user: ${ user.email } in QuoteQueryService."
     )
     if (quotes.nonEmpty) {
       val cachedFavQuoteIds: Future[Seq[String]] =
@@ -97,6 +99,15 @@ class QuoteQueryService @Inject() (
 
   def searchAuthorsSql(text: String): Future[Seq[String]] = {
     quotesDAO.searchAuthors(text)
+  }
+
+  /**
+   * Decode Header that returns User details id request has right Auth token
+   * @param request With header contents
+   * @return Either error message or User details
+   */
+  def decoderHeader(request: Request[AnyContent]): Either[ErrorMsg, UserDetail] = {
+    DecodeHeader(request.headers)
   }
 
 }
