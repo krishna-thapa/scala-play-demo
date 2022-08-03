@@ -10,7 +10,6 @@ import javax.inject._
 import model.UserDetail
 import play.api.mvc._
 import service.QuoteQueryService
-import config.DecodeHeader
 import play.api.Configuration
 
 import scala.concurrent.ExecutionContext

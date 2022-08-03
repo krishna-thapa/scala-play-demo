@@ -36,9 +36,7 @@ fi
 
 echo "Checking if the website is up and running"
 
-status="$(curl -Is ${URL}/ping | head -1)"
-validate=( $status )
-if [ ${validate[-2]} == "200" ]; then
+if curl -I ${URL} 2>&1 | grep -w "200\|301" ; then
   echo "Postgres is running at host ${HOST}"
   echo "Project is up and running with status: OK"
   echo "Restarting the sequence for CSVID field and truncating the table"

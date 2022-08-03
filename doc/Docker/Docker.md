@@ -1,15 +1,19 @@
 ## Install Docker and Docker compose
 
 ### Install Docker on Ubuntu 20.04
+
 Link [here](https://linuxize.com/post/how-to-install-and-use-docker-on-ubuntu-20-04/)
 
 ### Install Docker compose on Ubuntu 20.04
+
 Link [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04)
 
 ### docker-compose cheatsheet
+
 Link [here](https://devhints.io/docker-compose)
 
 ### Quick commands:
+
 ```
 docker-compose start
 docker-compose stop
@@ -29,29 +33,34 @@ docker-compose down -v
 ```
 
 ## Install Postgres Server in Docker
+
 - [Docker compose up with Postgres tips](https://hashinteractive.com/blog/docker-compose-up-with-postgres-quick-tips/)
 - [Use volumes in Docker](https://docs.docker.com/storage/volumes/)
 
 ### Connect to the Postgres database running in docker
+
 - First start the docker container with postgres image up and running
-`docker-compose up`
-- Connect to the postgres through terminal
-`psql -h localhost -p 5432 -U  admin postgres`
+  `docker-compose up`
+- Connect to the postgres through terminal 
+  `psql -h localhost -p 5432 -U  admin postgres`
 - Password for admin role is *admin*
 - Connect to the right database
-`\c inspiration_db`
-- See all the tables 
-`\dt`
+  `\c inspiration_db`
+- See all the tables
+  `\dt`
 - See the table description
-`\d <table_name>`
+  `\d <table_name>`
 
 ## Install ElasticSearch Server in Docker
+
 Link [here](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/docker.html#docker-prod-cluster-composefile)
 
 ### Elasticsearch in Docker
+
 The images use centos:7 as the base image.
 
 Run the `docker-compose up` to start the docker and to inspect status of the cluster in Docker:
+
 ```
 curl http://127.0.0.1:9200
 curl http://127.0.0.1:9200/_cat/health
@@ -62,6 +71,7 @@ curl -X GET http://127.0.0.1:9200/quotes/_doc/_search | jq
 To see the ES match API, [refer here](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)
 
 ## Install Redis Server in Docker
+
 [Configure and Run a Docker Container for Redis and Use it for Python](https://medium.com/better-programming/dockerizing-and-pythonizing-redis-41b1340979de)
 
 [How To Configure Redis + Redis Commander + Docker](https://hackernoon.com/how-to-configurate-redis-redis-commander-docker-616136f2)
@@ -71,6 +81,7 @@ To see the ES match API, [refer here](https://www.elastic.co/guide/en/elasticsea
 - REDIS_HOSTS=local:redis:6379 - tells redis commander how to connect to redis
 
 ### Connect to Redis cli running in docker
+
 - Get the Container id of Redis container running in docker
 
 **TODO: Need to protect redis commander interface with login/password using redis-commander. See above link**
@@ -80,11 +91,13 @@ docker ps
 ```
 
 - Connect to the redis-cli
+
 ```
 docker exec -it <container-id> redis-cli
 ```
 
 - Basic commands:
+
 ```
 // Get all the lists
 KEYS * 
@@ -98,6 +111,7 @@ LRANGE cache-quoteOfTheDay 0 -1
 ```
 
 ### Docker commands
+
 ```
 // Create a Docker image from Dockerfile:
 docker build -t inspirational-quote-api:latest .
@@ -131,6 +145,7 @@ docker exec -it c142a1ec9f31 /bin/sh
 ```
 
 ### How to Do a Clean Restart of a Docker Instance
+
 ```
 // Stop the container(s) using the following command:
 docker-compose down
@@ -146,6 +161,7 @@ docker-compose up -d
 ```
 
 ## Known errors while setting up docker:
+
 - [Docker Container exited with code 137](https://www.petefreitag.com/item/848.cfm#:~:text=As%20it%20turns%20out%20this,in%20and%20terminated%20the%20process.)
-- Problem faced while working [sbt-native-packager](https://sbt-native-packager.readthedocs.io/en/latest/): While running the `sbt docker:publishLocal`, there was an error regarding swagger package. I believe this error is related with swagger library, and I don't think there is a solution unless the library is removed from the project. [Error issue page](https://github.com/iheartradio/play-swagger/issues/190). 
+- Problem faced while working [sbt-native-packager](https://sbt-native-packager.readthedocs.io/en/latest/): While running the `sbt docker:publishLocal`, there was an error regarding swagger package. I believe this error is related with swagger library, and I don't think there is a solution unless the library is removed from the project. [Error issue page](https://github.com/iheartradio/play-swagger/issues/190).
 - PostgreSQL Database directory appears to contain a database; Skipping initialization - empty `pgdata` directory and run again `docker-compose up`

@@ -4,6 +4,11 @@
 * [ ]  Update the Scala, sbt and dependences versions
 * [ ]  Add the GitHub actions for checking dependence’s security vulnerabilities
 * [ ]  Add the configuration for the CORS disable in play
+* [ ]  Update the Swagger UI using latest version of 4
+  * [ ]  Update the use swagger-ui webjar, look more: `"org.webjars" % "swagger-ui"`
+  * [ ]  Update the sbt plugin for play with swagger: https://github.com/iheartradio/play-swagger
+  * [ ]  Cannot update as the url is not working and assest json can't find the swagger file, have to look into more
+* [ ]  Update the docker images
 * [ ]  Update the Slickpg: https://github.com/tminglei/slick-pg
   * [ ]  Use of Postgres Full-Text search to enable the Search service from Postgres instead of using ElasticSearch
   * [ ]  Make use of extended Slick pg library to add the array of string in terms of genres
