@@ -1,3 +1,0 @@
-package daos
-
-class CacheDAOSpec {}

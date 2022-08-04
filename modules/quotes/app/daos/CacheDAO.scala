@@ -19,10 +19,6 @@ class CacheDAO @Inject() (
   implicit val ec: ExecutionContext
 ) extends ResponseError {
 
-  /*
-    A cache API that uses synchronous calls rather than async calls.
-    Useful when you know you have a fast in-memory cache.
-   */
   protected lazy val quoteOfTheDayCacheList: RedisList[String, AsynchronousResult] =
     cache.list[String]("cache-quoteOfTheDay")
 
