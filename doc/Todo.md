@@ -15,6 +15,9 @@
 * [ ]  Fix the cron job for daily call for the quote of the day API
 * [ ]  Fix and add more test cases
 
+- Add the Postgres Cascading Delete
+- Replace the play evolution with flyway: https://github.com/flyway/flyway-play
+
 ### New modules to add
 
 * [ ]  Add new module for the load testing using Akka Gatling library

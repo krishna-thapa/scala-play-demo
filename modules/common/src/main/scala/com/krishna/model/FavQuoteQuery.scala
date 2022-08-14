@@ -3,10 +3,12 @@ package com.krishna.model
 import com.krishna.model.base.{ WithCSCVIdResource, WithUserIdResource }
 import play.api.libs.json.{ Json, OFormat }
 
+import java.util.UUID
+
 final case class FavQuoteQuery(
   id: Int,
   csvId: String,
-  userId: Int,
+  userId: UUID,
   favTag: Boolean
 ) extends WithCSCVIdResource
     with WithUserIdResource

@@ -14,6 +14,7 @@ import model.UserDetail
 import play.api.Configuration
 import play.api.mvc.{ AnyContent, Request, Result }
 
+import java.util.UUID
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.matching.Regex
 
@@ -62,7 +63,7 @@ class QuoteQueryService @Inject() (
     )
     if (quotes.nonEmpty) {
       val cachedFavQuoteIds: Future[Seq[String]] =
-        favQuoteService.getFavCachedQuotes(user.id).map(_.map(_.csvId))
+        favQuoteService.getFavCachedQuotes(user.userId).map(_.map(_.csvId))
       val futureCachedQuotes: Future[Seq[AllQuotesOfDay]] = cachedFavQuoteIds.map { ids =>
         quotes.map { cachedQuote =>
           if (ids.contains(cachedQuote.quote.csvId)) cachedQuote.copy(isFavQuote = true)
@@ -81,13 +82,13 @@ class QuoteQueryService @Inject() (
   def updateFavQuoteService(csvId: String, user: UserDetail): Future[Result] = {
     log.info(s"Executing favQuoteService in Service for user: ${ user.email }")
     if (csvIdPattern.matches(csvId)) {
-      responseOkAsync(favQuoteService.createOrUpdateFavQuote(user.id, csvId))
+      responseOkAsync(favQuoteService.createOrUpdateFavQuote(user.userId, csvId))
     } else {
       responseErrorResult(InvalidCsvId(csvId))
     }
   }
 
-  def getFavQuotesService(userId: Int): Future[Result] = {
+  def getFavQuotesService(userId: UUID): Future[Result] = {
     log.info(s"Executing getFavQuotesService in Service for userid: $userId")
     responseSeqResultAsync(favQuoteService.listAllQuotes(userId))
   }

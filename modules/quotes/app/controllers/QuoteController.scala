@@ -114,7 +114,7 @@ class QuoteController @Inject() (
     quoteService.decoderHeader(request) match {
       case Right(user) =>
         log.info(s"Executing getFavQuotes by user: ${ user.email } in QuoteController.")
-        quoteService.getFavQuotesService(user.id)
+        quoteService.getFavQuotesService(user.userId)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }

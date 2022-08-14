@@ -18,6 +18,7 @@ import play.api.test.Helpers.{ contentAsString, defaultAwaitTimeout, status, stu
 import service.{ AdminActionBuilder, QuoteQueryService, UserActionBuilder }
 
 import java.sql.Date
+import java.util.UUID
 import scala.concurrent.{ ExecutionContext, Future }
 
 class QuoteControllerSpec extends PlaySpec with Results with GuiceOneAppPerSuite {
@@ -49,8 +50,10 @@ class QuoteControllerSpec extends PlaySpec with Results with GuiceOneAppPerSuite
   val mockAdminActionBuilder: AdminActionBuilder =
     new AdminActionBuilder(defaultParser)(ExecutionContext.global, config)
 
+  val userUuid: UUID = UUID.randomUUID()
+
   val mockUserDetail: UserDetail =
-    UserDetail(1, "name", "email@com", new Date(System.currentTimeMillis()), isAdmin = false)
+    UserDetail(userUuid, "name", "email@com", new Date(System.currentTimeMillis()), isAdmin = false)
 
   when(mockSecuredControlledComponents.userActionBuilder).thenReturn(mockUserActionBuilder)
   when(mockSecuredControlledComponents.actionBuilder).thenReturn(mockDefaultActionBuilder)
@@ -128,7 +131,7 @@ class QuoteControllerSpec extends PlaySpec with Results with GuiceOneAppPerSuite
     "get all fav quotes for the user from the Controller for the logged in user" in {
       val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/favQuotes")
       when(mockQuoteQueryService.decoderHeader(any())).thenReturn(Right(mockUserDetail))
-      when(mockQuoteQueryService.getFavQuotesService(1))
+      when(mockQuoteQueryService.getFavQuotesService(userUuid))
         .thenReturn(Future.successful(Ok("fav quotes of the day")))
       val response = controller.getFavQuotes().apply(request)
       contentAsString(response) mustBe "fav quotes of the day"

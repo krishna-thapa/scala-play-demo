@@ -2,8 +2,8 @@ package service
 
 import com.krishna.response.ErrorMsg.{ AccountNotFound, InvalidBcryptValidation }
 import com.krishna.response.ResponseResult
-import com.krishna.util.UtilImplicits.ValidEmail
 import com.krishna.util.Logging
+import com.krishna.util.UtilImplicits.ValidEmail
 import config.JwtKey
 import dao.AuthDAO
 import form.{ SignInForm, SignUpForm }

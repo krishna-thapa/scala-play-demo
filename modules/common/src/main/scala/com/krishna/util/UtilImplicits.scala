@@ -33,7 +33,7 @@ object UtilImplicits extends Logging {
   // An implicit class to apply for validating email address on String
   implicit class ValidEmail(email: String) {
 
-    def validEmail: Boolean = """(?=\S+)(?=(\w+)@([\w.]+))""".r.matches(email)
+    def validEmail: Boolean = """^[A-Za-z0-9+_.-]+@(.+)$""".r.matches(email)
 
   }
 

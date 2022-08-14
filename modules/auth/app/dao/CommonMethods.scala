@@ -9,6 +9,7 @@ import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
 import table.UserTable
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -33,7 +34,9 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     // check if the account exists with that email
     isAccountExist(email).flatMap {
       case Some(userInfo) =>
-        log.info(s"Account is already in the table with id: ${ userInfo.id }")
+        log.info(
+          s"Account is already in the table with id: ${ userInfo.userId } for the user: ${ userInfo.firstName } ${ userInfo.lastName }"
+        )
         fun(userInfo).map(Right(_))
       case None =>
         notFound(AccountNotFound(email)).map(Left(_))
@@ -47,7 +50,7 @@ trait CommonMethods extends DbRunner with ResponseError with Logging {
     * @param role boolean tag to alter the admin role
     * @return user account id with updated admin role
     */
-  def alterAdminRole(id: Int, role: Boolean): Future[Int] = {
+  def alterAdminRole(id: UUID, role: Boolean): Future[Int] = {
     log.info(s"Changing the admin role status of: $id to ${ !role }")
     runDbAsyncAction(
       userInfo

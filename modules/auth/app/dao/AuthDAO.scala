@@ -3,7 +3,7 @@ package dao
 import java.sql.Date
 import bcrypt.BcryptException
 import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
-import com.krishna.response.ErrorMsg.{ InvalidPassword, InvalidBcryptValidation }
+import com.krishna.response.ErrorMsg.{ InvalidBcryptValidation, InvalidPassword }
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
 
@@ -14,6 +14,7 @@ import play.api.mvc.Result
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.jdbc.PostgresProfile.api._
 
+import java.util.UUID
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
@@ -37,7 +38,7 @@ class AuthDAO @Inject() (implicit
       case Success(encrypted) =>
         val action = userInfo returning userInfo
           .map(_.id) += UserInfo(
-          -1,
+          UUID.randomUUID(),
           details.firstName.capitalize,
           details.lastName.capitalize,
           details.email,
@@ -81,7 +82,7 @@ class AuthDAO @Inject() (implicit
     */
   def toggleAdmin(email: String): Future[Either[Result, OkResponse]] = {
     val toggleRole = (user: UserInfo) => {
-      alterAdminRole(user.id, user.isAdmin).map { _ =>
+      alterAdminRole(user.userId, user.isAdmin).map { _ =>
         OkResponse(s"Successfully toggled the admin role for entry $email")
       }
     }
@@ -95,9 +96,10 @@ class AuthDAO @Inject() (implicit
     */
   def removeUserAccount(email: String): Future[Either[Result, OkResponse]] = {
     val removeUser = (user: UserInfo) => {
-      runDbAsyncAction(userInfo.filter(_.id === user.id).delete).map { result =>
-        OkResponse(s"Successfully delete entry $result")
-      }
+      runDbAsyncAction(userInfo.filter(_.id === user.userId).delete)
+        .map { result =>
+          OkResponse(s"Successfully delete entry $result")
+        }
     }
     findValidEmail(email)(removeUser)
   }

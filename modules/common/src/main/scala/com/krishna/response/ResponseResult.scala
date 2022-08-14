@@ -19,14 +19,14 @@ trait ResponseResult extends ResponseError {
     futureRecord.map(record => Ok(Json.toJson(record)))
   }
 
-  def responseSeqResult[T <: IdResource](
+  def responseSeqResult[T](
     records: Seq[T]
   )(implicit conv: OFormat[T]): Future[Result] = {
     if (records.nonEmpty) Future.successful(Ok(Json.toJson(records)))
     else notFound(EmptyDbMsg)
   }
 
-  def responseSeqResultAsync[T <: IdResource](
+  def responseSeqResultAsync[T](
     futureRecords: Future[Seq[T]]
   )(implicit conv: OFormat[T]): Future[Result] = {
     futureRecords.flatMap(responseSeqResult(_))

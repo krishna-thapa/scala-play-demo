@@ -1,12 +1,13 @@
 package model
 
-import com.krishna.model.base.IdResource
-
-import java.sql.Date
+import com.krishna.model.base.UserIdResource
 import play.api.libs.json.{ Json, OFormat }
 
+import java.sql.Date
+import java.util.UUID
+
 case class UserInfo(
-  id: Int,
+  userId: UUID,
   firstName: String,
   lastName: String,
   email: String,
@@ -14,7 +15,7 @@ case class UserInfo(
   createdDate: Date,
   isAdmin: Boolean = false
 ) extends Login
-    with IdResource
+    with UserIdResource
 
 object UserInfo {
   implicit lazy val singUpFormat: OFormat[UserInfo] = Json.format[UserInfo]

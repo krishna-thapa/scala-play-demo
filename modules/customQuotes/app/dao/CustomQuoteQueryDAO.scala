@@ -15,6 +15,7 @@ import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import table.CustomQuotesQueriesTable
 
+import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import scala.concurrent.Future
 
@@ -43,7 +44,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId: Logged in user id
     * @return sequence of the CustomQuotesQuery records
     */
-  def listAllQuotes(userId: Int): Future[Seq[CustomQuotesQuery]] =
+  def listAllQuotes(userId: UUID): Future[Seq[CustomQuotesQuery]] =
     runDbAsyncAction(getAllQuotesForUser(userId))
 
   /**
@@ -52,7 +53,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listSelectedQuote(id: Int, userId: Int): Future[Option[CustomQuotesQuery]] =
+  def listSelectedQuote(id: Int, userId: UUID): Future[Option[CustomQuotesQuery]] =
     runDbAsyncAction(getSelectedQuote(id, userId))
 
   /**
@@ -61,7 +62,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listRandomQuote(records: Int, userId: Int): Future[Seq[CustomQuotesQuery]] =
+  def listRandomQuote(records: Int, userId: UUID): Future[Seq[CustomQuotesQuery]] =
     runDbAsyncAction(getRandomRecords(records, userId))
 
   /**
@@ -79,7 +80,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
 
     val action = insertQuery += CustomQuotesQuery(
       0,
-      user.id,
+      user.userId,
       customQuoteForm.quote,
       Some(author),
       customQuoteForm.genre,
@@ -91,11 +92,11 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
 
   /**
     * @param id quote record id
-    * @param userId logged in user id
+    * @param userId logged in user UUID
     * @param customQuoteForm updated custom quote object
     * @return number of updated records, just 1 here
     */
-  def updateQuote(id: Int, userId: Int, customQuoteForm: CustomQuoteForm): Future[Int] = {
+  def updateQuote(id: Int, userId: UUID, customQuoteForm: CustomQuoteForm): Future[Int] = {
     runDbAsyncAction(
       tables
         .filter(record => record.id === id && record.userId === userId)
@@ -114,7 +115,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param id of the selected row from the CustomQuotesQuery table
     * @param userId logged user id
     */
-  def deleteQuote(id: Int, userId: Int): Future[Int] = {
+  def deleteQuote(id: Int, userId: UUID): Future[Int] = {
     runDbAsyncAction(deleteCustomQuote(id, userId))
   }
 

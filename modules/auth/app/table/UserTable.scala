@@ -1,14 +1,15 @@
 package table
 
 import java.sql.Date
-
 import model.UserInfo
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 
+import java.util.UUID
+
 class UserTable(tag: Tag) extends Table[UserInfo](tag, "user_details_table") {
 
-  def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+  def id: Rep[UUID] = column[UUID]("id", O.PrimaryKey)
   def firstName: Rep[String] = column[String]("first_name")
   def lastName: Rep[String] = column[String]("last_name")
   def email: Rep[String] = column[String]("email")
