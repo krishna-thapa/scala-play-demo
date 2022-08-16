@@ -1,6 +1,6 @@
 ## TODO in coming days
 
-* [ ]  Complete the refactoring with Future use for all the modules
+* [X]  Complete the refactoring with Future use for all the modules
 * [ ]  Update the Scala, sbt and dependences versions
 * [ ]  Add the GitHub actions for checking dependence’s security vulnerabilities
 * [X]  Add the configuration for the CORS disable in play
@@ -14,9 +14,9 @@
   * [ ]  Make use of extended Slick pg library to add the array of string in terms of genres
 * [ ]  Fix the cron job for daily call for the quote of the day API
 * [ ]  Fix and add more test cases
+* [X]  Add the Postgres Cascading Delete
 
-- Add the Postgres Cascading Delete
-- Replace the play evolution with flyway: https://github.com/flyway/flyway-play
+- [ ]  Replace the play evolution with flyway: https://github.com/flyway/flyway-play
 
 ### New modules to add
 

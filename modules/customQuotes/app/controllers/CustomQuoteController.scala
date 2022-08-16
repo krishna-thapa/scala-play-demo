@@ -29,9 +29,8 @@ class CustomQuoteController @Inject() (
       (user: UserDetail) => responseSeqResultAsync(customerQuotesDAO.listAllQuotes(user.userId))
     getResultForCustomQuote(request, customQuotes)
   }
-
   /**
-    * A REST endpoint that gets a random quote as JSON from Custom quotes table.
+    * A REST endpoint that gets a random quote from Custom quotes table.
     */
   def getRandomCustomQuote: Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing getRandomCustomQuote in CustomQuoteController.")
@@ -42,7 +41,7 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that gets a selected quote as JSON from Custom quotes table.
+    * A REST endpoint that gets a selected quote from Custom quotes table.
     */
   def getSelectedQuote(id: Int): Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing getSelectedQuote in CustomQuoteController.")
@@ -53,7 +52,7 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that deletes selected quote as JSON from Custom quotes table.
+    * A REST endpoint that deletes selected quote from Custom quotes table.
     */
   def deleteCustomQuote(id: Int): Action[AnyContent] = UserAction.async {
     implicit request: Request[AnyContent] =>
@@ -74,8 +73,8 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that add a new quote as JSON to Custom quotes table.
-    * It takes the userinfo to add userid and user name in custom quotes tagble
+    * A REST endpoint that add a new quote to Custom quotes table.
+    * It takes the userinfo to add userid and user name in custom quotes table
     */
   def addCustomQuote(): Action[AnyContent] = UserAction.async { implicit request =>
     log.info(s"Executing addCustomQuote in CustomQuoteController.")
@@ -98,7 +97,7 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that updated selected quote to Custom quotes table.
+    * A REST endpoint that updates the selected quote to the Custom quotes table.
     */
   def updateCustomQuote(id: Int): Action[AnyContent] = UserAction.async {
     implicit request: Request[AnyContent] =>

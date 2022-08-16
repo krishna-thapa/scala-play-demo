@@ -5,6 +5,7 @@ import com.dimafeng.testcontainers.scalatest.TestContainerForAll
 import helper.LoadQueries
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatestplus.play.GuiceOneAppPerSuiteAsync
+import org.testcontainers.utility.DockerImageName
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import slick.jdbc.JdbcBackend
@@ -17,7 +18,8 @@ trait PostgresInstance
     with LoadQueries {
 
   // Define a Postgres Container for test docker
-  override val containerDef: PostgreSQLContainer.Def = PostgreSQLContainer.Def()
+  override val containerDef: PostgreSQLContainer.Def =
+    PostgreSQLContainer.Def(DockerImageName.parse("postgres:latest"))
 
   // Start the connection
   val containerPostgres: PostgreSQLContainer = startContainers()

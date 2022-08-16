@@ -66,7 +66,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     runDbAsyncAction(getRandomRecords(records, userId))
 
   /**
-    * Create a customQuotes in the table.
+    * Create a customQuote in the table.
     * @param customQuoteForm Custom quote info
     * @param user logged in user details
     */
@@ -91,6 +91,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
   }
 
   /**
+   *
     * @param id quote record id
     * @param userId logged in user UUID
     * @param customQuoteForm updated custom quote object
@@ -120,7 +121,7 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
   }
 
   /**
-    * Decode Header that returns User details id request has right Auth token
+    * Check if the request has the auth token and validate the token and return the User details if authorized
     * @param request With header contents
     * @return Either error message or User details
     */
