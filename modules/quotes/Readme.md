@@ -12,7 +12,7 @@ POSTGRES_USER: admin
 POSTGRES_PASSWORD: admin
 ```
 
-These environment variables are passed to docker container that will create a database with named: `inspiration_db` and crete a user `admin` with password of `admin`.
+These environment variables are passed to docker container that will create a database with name: `inspiration_db` and crete a user `admin` with password of `admin`.
 
 All the environment variables are declared in the `.env` file that is present under the root folder of the project. These environment variables has to be passed from main application docker container using the docker-compose file. When the docker-compose file is loaded, it will read all the environment variables from `.env` file and pass those variables to the respective docker services, that can be read in the project.
 
@@ -100,10 +100,13 @@ Have implemented [play cache](https://www.playframework.com/documentation/2.8.x/
 
 ## Further improvements on
 
-- Add paginiation using the offset value for getting all the records instead
+- Add pagination using the offset and limit value for getting all the record
 - Use of Postgres Full-Text search to enable the Search service from Postgres instead of using ElasticSearch
 - Make use of extended Slick pg library to add the array of string in terms of genres
 - Fix the cron schedule job
+- Add the Akka Kafka to add the systtem for notification:
+  - Check this:
+- Add new module for the load testing using Akka Gatling library
 - Run evolution sql scripts for test container (find out how the copy can be differed with test and actual project)
 
 ## Actor inject dependency

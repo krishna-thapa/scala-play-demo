@@ -15,8 +15,9 @@ import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import table.CustomQuotesQueriesTable
 
+import java.util.UUID
 import javax.inject.{ Inject, Singleton }
-import scala.util.Try
+import scala.concurrent.Future
 
 /**
   * A repository for the custom quotes
@@ -43,7 +44,8 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId: Logged in user id
     * @return sequence of the CustomQuotesQuery records
     */
-  def listAllQuotes(userId: Int): Seq[CustomQuotesQuery] = runDbAction(getAllQuotesForUser(userId))
+  def listAllQuotes(userId: UUID): Future[Seq[CustomQuotesQuery]] =
+    runDbAsyncAction(getAllQuotesForUser(userId))
 
   /**
     * List the selected CustomQuotesQuery record from the table
@@ -51,9 +53,8 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listSelectedQuote(id: Int, userId: Int): Option[CustomQuotesQuery] = runDbAction(
-    getSelectedQuote(id, userId)
-  )
+  def listSelectedQuote(id: Int, userId: UUID): Future[Option[CustomQuotesQuery]] =
+    runDbAsyncAction(getSelectedQuote(id, userId))
 
   /**
     * Return a random CustomQuotesQuery record for a logged in user
@@ -61,15 +62,15 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param userId logged in user id
     * @return Option of the CustomQuotesQuery record
     */
-  def listRandomQuote(records: Int, userId: Int): Seq[CustomQuotesQuery] =
-    runDbAction(getRandomRecords(records, userId))
+  def listRandomQuote(records: Int, userId: UUID): Future[Seq[CustomQuotesQuery]] =
+    runDbAsyncAction(getRandomRecords(records, userId))
 
   /**
-    * Create a customQuotes in the table.
+    * Create a customQuote in the table.
     * @param customQuoteForm Custom quote info
     * @param user logged in user details
     */
-  def createQuote(customQuoteForm: CustomQuoteForm, user: UserDetail): CustomQuotesQuery = {
+  def createQuote(customQuoteForm: CustomQuoteForm, user: UserDetail): Future[CustomQuotesQuery] = {
     val currentDate = new java.sql.Date(System.currentTimeMillis())
     val insertQuery = tables returning
       tables.map(_.id) into ((fields, id) => fields.copy(id = id))
@@ -79,24 +80,25 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
 
     val action = insertQuery += CustomQuotesQuery(
       0,
-      user.id,
+      user.userId,
       customQuoteForm.quote,
       Some(author),
       customQuoteForm.genre,
       currentDate,
       customQuoteForm.ownQuote
     )
-    runDbAction(action)
+    runDbAsyncAction(action)
   }
 
   /**
+   *
     * @param id quote record id
-    * @param userId logged in user id
+    * @param userId logged in user UUID
     * @param customQuoteForm updated custom quote object
     * @return number of updated records, just 1 here
     */
-  def updateQuote(id: Int, userId: Int, customQuoteForm: CustomQuoteForm): Try[Int] = {
-    runDbActionCatchError(
+  def updateQuote(id: Int, userId: UUID, customQuoteForm: CustomQuoteForm): Future[Int] = {
+    runDbAsyncAction(
       tables
         .filter(record => record.id === id && record.userId === userId)
         .map(quote => (quote.quote, quote.author, quote.genre, quote.ownQuote))
@@ -114,12 +116,12 @@ class CustomQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)(i
     * @param id of the selected row from the CustomQuotesQuery table
     * @param userId logged user id
     */
-  def deleteQuote(id: Int, userId: Int): Int = {
-    runDbAction(deleteCustomQuote(id, userId))
+  def deleteQuote(id: Int, userId: UUID): Future[Int] = {
+    runDbAsyncAction(deleteCustomQuote(id, userId))
   }
 
   /**
-    * Decode Header that returns User details id request has right Auth token
+    * Check if the request has the auth token and validate the token and return the User details if authorized
     * @param request With header contents
     * @return Either error message or User details
     */

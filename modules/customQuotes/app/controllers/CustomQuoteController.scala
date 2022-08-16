@@ -2,15 +2,15 @@ package controllers.customQuotes
 
 import com.krishna.response.ErrorMsg.RecordNotFound
 import com.krishna.response.{ OkResponse, ResponseResult }
+import com.krishna.util.UtilImplicits.ErrorRecover
 import dao.CustomQuoteQueryDAO
 import depInject.{ SecuredController, SecuredControllerComponents }
 import forms.RequestForm
 import model.UserDetail
-import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
-import scala.util.{ Failure, Success }
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class CustomQuoteController @Inject() (
@@ -23,46 +23,49 @@ class CustomQuoteController @Inject() (
   /**
     * A REST endpoint that gets all the custom quotes for the logged in user.
     */
-  def getCustomQuotes: Action[AnyContent] = UserAction { implicit request =>
-    log.info(s"Executing getCustomQuotes from Custom quotes")
+  def getCustomQuotes: Action[AnyContent] = UserAction.async { implicit request =>
+    log.info(s"Executing getCustomQuotes in CustomQuoteController.")
     val customQuotes =
-      (user: UserDetail) => responseSeqResult(customerQuotesDAO.listAllQuotes(user.id))
+      (user: UserDetail) => responseSeqResultAsync(customerQuotesDAO.listAllQuotes(user.userId))
     getResultForCustomQuote(request, customQuotes)
   }
-
   /**
-    * A REST endpoint that gets a random quote as JSON from Custom quotes table.
+    * A REST endpoint that gets a random quote from Custom quotes table.
     */
-  def getRandomCustomQuote: Action[AnyContent] = UserAction { implicit request =>
-    log.info(s"Executing getRandomCustomQuote from Custom quotes")
+  def getRandomCustomQuote: Action[AnyContent] = UserAction.async { implicit request =>
+    log.info(s"Executing getRandomCustomQuote in CustomQuoteController.")
     val randomCustomQuote =
-      (user: UserDetail) => responseSeqResult(customerQuotesDAO.listRandomQuote(1, user.id))
+      (user: UserDetail) =>
+        responseSeqResultAsync(customerQuotesDAO.listRandomQuote(1, user.userId))
     getResultForCustomQuote(request, randomCustomQuote)
   }
 
   /**
-    * A REST endpoint that gets a selected quote as JSON from Custom quotes table.
+    * A REST endpoint that gets a selected quote from Custom quotes table.
     */
-  def getSelectedQuote(id: Int): Action[AnyContent] = UserAction { implicit request =>
-    log.info(s"Executing getSelectedQuote from Custom quotes")
+  def getSelectedQuote(id: Int): Action[AnyContent] = UserAction.async { implicit request =>
+    log.info(s"Executing getSelectedQuote in CustomQuoteController.")
     val selectedQuote =
-      (user: UserDetail) => responseOptionResult(customerQuotesDAO.listSelectedQuote(id, user.id))
+      (user: UserDetail) =>
+        responseOptionResult(customerQuotesDAO.listSelectedQuote(id, user.userId))
     getResultForCustomQuote(request, selectedQuote)
   }
 
   /**
-    * A REST endpoint that deletes selected quote as JSON from Custom quotes table.
+    * A REST endpoint that deletes selected quote from Custom quotes table.
     */
-  def deleteCustomQuote(id: Int): Action[AnyContent] = UserAction {
+  def deleteCustomQuote(id: Int): Action[AnyContent] = UserAction.async {
     implicit request: Request[AnyContent] =>
-      log.info(s"Executing deleteCustomQuote from Custom quotes")
+      log.info(s"Executing deleteCustomQuote in CustomQuoteController.")
 
       val deletedQuote = (user: UserDetail) => {
-        if (customerQuotesDAO.deleteQuote(id, user.id) > 0) {
-          log.warn(s"Successfully deleted custom quote with id: $id")
-          responseOk(OkResponse(s"Successfully delete quote with id: $id"))
-        } else {
-          badRequest(s"Error on request with quote id: $id")
+        customerQuotesDAO.deleteQuote(id, user.userId).flatMap { response =>
+          if (response > 0) {
+            log.warn(s"Successfully deleted custom quote with id: $id")
+            responseOk(OkResponse(s"Successfully delete quote with id: $id"))
+          } else {
+            badRequest(s"Error on request with quote id: $id")
+          }
         }
       }
 
@@ -70,14 +73,12 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that add a new quote as JSON to Custom quotes table.
-    * It takes the userinfo to add userid and user name in custom quotes tagble
+    * A REST endpoint that add a new quote to Custom quotes table.
+    * It takes the userinfo to add userid and user name in custom quotes table
     */
-  def addCustomQuote(): Action[AnyContent] = UserAction { implicit request =>
-    log.info(s"Executing addCustomQuote from Custom quotes")
-    log.warn(
-      s"Executing addCustomQuote from Custom quotes ${ RequestForm.quotesQueryForm.bindFromRequest() }"
-    )
+  def addCustomQuote(): Action[AnyContent] = UserAction.async { implicit request =>
+    log.info(s"Executing addCustomQuote in CustomQuoteController.")
+
     val addQuote = (user: UserDetail) => {
       RequestForm
         .quotesQueryForm
@@ -87,7 +88,7 @@ class CustomQuoteController @Inject() (
             badRequest("error" + formWithErrors.errors)
           },
           customQuote => {
-            responseOk(customerQuotesDAO.createQuote(customQuote, user))
+            responseOkAsync(customerQuotesDAO.createQuote(customQuote, user))
           }
         )
     }
@@ -96,11 +97,11 @@ class CustomQuoteController @Inject() (
   }
 
   /**
-    * A REST endpoint that updated selected quote to Custom quotes table.
+    * A REST endpoint that updates the selected quote to the Custom quotes table.
     */
-  def updateCustomQuote(id: Int): Action[AnyContent] = UserAction {
+  def updateCustomQuote(id: Int): Action[AnyContent] = UserAction.async {
     implicit request: Request[AnyContent] =>
-      log.info(s"Executing updateCustomQuote from Custom quotes")
+      log.info(s"Executing updateCustomQuote in CustomQuoteController.")
 
       val updateQuote = (user: UserDetail) => {
         RequestForm
@@ -111,12 +112,12 @@ class CustomQuoteController @Inject() (
               badRequest("error" + formWithErrors.errors)
             },
             customQuote => {
-              customerQuotesDAO.updateQuote(id, user.id, customQuote) match {
-                case Success(recordsUpdated) if recordsUpdated == 1 =>
-                  responseOk(OkResponse(s"Successfully updated record with id: $id"))
-                case Success(_) =>
-                  notFound(RecordNotFound(id))
-                case Failure(exception) => internalServerError(exception.getMessage)
+              customerQuotesDAO.updateQuote(id, user.userId, customQuote).flatMap {
+                recordsUpdated =>
+                  if (recordsUpdated == 1)
+                    responseOk(OkResponse(s"Successfully updated record with id: $id"))
+                  else
+                    notFound(RecordNotFound(id))
               }
             }
           )
@@ -127,13 +128,13 @@ class CustomQuoteController @Inject() (
 
   private def getResultForCustomQuote(
     request: Request[AnyContent],
-    result: UserDetail => Result
-  ): Result = {
+    customRunResult: UserDetail => Future[Result]
+  ): Future[Result] = {
     customerQuotesDAO.decoderHeader(request) match {
       case Left(errorMsg) => responseErrorResult(errorMsg)
       case Right(user) =>
         log.info(s"Executing CustomQuoteController for user: ${ user.email }")
-        result(user)
+        customRunResult(user).errorRecover
     }
   }
 

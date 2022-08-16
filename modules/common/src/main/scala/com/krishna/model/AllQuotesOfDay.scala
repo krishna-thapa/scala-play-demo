@@ -15,11 +15,11 @@ object AllQuotesOfDay {
   implicit lazy val allQuotesOfDay: OFormat[AllQuotesOfDay] =
     Json.format[AllQuotesOfDay]
 
-  def apply(contentDate: String, quote: String, index: Int): AllQuotesOfDay = {
+  def apply(contentDate: String, quote: Option[String], index: Int): AllQuotesOfDay = {
     new AllQuotesOfDay(
       id = index + 1,
       contentDate = contentDate,
-      quote = Json.parse(quote).as[QuotesQuery]
+      quote = Json.parse(quote.getOrElse(throw exception.ParseException(""))).as[QuotesQuery]
     )
   }
 

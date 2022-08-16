@@ -1,7 +1,8 @@
 package controllers.auth
 
+import com.krishna.response.ErrorMsg.EmptyDbMsg
 import com.krishna.response.ResponseResult
-import com.krishna.util.FutureErrorHandler.{ ErrorRecover, ToFuture }
+import com.krishna.util.UtilImplicits.ErrorRecover
 import com.krishna.util.Logging
 import config.DecodeHeader
 import dao.MongoControllerRefactored
@@ -43,9 +44,9 @@ class GridFsController @Inject() (
                 s"Received file: ${ file.filename } with content type of: ${ file.contentType }"
               )
               gridFsAttachmentService.addImageAttachment(user.email, file)
-            case _ => NotFound("Select the picture to upload").toFuture
+            case _ => badRequest("Invalid image format")
           }
-        case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+        case Left(errorMsg) => responseErrorResult(errorMsg)
       }
     }
 
@@ -55,7 +56,7 @@ class GridFsController @Inject() (
       case Right(user) =>
         log.info(s"Executing getAttachedPicture for the request user email: ${ user.email }")
         getAttachment(user.email)
-      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+      case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }
 
@@ -67,7 +68,7 @@ class GridFsController @Inject() (
         gridFsAttachmentService
           .removeUserPicture(user.email)
           .map(_ => Ok("Success on removing the profile picture"))
-      case Left(errorMsg) => responseErrorResult(errorMsg).toFuture
+      case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }
 

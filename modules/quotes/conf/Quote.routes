@@ -69,6 +69,15 @@ GET      /randomTen             controllers.quotes.QuoteController.getFirst10Quo
 #  description: "This can only be done by the admin."
 #  tags:
 #    - Quote
+#  parameters:
+#    - name: "offset"
+#      in: "query"
+#      description: "For paginiation - default to 0"
+#      type: "integer"
+#    - name: "limit"
+#      in: "query"
+#      description: "For paginiation - default to 100"
+#      type: "integer"
 #  responses:
 #    200:
 #      description: Success response of the quotes.

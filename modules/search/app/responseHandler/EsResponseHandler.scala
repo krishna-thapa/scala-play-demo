@@ -1,6 +1,6 @@
 package responseHandler
 
-import com.krishna.response.ErrorMsg.{ EmptyDbMsg, EsPlaceHolder }
+import com.krishna.response.ErrorMsg.{ EmptyDbMsg, EsErrorMessage }
 import com.krishna.response.ResponseError
 import com.sksamuel.elastic4s.Response
 import com.sksamuel.elastic4s.playjson.playJsonHitReader
@@ -47,7 +47,7 @@ object EsResponseHandler extends ResponseError {
       log.info(s"Total hits for the searched text: ${ response.size }")
       quoteAuthorSearchedResponse(response)
     } else {
-      notFound(EsPlaceHolder(EmptyDbMsg.msg))
+      elasticSearchNotFound(EsErrorMessage(EmptyDbMsg.msg))
     }
   }
 
@@ -84,7 +84,7 @@ object EsResponseHandler extends ResponseError {
       log.error(
         s"Error while performing action on index: $indexName with an error: ${ response.error.reason }"
       )
-      notFound(EsPlaceHolder(response.error.reason))
+      elasticSearchNotFound(EsErrorMessage(response.error.reason))
     }
   }
 
@@ -96,7 +96,7 @@ object EsResponseHandler extends ResponseError {
         .suggestions(CompletionCustomSuggestion.suggestionName)
         .flatMap(_.toCompletion.options)
 
-    if (searchResponse.isEmpty) notFound(EsPlaceHolder("Searched author not found"))
+    if (searchResponse.isEmpty) elasticSearchNotFound(EsErrorMessage("Searched author not found"))
     else {
       val results: Seq[String] = searchResponse.map(_.text)
       Ok(Json.toJson(AuthorCompletion(CompletionResponseType.AutoCompletion, results)))

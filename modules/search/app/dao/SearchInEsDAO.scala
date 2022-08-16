@@ -38,7 +38,7 @@ class SearchInEsDAO @Inject() (
     */
   def getAndStoreQuotes(records: Int): Future[Response[BulkResponse]] = {
     log.info(s"Getting $records random quotes from postgres database")
-    val quotes: Seq[QuotesQuery] = quotesDAO.listRandomQuote(records)
+    val quotes: Future[Seq[QuotesQuery]] = quotesDAO.listRandomQuote(records)
 
     // if the index exist, have to wait until the index is deleted without any error
     if (doesIndexExists) deleteQuotesIndex(indexName).await
@@ -49,13 +49,15 @@ class SearchInEsDAO @Inject() (
     // If createOnly set to true then trying to update a document will fail, it
     // is set as false (default) so that duplicate records can override the existing records
 
-    createIndexWithCompletionField.flatMap { _ =>
-      client.execute {
-        bulk {
-          quotes.map { quote =>
-            indexInto(indexName).id(quote.csvId).doc(QuoteWithAuthor(quote))
-          }
-        }.refresh(RefreshPolicy.Immediate)
+    quotes.flatMap { re =>
+      createIndexWithCompletionField.flatMap { _ =>
+        client.execute {
+          bulk {
+            re.map { quote =>
+              indexInto(indexName).id(quote.csvId).doc(QuoteWithAuthor(quote))
+            }
+          }.refresh(RefreshPolicy.Immediate)
+        }
       }
     }
   }

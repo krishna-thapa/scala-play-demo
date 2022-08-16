@@ -12,9 +12,10 @@ CREATE TABLE quotes (
 
 CREATE TABLE fav_quotations (
     id serial PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id UUID NOT NULL REFERENCES user_details_table ON DELETE CASCADE,
     csv_id text NOT NULL,
-    fav_tag boolean default true
+    fav_tag boolean default true,
+    FOREIGN KEY(user_id) REFERENCES user_details_table (id)
 );
 
 --- !Downs

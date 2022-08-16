@@ -21,23 +21,29 @@ trait DbRunner extends Logging {
 
   }
 
-  /* Run and get the result from the future*/
+  /* Run and get the result from the future */
   def runDbAction[T](action: DBIOAction[T, NoStream, All], timeout: Option[Int] = None): T = {
     dbConfig.run(action.transactionally).andGetResult(timeout)
   }
 
+  /* Run and get the result asynchronously */
+  def runDbAsyncAction[T](action: DBIOAction[T, NoStream, All]): Future[T] = {
+    dbConfig.run(action.transactionally)
+  }
+
   /* Run and get the result from the future or catch any error*/
   def runDbActionCatchError[T](
-    action: DBIOAction[T, NoStream, All],
-    timeout: Option[Int] = None
-  ): Try[T] = {
-    try {
-      Success(runDbAction(action, timeout))
-    } catch {
-      case ex: Exception =>
-        log.warn("Db Action failed: ", ex)
-        Failure(ex)
-    }
+    action: DBIOAction[T, NoStream, All]
+  ): Future[T] = {
+    val runAsyncAction: Try[Future[T]] =
+      try {
+        Success(runDbAsyncAction(action))
+      } catch {
+        case ex: Exception =>
+          log.warn("Db Action failed: ", ex)
+          Failure(ex)
+      }
+    Future.fromTry(runAsyncAction).flatten
   }
 
 }

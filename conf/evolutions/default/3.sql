@@ -1,18 +1,16 @@
 --- !Ups
 
-CREATE TABLE user_details_table (
+CREATE TABLE custom_quotations (
     id serial PRIMARY KEY,
-    first_name varchar(255) NOT NULL,
-    last_name varchar(255) NOT NULL,
-    email varchar(255) NOT NULL UNIQUE,
-    password varchar(255) NOT NULL,
-    created_date date NOT NULL,
-    is_admin boolean default true
+    user_id UUID NOT NULL REFERENCES user_details_table ON DELETE CASCADE,
+    quote VARCHAR(1000) NOT NULL,
+    author VARCHAR(255),
+    genre VARCHAR(100),
+    stored_date DATE NOT NULL,
+    own_quote boolean default true,
+    FOREIGN KEY(user_id) REFERENCES user_details_table (id)
 );
-
--- Admin account in the database with -1 as an ID and "admin" as encrypted password
-INSERT INTO user_details_table VALUES (-1, 'admin', 'admin', 'admin@com', '$2a$05$qURyvfv6eJtoroIDL48ExuAeOGxN705UcTgrHYyrrDjBLm5UrBDgO', '2020-10-15', true);
 
 --- !Downs
 
-DROP TABLE if exists user_details_table CASCADE;
+DROP TABLE if exists custom_quotations CASCADE;

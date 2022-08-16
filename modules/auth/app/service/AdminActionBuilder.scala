@@ -3,7 +3,7 @@ package service
 import java.time.Clock
 import com.krishna.response.ErrorMsg.{ AuthenticationFailed, AuthorizationForbidden }
 import com.krishna.response.ResponseResult
-import com.krishna.util.FutureErrorHandler.ErrorRecover
+import com.krishna.util.UtilImplicits.ErrorRecover
 
 import javax.inject.Inject
 import model.UserDetail
@@ -36,12 +36,10 @@ class AdminActionBuilder @Inject() (parser: BodyParsers.Default)(implicit
           .errorRecover
       // If the logged in user doesn't have an admin role
       case Some(userDetail) =>
-        Future(
-          responseErrorResult(AuthorizationForbidden(s"${ userDetail.email }"))
-            .refreshJwtSession(request)
-        )
+        responseErrorResult(AuthorizationForbidden(s"${ userDetail.email }"))
+          .map(_.refreshJwtSession(request))
       case _ =>
-        Future(responseErrorResult(AuthenticationFailed))
+        responseErrorResult(AuthenticationFailed)
     }
   }
 

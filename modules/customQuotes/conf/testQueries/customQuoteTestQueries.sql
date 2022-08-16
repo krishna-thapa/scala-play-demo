@@ -1,6 +1,6 @@
 CREATE TABLE custom_quotations (
     id serial PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id UUID NOT NULL,
     quote varchar(1000) NOT NULL,
     author varchar(255),
     genre varchar(100),

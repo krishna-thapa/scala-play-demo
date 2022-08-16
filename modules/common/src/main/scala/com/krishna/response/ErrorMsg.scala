@@ -52,11 +52,11 @@ object ErrorMsg {
     override val msg: String = s"Invalid password for account: $email"
   }
 
-  case class invalidBcryptValidation(error: String) extends ErrorMsg {
+  case class InvalidBcryptValidation(error: String) extends ErrorMsg {
     override val msg: String = s"Bcrypt encryption failed: $error"
   }
 
-  case class EsPlaceHolder(message: String) extends ErrorMsg {
+  case class EsErrorMessage(message: String) extends ErrorMsg {
     override val msg: String = s"Error in ES: $message"
   }
 

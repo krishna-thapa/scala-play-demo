@@ -11,9 +11,10 @@ import slick.jdbc.{ JdbcBackend, JdbcProfile }
 import slick.sql.FixedSqlStreamingAction
 import tables.{ FavQuoteQueriesTable, QuoteQueriesTable }
 
+import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Try
+import scala.concurrent.Future
 
 @Singleton
 class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
@@ -33,22 +34,22 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
     * @param userId primary id from user_details_table
     * @return Quotes that are marked as favorite for the specific user id
     */
-  def listFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
+  def listFavQuotes[T <: WithCSCVIdResource](userId: UUID): Future[Seq[T]] = {
     val query = quotesTable
       .join(favQuotesTable.filter { favQuote =>
         favQuote.userId === userId && favQuote.favTag
       })
       .on(_.csvId === _.csvId)
 
-    runDbAction(query.result).map(_._1.asInstanceOf[T])
+    runDbAsyncAction(query.result).map(_.map(_._1.asInstanceOf[T]))
   }
 
-  def listCachedFavQuotes[T <: WithCSCVIdResource](userId: Int): Seq[T] = {
+  def listCachedFavQuotes[T <: WithCSCVIdResource](userId: UUID): Future[Seq[T]] = {
     val query = favQuotesTable.filter { record =>
       record.userId === userId && record.favTag
     }.result
 
-    runDbAction(query).map(_.asInstanceOf[T])
+    runDbAsyncAction(query).map(_.map(_.asInstanceOf[T]))
   }
 
   // list all records from the fav_quotes table
@@ -59,7 +60,7 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
     * @param csvId id from csv custom table
     * @return new or updated records in fav_quotes table
     */
-  def modifyFavQuote[T <: WithCSCVIdResource](userId: Int, csvId: String): Try[T] = {
+  def modifyFavQuote[T <: WithCSCVIdResource](userId: UUID, csvId: String): Future[T] = {
     // check if the record exists with that csv id in the fav_quotes table for that user id
     val favRecord: FixedSqlStreamingAction[Seq[FavQuoteQuery], FavQuoteQuery, Effect.Read] =
       favQuotesTable.filter { quote =>
@@ -79,13 +80,14 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
             log.info("Inserting new record in the fav quotes table")
             createFavQuote(userId, csvId)
         }
-    runDbActionCatchError(action).map(_.asInstanceOf[T])
+    runDbAsyncAction(action).map(_.asInstanceOf[T])
   }
 
   /**
     * @param id id from fav_quotations table
     * @param tag boolean tag to specify favorite quote
     * @return record with altered fav tag
+    * Wait until the fav tag is modified hence use of Await instead of future response  
     */
   private def alterFavTag(id: Int, tag: Boolean): Int = {
     log.info(s"Changing the fav tag status of: $id to ${ !tag }")
@@ -103,7 +105,7 @@ class FavQuoteQueryDAO @Inject() (dbConfigProvider: DatabaseConfigProvider)
     * @return create a new record in the fav_quotes table with fav tag as true
     */
   private def createFavQuote(
-    userId: Int,
+    userId: UUID,
     csvId: String
   ): DBIOAction[FavQuoteQuery, NoStream, Effect.Write] = {
     val insertFavQuote = FavQuoteQueriesTable.favQuoteQueries returning

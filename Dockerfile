@@ -14,7 +14,7 @@ RUN \
 # Any RUN command after any ARG is declared, it has that value in it as an environment variable and thus
 # invalidates layer cache, so only declaring these ARGs when they're used
 
-ARG SBT_VERSION=1.6.0
+ARG SBT_VERSION=1.6.2
 
 RUN \
   curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \

@@ -99,9 +99,8 @@ services:
     volumes:
       - "./conf/docker/postgres.conf:/etc/postgresql/postgresql.conf"
       # for debian system use: /var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata
-      # for mac OS: ./pgdata/:/var/lib/postgresql/data/pgdata and copy the CSV files under pgdata
-      # which will be under the project level directory, not the root level
-      - "/var/lib/postgresql/data/:/var/lib/postgresql/data/pgdata"
+      # for mac OS: ./pgdata/:/var/lib/postgresql/data/pgdata
+      - "./pgdata/:/var/lib/postgresql/data/pgdata"
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
   mongodb:
     image: mongo

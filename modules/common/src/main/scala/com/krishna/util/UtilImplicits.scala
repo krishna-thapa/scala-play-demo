@@ -5,7 +5,7 @@ import play.api.mvc.Results.InternalServerError
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object FutureErrorHandler extends Logging {
+object UtilImplicits extends Logging {
 
   // An implicit class to apply future recover method for any time of Future[Result] response
   implicit class ErrorRecover(futureResult: Future[Result])(implicit
@@ -33,9 +33,7 @@ object FutureErrorHandler extends Logging {
   // An implicit class to apply for validating email address on String
   implicit class ValidEmail(email: String) {
 
-    def validEmail: Boolean = {
-      if ("""(?=[^\s]+)(?=(\w+)@([\w.]+))""".r.findFirstIn(email).isEmpty) false else true
-    }
+    def validEmail: Boolean = """^[A-Za-z0-9+_.-]+@(.+)$""".r.matches(email)
 
   }
 

@@ -5,22 +5,29 @@ import com.krishna.model.Genre
 import controllers.customQuotes.CustomQuoteController
 import dao.CustomQuoteQueryDAO
 import depInject.SecuredControllerComponents
+import forms.RequestForm
+import forms.RequestForm.CustomQuoteForm
 import model.UserDetail
 import models.CustomQuotesQuery
-import org.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.mock
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Configuration
+import play.api.data.{ DefaultFormBinding, Form }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import service.UserActionBuilder
 
 import java.sql.Date
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }
 
-class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
+class CustomQuoteControllerSpec extends PlaySpec with Results with GuiceOneAppPerSuite {
 
   implicit lazy val materializer: Materializer = app.materializer
 
@@ -46,12 +53,14 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
   val mockRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders(("Authorization", "1"))
 
+  val userUuid: UUID = UUID.randomUUID()
+
   val mockUserDetail: UserDetail =
-    UserDetail(1, "name", "email@com", new Date(System.currentTimeMillis()), isAdmin = false)
+    UserDetail(userUuid, "name", "email@com", new Date(System.currentTimeMillis()), isAdmin = false)
 
   val mockCustomQuote: CustomQuotesQuery = CustomQuotesQuery(
     1,
-    1,
+    userUuid,
     "dummy Quote",
     None,
     Some(Genre.cool),
@@ -62,34 +71,35 @@ class CustomQuoteControllerSpec extends PlaySpec with MockitoSugar with GuiceOne
   when(mockCustomQuoteQueryDAO.decoderHeader(mockRequest)).thenReturn(Right(mockUserDetail))
 
   "CustomQuoteController" should {
-    "getCustomQuotes sgould give all the custom quotes only" in {
-      when(mockCustomQuoteQueryDAO.listAllQuotes(1))
-        .thenReturn(Seq(mockCustomQuote))
+    "getCustomQuotes should give all the custom quotes only" in {
+      when(mockCustomQuoteQueryDAO.listAllQuotes(userUuid))
+        .thenReturn(Future.successful(Seq(mockCustomQuote)))
       val result: Future[Result] = customQuoteController.getCustomQuotes.apply(mockRequest)
       val bodyText: String = contentAsString(result)
       bodyText mustBe
-        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
+        s"""[{"id":1,"userId":"$userUuid","quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
 
     "getRandomCustomQuote should give random quote only" in {
-      when(mockCustomQuoteQueryDAO.listRandomQuote(1, 1))
-        .thenReturn(Seq(mockCustomQuote))
+      when(mockCustomQuoteQueryDAO.listRandomQuote(1, userUuid))
+        .thenReturn(Future.successful(Seq(mockCustomQuote)))
       val result: Future[Result] = customQuoteController.getRandomCustomQuote.apply(mockRequest)
       val bodyText: String = contentAsString(result)
       bodyText mustBe
-        """[{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
+        s"""[{"id":1,"userId":"$userUuid","quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}]""".stripMargin
     }
 
     "getSelectedQuote should give selected quote only" in {
-      when(mockCustomQuoteQueryDAO.listSelectedQuote(1, 1)).thenReturn(Some(mockCustomQuote))
+      when(mockCustomQuoteQueryDAO.listSelectedQuote(1, userUuid))
+        .thenReturn(Future.successful(Some(mockCustomQuote)))
       val result: Future[Result] = customQuoteController.getSelectedQuote(1).apply(mockRequest)
       val bodyText: String = contentAsString(result)
       bodyText mustBe
-        """{"id":1,"userId":1,"quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}""".stripMargin
+        s"""{"id":1,"userId":"$userUuid","quote":"dummy Quote","genre":"cool","storedDate":1425168000000,"ownQuote":false}""".stripMargin
     }
 
     "deleteCustomQuote should delete selected quote only" in {
-      when(mockCustomQuoteQueryDAO.deleteQuote(1, 1)).thenReturn(1)
+      when(mockCustomQuoteQueryDAO.deleteQuote(1, userUuid)).thenReturn(Future.successful(1))
       val result: Future[Result] = customQuoteController.deleteCustomQuote(1).apply(mockRequest)
       val bodyText: String = contentAsString(result)
       bodyText mustBe
