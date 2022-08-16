@@ -2,7 +2,7 @@
 
 * [X]  Complete the refactoring with Future use for all the modules
 * [ ]  Update the Scala, sbt and dependences versions
-* [ ]  Add the GitHub actions for checking dependence’s security vulnerabilities
+* [X]  Add the GitHub actions for checking dependence’s security vulnerabilities
 * [X]  Add the configuration for the CORS disable in play
 * [ ]  Update the Swagger UI using latest version of 4
   * [ ]  Update the use swagger-ui webjar, look more: `"org.webjars" % "swagger-ui"`
