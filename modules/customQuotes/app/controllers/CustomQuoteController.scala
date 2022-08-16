@@ -29,6 +29,7 @@ class CustomQuoteController @Inject() (
       (user: UserDetail) => responseSeqResultAsync(customerQuotesDAO.listAllQuotes(user.userId))
     getResultForCustomQuote(request, customQuotes)
   }
+
   /**
     * A REST endpoint that gets a random quote from Custom quotes table.
     */
