@@ -1,6 +1,6 @@
 package com.krishna.model.auth
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{ Json, OFormat }
 
 case class ProfilePictureInfo(
   filename: String,
