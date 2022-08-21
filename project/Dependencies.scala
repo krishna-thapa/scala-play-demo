@@ -15,7 +15,7 @@ object Dependencies {
     val monogoDb = "1.0.10-play28"
     val elastic4s = "7.9.1"
     val playRedis = "2.7.0"
-    val postgresql = "42.4.1"
+    val postgresql = "42.4.2"
 
     // tests
     val scalaPlayTest = "5.1.0"
