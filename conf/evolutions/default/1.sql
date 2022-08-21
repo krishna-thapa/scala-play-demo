@@ -7,7 +7,9 @@ CREATE TABLE user_details_table (
     email varchar(255) NOT NULL UNIQUE,
     password varchar(255) NOT NULL,
     created_date date NOT NULL,
-    is_admin boolean default true
+    is_admin boolean default true,
+    profile_picture_info json,
+    profile_picture bytea
 );
 
 -- Admin account in the database with "admin" as encrypted password

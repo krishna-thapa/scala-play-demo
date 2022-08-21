@@ -1,8 +1,11 @@
 # Pull base image
 FROM openjdk:11
 
-MAINTAINER krishna Thapa <krishna.thapa91@gmail.com>
-LABEL org.opencontainers.image.description DESCRIPTION
+LABEL developer="Krishna Thapa"
+LABEL maintainer="krishna.thapa91@gmail.com"
+LABEL version="1.0"
+LABEL description="Scala play project to create a backend endpoints for an inspirational quotes using Postgres, Redis and\
+elasticsearch as databases. Its purely for the learning purpose only."
 
 # Setup adapted from https://github.com/hseeberger/scala-sbt/blob/master/debian/Dockerfile
 RUN \

@@ -5,6 +5,7 @@ object Dependencies {
 
   object Versions {
     val playSlick = "5.0.2"
+    val slickPg = "0.20.3"
     val swagger = "3.43.0"
     val playjwt = "5.0.0"
     val bcrypt = "4.3.0"
@@ -12,7 +13,6 @@ object Dependencies {
     val akkaVersion = "2.6.19"
 
     // Database
-    val monogoDb = "1.0.10-play28"
     val elastic4s = "7.9.1"
     val playRedis = "2.7.0"
     val postgresql = "42.4.1"
@@ -42,17 +42,13 @@ object Dependencies {
       "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "3.0.4"
     )
 
-    // Reactive Mongo DB
-    lazy val mongoDependencies = Seq(
-      "org.reactivemongo" %% "play2-reactivemongo" % Versions.monogoDb,
-      "org.reactivemongo" %% "reactivemongo-play-json-compat" % Versions.monogoDb
-    )
-
     // Slick for the Postgres DB
     lazy val slickDatabaseDependencies = Seq(
       "org.postgresql" % "postgresql" % Versions.postgresql,
       "com.typesafe.play" %% "play-slick" % Versions.playSlick,
-      "com.typesafe.play" %% "play-slick-evolutions" % Versions.playSlick
+      "com.typesafe.play" %% "play-slick-evolutions" % Versions.playSlick,
+      "com.github.tminglei" %% "slick-pg" % Versions.slickPg,
+      "com.github.tminglei" %% "slick-pg_play-json" % Versions.slickPg
     )
 
     // Elastic Search dependencies

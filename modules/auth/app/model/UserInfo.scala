@@ -1,5 +1,6 @@
 package model
 
+import com.krishna.model.auth.ProfilePictureInfo
 import com.krishna.model.base.UserIdResource
 import play.api.libs.json.{ Json, OFormat }
 
@@ -13,7 +14,9 @@ case class UserInfo(
   email: String,
   password: String,
   createdDate: Date,
-  isAdmin: Boolean = false
+  isAdmin: Boolean = false,
+  profilePictureInfo: Option[ProfilePictureInfo],
+  profilePicture: Array[Byte]
 ) extends Login
     with UserIdResource
 

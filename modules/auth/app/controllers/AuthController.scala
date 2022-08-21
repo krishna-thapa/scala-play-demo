@@ -1,18 +1,20 @@
 // Auth has to be appended on the controller so that routes file can read
 package controllers.auth
 
-import java.time.Clock
 import com.krishna.response.ErrorMsg.InvalidFormFormat
 import com.krishna.response.ResponseResult
 import com.krishna.util.Logging
+import config.DecodeHeader
 import depInject.{ SecuredController, SecuredControllerComponents }
 import form.{ AuthForms, SignInForm, SignUpForm }
-
-import javax.inject.{ Inject, Singleton }
-import play.api.mvc._
-import config.DecodeHeader
 import play.api.Configuration
+import play.api.libs.Files
+import play.api.mvc._
 import service.AuthService
+
+import java.time.Clock
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.Future
 
 @Singleton
 class AuthController @Inject() (
@@ -117,6 +119,64 @@ class AuthController @Inject() (
               invalidForm[SignUpForm](formWithErrors, InvalidFormFormat("UpdateSignUpForm")),
             userDetails => authService.updateUserInfoService(user.email, userDetails)
           )
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+    }
+  }
+
+  /**
+   * Save the user's profile picture in the Postgres database as Array of bytes
+   * @return Success on inserting a new picture or updating picture or an error response
+   */
+  def insertProfilePic: Action[MultipartFormData[Files.TemporaryFile]] =
+    UserAction.async(parse.multipartFormData) { request =>
+      DecodeHeader(request.headers) match {
+        case Right(user) =>
+          log.info(
+            s"Executing insertProfilePic for the user: ${ user.email } method in AuthController."
+          )
+          request
+            .body
+            .files
+            .headOption
+            .map { picture =>
+              log.info(
+                s"Trying to upload profile pic: ${ picture.filename }, of type ${ picture.contentType } for user: ${ user.email }"
+              )
+              authService.uploadUserProfilePic(user, picture)
+            }
+            .getOrElse {
+              Future.successful(NoContent)
+            }
+        case Left(errorMsg) => responseErrorResult(errorMsg)
+      }
+    }
+
+  /**
+   * Retrieve the user's profile picture, the picture details will be in the HTTP response header
+   * @return Picture of the users profile
+   */
+  def getAttachedPicture: Action[AnyContent] = UserAction.async { request =>
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(
+          s"Executing getAttachedPicture for the request user email: ${ user.email } in AuthController."
+        )
+        authService.getUserProfilePic(user)
+      case Left(errorMsg) => responseErrorResult(errorMsg)
+    }
+  }
+
+  /**
+   * Delete the user's profile picture
+   * @return Success or error while deleting the picture
+   */
+  def removeProfilePicture: Action[AnyContent] = UserAction.async { request =>
+    DecodeHeader(request.headers) match {
+      case Right(user) =>
+        log.info(
+          s"Executing removeProfilePicture for the request user email: ${ user.email } in AuthController."
+        )
+        authService.deleteUserProfilePic(user)
       case Left(errorMsg) => responseErrorResult(errorMsg)
     }
   }

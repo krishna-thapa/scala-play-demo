@@ -41,7 +41,7 @@ docker-compose down -v
 
 - First start the docker container with postgres image up and running
   `docker-compose up`
-- Connect to the postgres through terminal 
+- Connect to the postgres through terminal
   `psql -h localhost -p 5432 -U  admin postgres`
 - Password for admin role is *admin*
 - Connect to the right database

@@ -7,9 +7,7 @@ version := "1.0-SNAPSHOT"
 
 ThisBuild / organization := "com.krishna"
 ThisBuild / scalaVersion := "2.13.8"
-
-resolvers += Resolver.sonatypeRepo("releases")
-resolvers += Resolver.sonatypeRepo("snapshots")
+ThisBuild / crossScalaVersions := Seq("2.12.8", "2.13.8")
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
@@ -57,7 +55,6 @@ lazy val auth = project
     libraryDependencies ++=
       commonDependencies ++
         slickDatabaseDependencies ++
-        mongoDependencies ++
         Seq(
           playJwt,
           scalaBcrypt
@@ -92,26 +89,41 @@ lazy val common = project
 // Creating a custom sbt task for the docker start-up
 import scala.sys.process._
 lazy val sbtDockerStart = taskKey[Unit]("Start the docker containers")
+
 sbtDockerStart := {
   "./scripts/docker_start.sh" !
 }
 
 // Creating a custom sbt task for running project using sbt run
 lazy val sbtLocalStart = taskKey[Unit]("Start the project using sbt shell")
+
 sbtLocalStart := {
   "./scripts/sbt_start.sh" !
 }
 
 // Creating a custom sbt task for the csv migration to the docker container
 lazy val sbtCsvMigrate = taskKey[Unit]("Migrate the CSV to the Postgres table")
+
 sbtCsvMigrate := {
   "./scripts/csv_migration.sh" !
 }
 
 // Creating a custom sbt task for running project's test coverage and opening coverage report in google chrome
 lazy val sbtScoverageDoc = taskKey[Unit]("Get the project's scoverage report in html")
+
 sbtScoverageDoc := {
   "./scripts/scoverage_html.sh" !
+}
+
+// Creating a custom sbt task with input key for to perform Docker commands using SBT
+import complete.DefaultParsers._
+
+val sbtDocker = inputKey[Unit]("Add the docker command to execute")
+
+sbtDocker := {
+  val args: Seq[String] = spaceDelimited("<arg>").parsed
+  println(s"The Docker command to execute: docker ${ args.mkString(" ") }")
+  s"./scripts/docker_scripts.sh ${ args.head }" !
 }
 
 /*
@@ -136,9 +148,17 @@ dependencyCheckSkipProvidedScope := true
 dependencyCheckSkipRuntimeScope := true
 
 scalacOptions ++= Seq(
-  "-feature",
-  "-deprecation",
+  "-feature", // Emit warning and location for usages of features that should be imported explicitly.
+  "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-Xfatal-warnings",
-  // Enable routes file splitting
-  "-language:reflectiveCalls"
+  "-language:reflectiveCalls", // Enable routes file splitting
+  "-Ywarn-dead-code", // Warn when dead code is identified.
+  "-Ywarn-unused:implicits", // Warn if an implicit parameter is unused.
+  "-Ywarn-unused:imports", // Warn if an import selector is not referenced.
+  "-Ywarn-unused:locals", // Warn if a local definition is unused.
+  "-Ywarn-unused:params", // Warn if a value parameter is unused.
+  "-Ywarn-unused:patvars", // Warn if a variable bound in a pattern is unused.
+  "-Ywarn-unused:privates" // Warn if a private member is unused.
 )
+
+Global / onChangedBuildSource := ReloadOnSourceChanges
