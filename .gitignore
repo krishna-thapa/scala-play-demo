@@ -1,7 +1,6 @@
 logs
 target
 .idea
-.bsp
 .idea_modules
 .classpath
 .settings
@@ -13,7 +12,7 @@ target
 # and Full quotes has the size of 137.7 MB. Hence use script to download the file
 # from Google Drive which can be access by anyone
 /data/Full_Quotes.csv
-/.bsp/
 
 # Portainer data should be git ignored
 /portainer-data/
+/.bsp/

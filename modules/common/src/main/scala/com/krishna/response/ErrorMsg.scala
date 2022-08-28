@@ -1,5 +1,7 @@
 package com.krishna.response
 
+import java.util.UUID
+
 // Don't need to match every case classes so no need of sealed
 trait ErrorMsg {
   val msg: String
@@ -54,6 +56,10 @@ object ErrorMsg {
 
   case class InvalidBcryptValidation(error: String) extends ErrorMsg {
     override val msg: String = s"Bcrypt encryption failed: $error"
+  }
+
+  case class ProfilePicErrorMessage(message: String) extends ErrorMsg {
+    override val msg: String = s"Error while retrieving user's profile picture: $message"
   }
 
   case class EsErrorMessage(message: String) extends ErrorMsg {

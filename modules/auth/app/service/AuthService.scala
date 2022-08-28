@@ -11,6 +11,7 @@ import model.UserDetail
 import pdi.jwt.JwtSession.RichResult
 import play.api.Configuration
 import play.api.libs.json.OFormat
+import play.api.libs.{ Files => PlayFile }
 import play.api.mvc.Results.Ok
 import play.api.mvc._
 
@@ -18,8 +19,7 @@ import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
-class AuthService @Inject() (authDAO: AuthDAO, gridFsAttachmentService: GridFsAttachmentService)(
-  implicit
+class AuthService @Inject() (authDAO: AuthDAO)(implicit
   executionContext: ExecutionContext,
   config: Configuration
 ) extends JwtKey
@@ -79,13 +79,39 @@ class AuthService @Inject() (authDAO: AuthDAO, gridFsAttachmentService: GridFsAt
     runApiAction(overrideEmail)(getUserInfoDetails)
   }
 
-  def updateUserInfoService(oldEmail: String, signUpForm: SignUpForm): Future[Result] = {
-    authDAO.updateUserInfo(oldEmail, signUpForm).flatMap {
-      case Right(id) =>
-        gridFsAttachmentService
-          .updateEmailInfo(oldEmail, signUpForm.email)
-          .map(_ => Ok(s"Successfully updated for the record id : $id"))
+  def uploadUserProfilePic(
+    user: UserDetail,
+    picture: MultipartFormData.FilePart[PlayFile.TemporaryFile]
+  ): Future[Result] = {
+    picture.contentType match {
+      case Some(fileType) if fileType.startsWith("image") =>
+        authDAO.insertOrUpdatePic(user, picture).flatMap {
+          case Right(value)    => responseOk(value)
+          case Left(exception) => Future.successful(exception)
+        }
+      case _ => badRequest(s"Image file is in wrong format: ${ picture.contentType }")
+    }
+  }
+
+  def getUserProfilePic(user: UserDetail): Future[Result] = {
+    authDAO.getProfilePicture(user).map {
+      case Right(value)    => value
+      case Left(exception) => exception
+    }
+  }
+
+  def deleteUserProfilePic(user: UserDetail): Future[Result] = {
+    authDAO.deleteProfilePicture(user).flatMap {
+      case Right(value)    => responseOk(value)
       case Left(exception) => Future.successful(exception)
+    }
+  }
+
+  def updateUserInfoService(oldEmail: String, signUpForm: SignUpForm): Future[Result] = {
+    authDAO.updateUserInfo(oldEmail, signUpForm).map {
+      case Right(id) =>
+        Ok(s"Successfully updated for the record id : $id")
+      case Left(exception) => exception
     }
   }
 

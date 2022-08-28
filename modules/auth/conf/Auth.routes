@@ -22,6 +22,8 @@
 #      description: User account is not found in the database
 #    422:
 #      description: Invalid request form format
+#    500:
+#      description: Internal server error
 ###
 POST        /signIn                 controllers.auth.AuthController.signIn
 
@@ -49,6 +51,8 @@ POST        /signIn                 controllers.auth.AuthController.signIn
 #      description: Account already exist in the database
 #    422:
 #      description: Invalid request form format
+#    500:
+#      description: Internal server error
 ###
 POST        /signUp                  controllers.auth.AuthController.signUp
 
@@ -69,6 +73,8 @@ POST        /signUp                  controllers.auth.AuthController.signUp
 #      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
+#    500:
+#      description: Internal server error
 #  security:
 #    - TokenKey: []
 ###
@@ -93,40 +99,14 @@ GET        /users                    controllers.auth.AuthController.getAllUser
 #      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
+#    500:
+#      description: Internal server error
 #  security:
 #    - TokenKey: []
 ###
 GET        /user/:email                   controllers.auth.AuthController.getUserInfo(email: String)
 
 # Know error with Play routes: https://stackoverflow.com/questions/36919316/playframe-work-cant-find-the-right-route
-
-###
-#  summary: Post a user picture with the user email id
-#  description: >
-#   Store the uploaded user picture as GridFS in MongoDB
-#  tags:
-#    - Auth
-#  consumes:
-#    - multipart/form-data
-#  parameters:
-#    - name: upload
-#      in: formData
-#      type: file
-#      required: true
-#      description: Picture to upload for the user profile
-#  responses:
-#    200:
-#      description: success with response code
-#    400:
-#      description: Bad request (Has to be in picture format)
-#    403:
-#      description: Forbidden authorization for user
-#    500:
-#      description: internal server error (connection issues)
-#  security:
-#    - TokenKey: []
-###
-POST    /user/picture                      controllers.auth.GridFsController.saveUserPicture
 
 ###
 #  summary: Update the user details. Different email will replace the older email
@@ -154,6 +134,8 @@ POST    /user/picture                      controllers.auth.GridFsController.sav
 #      description: Forbidden authorization for user
 #    422:
 #      description: Invalid request form format
+#    500:
+#      description: Internal server error
 #  security:
 #    - TokenKey: []
 ###
@@ -178,6 +160,8 @@ POST        /user/                         controllers.auth.AuthController.updat
 #      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
+#    500:
+#      description: Internal server error
 #  security:
 #    - TokenKey: []
 ###
@@ -202,10 +186,42 @@ POST     /admin/:email                    controllers.auth.AuthController.toggle
 #      description: Forbidden authorization for user
 #    404:
 #      description: Not found. Database is empty.
+#    500:
+#      description: Internal server error
 #  security:
 #    - TokenKey: []
 ###
 DELETE     /user/:email                   controllers.auth.AuthController.removeUser(email: String)
+
+###
+#  summary: Post a user picture with the user email id
+#  description: >
+#   Store the uploaded user picture as GridFS in MongoDB
+#  tags:
+#    - Auth
+#  consumes:
+#    - multipart/form-data
+#  parameters:
+#    - name: upload
+#      in: formData
+#      type: file
+#      required: true
+#      description: Picture to upload for the user profile
+#  responses:
+#    200:
+#      description: success with response code
+#    400:
+#      description: Bad request (Has to be in picture format)
+#    401:
+#      description: Unauthorized
+#    403:
+#      description: Forbidden authorization for user
+#    500:
+#      description: internal server error (connection issues)
+#  security:
+#    - TokenKey: []
+###
+POST    /user/picture                      controllers.auth.AuthController.insertProfilePic
 
 ###
 #  summary: Get the selected attched picture from the GridFs index
@@ -216,6 +232,8 @@ DELETE     /user/:email                   controllers.auth.AuthController.remove
 #  responses:
 #    200:
 #      description: success
+#    401:
+#      description: Unauthorized
 #    404:
 #      description: empty response from database
 #    403:
@@ -225,7 +243,7 @@ DELETE     /user/:email                   controllers.auth.AuthController.remove
 #  security:
 #    - TokenKey: []
 ###
-GET  /user/picture/                     controllers.auth.GridFsController.getAttachedPicture
+GET  /user/picture/                     controllers.auth.AuthController.getAttachedPicture
 
 ###
 #  summary: Delete the selected attched picture from the GridFs index
@@ -236,6 +254,8 @@ GET  /user/picture/                     controllers.auth.GridFsController.getAtt
 #  responses:
 #    200:
 #      description: success
+#    401:
+#      description: Unauthorized
 #    404:
 #      description: empty response from database
 #    403:
@@ -245,4 +265,4 @@ GET  /user/picture/                     controllers.auth.GridFsController.getAtt
 #  security:
 #    - TokenKey: []
 ###
-DELETE  /user/picture/                  controllers.auth.GridFsController.removeAttachedPicture
+DELETE  /user/picture/                  controllers.auth.AuthController.removeProfilePicture

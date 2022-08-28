@@ -1,20 +1,30 @@
 package dao
 
-import java.sql.Date
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 import bcrypt.BcryptException
 import bcrypt.BcryptObject.{ encryptPassword, validatePassword }
-import com.krishna.response.ErrorMsg.{ InvalidBcryptValidation, InvalidPassword }
+import com.krishna.model.auth.ProfilePictureInfo
+import com.krishna.response.ErrorMsg.{
+  InvalidBcryptValidation,
+  InvalidPassword,
+  ProfilePicErrorMessage
+}
 import com.krishna.response.OkResponse
 import form.{ SignInForm, SignUpForm }
-
-import javax.inject.{ Inject, Singleton }
 import model.{ UserDetail, UserInfo }
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.mvc.Result
-import slick.jdbc.{ JdbcBackend, JdbcProfile }
+import play.api.http.HttpEntity
+import play.api.http.Status.OK
+import play.api.libs.{ Files => PlayFile }
+import play.api.mvc.{ MultipartFormData, ResponseHeader, Result }
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{ JdbcBackend, JdbcProfile }
 
+import java.nio.file.{ Files, Paths }
+import java.sql.Date
 import java.util.UUID
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
@@ -43,7 +53,9 @@ class AuthDAO @Inject() (implicit
           details.lastName.capitalize,
           details.email,
           encrypted,
-          currentDate
+          currentDate,
+          profilePictureInfo = None,
+          profilePicture = Array[Byte]()
         )
         Right(OkResponse(s"${ runDbAction(action) }"))
       case Failure(exception) => Left(BcryptException(exception.getMessage))
@@ -136,6 +148,90 @@ class AuthDAO @Inject() (implicit
       case Failure(exception) =>
         bcryptValidationFailed(InvalidBcryptValidation(exception.getMessage)).map(Left(_))
     }
+  }
+
+  /**
+   * Insert a new profile picture or update the existing one along with picture details in JSON format
+   * @param user User can only perform this action
+   * @param picture In Java File type format
+   * @return Success or error while performing action in Postgres DB
+   */
+  def insertOrUpdatePic(
+    user: UserDetail,
+    picture: MultipartFormData.FilePart[PlayFile.TemporaryFile]
+  ): Future[Either[Result, OkResponse]] = {
+    val pictureAsByteArray = Files.readAllBytes(Paths.get(picture.ref.getPath))
+    val pictureInfo = ProfilePictureInfo(
+      filename = picture.filename,
+      contentType = picture.contentType,
+      fileSize = picture.fileSize,
+      dispositionType = picture.dispositionType
+    )
+    val saveUserPicture = (userRow: UserInfo) =>
+      runDbAsyncAction(
+        userInfo.insertOrUpdate(
+          userRow.copy(profilePictureInfo = Some(pictureInfo), profilePicture = pictureAsByteArray)
+        )
+      )
+        .map { result =>
+          log.info(
+            s"Successfully inserted or updated an entry $result for the user: ${ user.email }"
+          )
+          OkResponse(s"Successfully inserted or updated an entry $result")
+        }
+
+    findUserById(user.userId)(saveUserPicture)
+  }
+
+  /**
+   * Get the user's profile picture from the Postgres Database that is stored as Array of bytes
+   * Convert the Byte array to Source of Akka ByteString and send as Result for API response
+   * @param user User details
+   * @return Result of Stream containing the user's profile picture
+   */
+  def getProfilePicture(user: UserDetail): Future[Either[Result, Result]] = {
+    val getUserPicture = (user: UserInfo) => {
+      if (user.profilePictureInfo.isDefined) {
+        val getPictureInfo = user.profilePictureInfo.get
+        val source: Source[ByteString, _] = Source.single(ByteString.apply(user.profilePicture))
+
+        log.info(s"Profile picture found for the user: ${ user.email }")
+        val pictureAsArrayByte = Result(
+          header = ResponseHeader(OK, Map("Content-file-name" -> s"${ getPictureInfo.filename }")),
+          body =
+            HttpEntity.Streamed(source, Option(getPictureInfo.fileSize), getPictureInfo.contentType)
+        )
+        Future(pictureAsArrayByte)
+      } else {
+        log.info(s"Profile picture couldn't found for the user: ${ user.email }")
+        notFound(
+          ProfilePicErrorMessage(s"Profile picture not found for user: ${ user.email }")
+        )
+      }
+
+    }
+
+    findUserById(user.userId)(getUserPicture)
+  }
+
+  /**
+   * Delete the profile picture for the user
+   * @param user User details
+   * @return Success while deleting the profile pciture or error
+   */
+  def deleteProfilePicture(user: UserDetail): Future[Either[Result, OkResponse]] = {
+    val saveUserPicture = (userRow: UserInfo) =>
+      runDbAsyncAction(
+        userInfo.insertOrUpdate(
+          userRow.copy(profilePictureInfo = None, profilePicture = Array[Byte]())
+        )
+      ).map { result =>
+        log.info(
+          s"Successfully delete profile picture for user: ${ user.email }"
+        )
+        OkResponse(s"Successfully deleted profile picture for user: ${ user.email }")
+      }
+    findUserById(user.userId)(saveUserPicture)
   }
 
 }
