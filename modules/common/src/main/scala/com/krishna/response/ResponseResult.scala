@@ -69,6 +69,7 @@ trait ResponseResult extends ResponseError {
       case AuthenticationFailed                           => unauthorized(AuthenticationFailed)
       case authorizationForbidden: AuthorizationForbidden => forbidden(authorizationForbidden)
       case accountNotFound: AccountNotFound               => notFound(accountNotFound)
+      case errorProfilePic: ProfilePicErrorMessage        => notFound(errorProfilePic)
       case _                                              => badRequest("Something went wrong")
     }
   }

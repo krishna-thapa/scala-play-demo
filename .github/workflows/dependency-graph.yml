@@ -1,10 +1,11 @@
 # .github/workflows/dependency-graph.yml
-name: Update Dependency Graph
-
+# This workflow will launch at 00:00 every Sunday
 on:
-  push:
-    branches:
-      - master # default branch of the project
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+name: Update Dependency Graph
 
 jobs:
   update-graph:

@@ -1,8 +1,11 @@
 # Pull base image
 FROM openjdk:11
 
-MAINTAINER krishna Thapa <krishna.thapa91@gmail.com>
-LABEL org.opencontainers.image.description DESCRIPTION
+LABEL developer="Krishna Thapa"
+LABEL maintainer="krishna.thapa91@gmail.com"
+LABEL version="1.0"
+LABEL description="Scala play project to create a backend endpoints for an inspirational quotes using Postgres, Redis and\
+elasticsearch as databases. Its purely for the learning purpose only."
 
 # Setup adapted from https://github.com/hseeberger/scala-sbt/blob/master/debian/Dockerfile
 RUN \
@@ -14,7 +17,7 @@ RUN \
 # Any RUN command after any ARG is declared, it has that value in it as an environment variable and thus
 # invalidates layer cache, so only declaring these ARGs when they're used
 
-ARG SBT_VERSION=1.6.2
+ARG SBT_VERSION=1.7.1
 
 RUN \
   curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \

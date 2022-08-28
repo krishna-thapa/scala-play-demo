@@ -14,7 +14,7 @@ class ApplicationStart @Inject() (
 
   // Shut-down hook
   lifecycle.addStopHook { () =>
-    Future.successful()
+    Future.successful((): Unit)
   }
 
   // TODO: Start scheduling
