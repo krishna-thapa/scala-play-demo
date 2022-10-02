@@ -4,7 +4,7 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val playSlick = "5.0.2"
+    val playSlick = "5.1.0"
     val slickPg = "0.20.3"
     val swagger = "3.43.0"
     val playjwt = "5.0.0"
