@@ -33,4 +33,4 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.3")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
 
 // https://github.com/albuch/sbt-dependency-check
-addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "4.1.0")
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "4.2.0")
