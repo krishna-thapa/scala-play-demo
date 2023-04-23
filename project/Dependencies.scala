@@ -19,7 +19,7 @@ object Dependencies {
 
     // tests
     val scalaPlayTest = "5.1.0"
-    val testContainers = "0.40.10"
+    val testContainers = "0.40.15"
     val mockitoVer = "1.17.12"
 
     // logs
