@@ -23,7 +23,7 @@ object Dependencies {
     val mockitoVer = "1.17.12"
 
     // logs
-    val logbackEncoder = "7.2"
+    val logbackEncoder = "7.4"
   }
 
   object Libraries {
