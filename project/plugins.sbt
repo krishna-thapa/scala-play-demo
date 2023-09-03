@@ -10,7 +10,7 @@ addSbtPlugin("com.iheart" % "sbt-play-swagger" % "0.10.6-PLAY2.8")
 // scalafmt plugin for scala formatter - https://github.com/scalameta/sbt-scalafmt
 // sbt scalafmtCheckAll
 // sbt scalafmtAll
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 
 // https://github.com/Philippus/sbt-dotenv
 addSbtPlugin("nl.gn0s1s" % "sbt-dotenv" % "3.0.0")
