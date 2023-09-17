@@ -6,7 +6,7 @@ description := "Back-end project for Inspirational quotes"
 version := "1.0-SNAPSHOT"
 
 ThisBuild / organization := "com.krishna"
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.12"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
