@@ -18,7 +18,7 @@ object Dependencies {
     val postgresql = "42.4.1"
 
     // tests
-    val scalaPlayTest = "5.1.0"
+    val scalaPlayTest = "7.0.0"
     val testContainers = "0.40.10"
     val mockitoVer = "1.17.12"
 
